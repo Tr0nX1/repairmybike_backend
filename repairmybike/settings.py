@@ -78,94 +78,39 @@ TEMPLATES = [
 WSGI_APPLICATION = 'repairmybike.wsgi.application'
 
 # Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 import dj_database_url
 
-# DATABASE_URL = config('DATABASE_URL', default=None)
-
-# if DATABASE_URL:
-#     DATABASES = {
-#         'default': dj_database_url.parse(DATABASE_URL)
-#     }
-# else:
-#     # Use SQLite for local development
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-# Database configuration debugging
-print("Attempting to configure database...")
-
-DATABASE_URL = config('DATABASE_URL', default='', cast=str)
-print(f"DATABASE_URL found: {'Yes' if DATABASE_URL else 'No'}")
+# Database configuration with Railway-specific optimizations
+DATABASE_URL = config('DATABASE_URL', default='')
 
 if DATABASE_URL:
-    try:
-        if DATABASE_URL.startswith('postgres://') or DATABASE_URL.startswith('postgresql://'):
-            DATABASES = {
-                'default': dj_database_url.config(
-                    default=DATABASE_URL,
-                    conn_max_age=600,
-                    conn_health_checks=True,
-                )
-            }
-            print("Successfully configured PostgreSQL from DATABASE_URL")
-    except Exception as e:
-        print(f"Error configuring PostgreSQL from DATABASE_URL: {str(e)}")
-        print("Falling back to local configuration")
+    # Production database configuration (Railway PostgreSQL)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
+    }
+    # Enable atomic requests for better data consistency
+    DATABASES['default']['ATOMIC_REQUESTS'] = True
+    # Add PostgreSQL-specific options
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
+        'connect_timeout': 10,
+    }
+    print("✓ Configured PostgreSQL database from DATABASE_URL")
 else:
-    print("No DATABASE_URL found, checking local PostgreSQL configuration...")
-    # If no DATABASE_URL but PostgreSQL config is set, try to use it
-    DB_USE_POSTGRES = config('DB_USE_POSTGRES', default='false', cast=str).lower() == 'true'
-    print(f"DB_USE_POSTGRES setting: {DB_USE_POSTGRES}")
-    
-    if DB_USE_POSTGRES:
-        try:
-            db_name = config('DATABASE_NAME', default='rmbdev')
-            db_user = config('DATABASE_USER', default='postgres')
-            db_password = config('DATABASE_PASSWORD', default='password')
-            db_host = config('DATABASE_HOST', default='localhost')
-            db_port = config('DATABASE_PORT', default='5432')
-            
-        
-            
-            DATABASES = {
-                "default": {
-                    "ENGINE": "django.db.backends.postgresql_psycopg2",
-                    "NAME": db_name,
-                    "USER": db_user,
-                    "PASSWORD": db_password,
-                    "HOST": db_host,
-                    "PORT": db_port,
-                }
-            }
-            print("Successfully configured local PostgreSQL")
-        except Exception as e:
-            print(f"Error configuring local PostgreSQL: {str(e)}")
-            print("Falling back to SQLite database")
-            DATABASES = {
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'NAME': BASE_DIR / 'db.sqlite3',
-                }
-            }
-            print("Successfully configured SQLite database")
-    else:
-        print("PostgreSQL not enabled, using SQLite database")
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
+    # Local development database (SQLite)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
-        print("Successfully configured SQLite database")
-
-print("Database configuration complete.")
+    }
+    print("✓ Configured SQLite database for local development")
 
 
 
