@@ -27,3 +27,13 @@ WARNING 2025-10-31 19:43:45,413 log 24552 11332 Not Found: /@vite/client
 WARNING 2025-10-31 19:43:45,414 basehttp 24552 11332 "GET /@vite/client HTTP/1.1" 404 3642
 INFO 2025-10-31 19:43:56,047 basehttp 24552 9640 "GET /health/ HTTP/1.1" 200 88
 INFO 2025-10-31 20:36:40,717 autoreload 9 132759644343168 Watching for file changes with StatReloader
+INFO 2025-10-31 20:48:19,521 autoreload 27864 18444 Watching for file changes with StatReloader
+INFO 2025-10-31 20:48:23,041 basehttp 27864 4148 "GET / HTTP/1.1" 301 0
+INFO 2025-10-31 20:48:23,084 basehttp 27864 29332 code 400, message Bad request version ('SÄu\x17vÂ\x8bÒ\x93r¯}')
+ERROR 2025-10-31 20:48:23,087 basehttp 27864 29332 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-31 20:48:23,090 basehttp 27864 26412 code 400, message Bad request version ('zz\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x06sjj\x00\x00ÿ\x01\x00\x01\x00\x00')
+ERROR 2025-10-31 20:48:23,090 basehttp 27864 26412 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-31 20:48:31,980 basehttp 27864 29492 code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x06à\x01\x00\x06Ü\x03\x03sQD¡\x7fÃÃ@\x8e`à0ì6QÅÚÀH\x9eÝ\x17ìÚ|\x9c\x19´ï£H®')
+ERROR 2025-10-31 20:48:31,980 basehttp 27864 29492 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-31 20:48:31,982 basehttp 27864 30276 code 400, message Bad request version ('¢31þS£\x8f\x8b\x80\xad~Ð\x0eG\x9b')
+ERROR 2025-10-31 20:48:31,982 basehttp 27864 30276 You're accessing the development server over HTTPS, but it only supports HTTP.
