@@ -10,7 +10,16 @@ env:
   PYTHON_VERSION: '3.11'
   POSTGRES_PASSWORD: postgres
   POSTGRES_USER: postgres
-  POSTGRES_DB: test_repairmybike
+  POSTGRES_DB: IjPyvqxtRYYbdpCHdGVVoLuUiwkMJRTs
+
+
+
+# DB_NAME=railway
+# DB_USER=postgres
+# DB_PASSWORD=IjPyvqxtRYYbdpCHdGVVoLuUiwkMJRTs
+# DB_HOST=postgres.railway.internal
+# DB_PORT=5432
+
 
 jobs:
   test:
