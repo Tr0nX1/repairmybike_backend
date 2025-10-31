@@ -256,42 +256,84 @@ jobs:
       - name: Detect Django project location
         id: detect-django
         run: |
+          echo "=== Debugging directory detection ==="
+          echo "Current directory: $(pwd)"
+          echo "Contents of current directory:"
+          ls -la
+          echo ""
+          
           # Find manage.py to determine Django project location
+          echo "Searching for manage.py..."
+          find . -name "manage.py" -type f -exec echo "Found manage.py at: {}" \;
+          
           MANAGE_PY_PATH=$(find . -name "manage.py" -type f | head -1)
           if [ -n "$MANAGE_PY_PATH" ]; then
             DJANGO_DIR=$(dirname "$MANAGE_PY_PATH")
+            # Convert ./backend to backend, or . to . (current dir)
+            if [ "$DJANGO_DIR" = "." ]; then
+              DJANGO_DIR="."
+            else
+              DJANGO_DIR=$(echo "$DJANGO_DIR" | sed 's|^\./||')
+            fi
             echo "Django project found at: $DJANGO_DIR"
             echo "django_dir=$DJANGO_DIR" >> $GITHUB_OUTPUT
           else
-            echo "manage.py not found, assuming root directory"
+            echo "manage.py not found, assuming current directory"
             echo "django_dir=." >> $GITHUB_OUTPUT
           fi
           
           # Find requirements.txt
+          echo "Searching for requirements.txt..."
+          find . -name "requirements.txt" -type f -exec echo "Found requirements.txt at: {}" \;
+          
           REQUIREMENTS_PATH=$(find . -name "requirements.txt" -type f | head -1)
           if [ -n "$REQUIREMENTS_PATH" ]; then
             REQUIREMENTS_DIR=$(dirname "$REQUIREMENTS_PATH")
+            # Convert ./backend to backend, or . to . (current dir)
+            if [ "$REQUIREMENTS_DIR" = "." ]; then
+              REQUIREMENTS_DIR="."
+            else
+              REQUIREMENTS_DIR=$(echo "$REQUIREMENTS_DIR" | sed 's|^\./||')
+            fi
             echo "requirements.txt found at: $REQUIREMENTS_DIR"
             echo "requirements_dir=$REQUIREMENTS_DIR" >> $GITHUB_OUTPUT
           else
-            echo "requirements.txt not found"
+            echo "requirements.txt not found, assuming current directory"
             echo "requirements_dir=." >> $GITHUB_OUTPUT
           fi
+          
+          echo "=== Final detection results ==="
+          echo "Django directory: $DJANGO_DIR"
+          echo "Requirements directory: $REQUIREMENTS_DIR"
 
       - name: Install dependencies
-        working-directory: ${{ steps.detect-django.outputs.requirements_dir }}
         run: |
-          echo "Installing dependencies from: $(pwd)"
+          REQUIREMENTS_DIR="${{ steps.detect-django.outputs.requirements_dir }}"
+          echo "Requirements directory detected as: $REQUIREMENTS_DIR"
+          
           python -m pip install --upgrade pip
           pip install setuptools
           
-          # Check if requirements.txt exists in current directory
-          if [ -f "requirements.txt" ]; then
-            echo "Found requirements.txt, installing dependencies..."
-            pip install -r requirements.txt
+          if [ "$REQUIREMENTS_DIR" = "." ]; then
+            echo "Installing dependencies from current directory: $(pwd)"
+            if [ -f "requirements.txt" ]; then
+              echo "Found requirements.txt, installing dependencies..."
+              pip install -r requirements.txt
+            else
+              echo "ERROR: No requirements.txt found in current directory"
+              ls -la
+              exit 1
+            fi
           else
-            echo "No requirements.txt found in $(pwd)"
-            exit 1
+            echo "Installing dependencies from: $REQUIREMENTS_DIR"
+            if [ -f "$REQUIREMENTS_DIR/requirements.txt" ]; then
+              echo "Found requirements.txt at $REQUIREMENTS_DIR/requirements.txt, installing dependencies..."
+              pip install -r "$REQUIREMENTS_DIR/requirements.txt"
+            else
+              echo "ERROR: No requirements.txt found at $REQUIREMENTS_DIR/requirements.txt"
+              ls -la "$REQUIREMENTS_DIR"
+              exit 1
+            fi
           fi
           
           # Install additional testing dependencies
@@ -304,22 +346,65 @@ jobs:
           echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/railway" >> $GITHUB_ENV
 
       - name: Run Django checks
-        working-directory: ${{ steps.detect-django.outputs.django_dir }}
         run: |
-          echo "Running Django checks from: $(pwd)"
-          python manage.py check --deploy
+          DJANGO_DIR="${{ steps.detect-django.outputs.django_dir }}"
+          echo "Django directory detected as: $DJANGO_DIR"
+          
+          if [ "$DJANGO_DIR" = "." ]; then
+            echo "Running Django checks from current directory: $(pwd)"
+            if [ -f "manage.py" ]; then
+              python manage.py check --deploy
+            else
+              echo "ERROR: manage.py not found in current directory"
+              ls -la
+              exit 1
+            fi
+          else
+            echo "Running Django checks from: $DJANGO_DIR"
+            cd "$DJANGO_DIR"
+            echo "Changed to directory: $(pwd)"
+            if [ -f "manage.py" ]; then
+              python manage.py check --deploy
+            else
+              echo "ERROR: manage.py not found in $DJANGO_DIR"
+              ls -la
+              exit 1
+            fi
+          fi
 
       - name: Run migrations
-        working-directory: ${{ steps.detect-django.outputs.django_dir }}
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/railway
         run: |
-          echo "Running migrations from: $(pwd)"
-          python manage.py makemigrations --check --dry-run || echo "No new migrations needed"
-          python manage.py migrate
+          DJANGO_DIR="${{ steps.detect-django.outputs.django_dir }}"
+          echo "Django directory detected as: $DJANGO_DIR"
+          
+          if [ "$DJANGO_DIR" = "." ]; then
+            echo "Running migrations from current directory: $(pwd)"
+            python manage.py makemigrations --check --dry-run || echo "No new migrations needed"
+            python manage.py migrate
+          else
+            echo "Running migrations from: $DJANGO_DIR"
+            cd "$DJANGO_DIR"
+            echo "Changed to directory: $(pwd)"
+            python manage.py makemigrations --check --dry-run || echo "No new migrations needed"
+            python manage.py migrate
+          fi
 
       - name: Run tests
-        working-directory: ${{ steps.detect-django.outputs.django_dir }}
+        run: |
+          DJANGO_DIR="${{ steps.detect-django.outputs.django_dir }}"
+          echo "Django directory detected as: $DJANGO_DIR"
+          
+          if [ "$DJANGO_DIR" = "." ]; then
+            echo "Running tests from current directory: $(pwd)"
+            python manage.py test
+          else
+            echo "Running tests from: $DJANGO_DIR"
+            cd "$DJANGO_DIR"
+            echo "Changed to directory: $(pwd)"
+            python manage.py test
+          fi
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/railway
         run: |
