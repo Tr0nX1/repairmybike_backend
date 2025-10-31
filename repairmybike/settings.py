@@ -24,7 +24,7 @@ SECRET_KEY = config('SECRET_KEY', default=secrets.token_urlsafe(50))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,*.railway.app,repairmybikebackend-production.up.railway.app', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.railway.app', 'repairmybikebackend-production.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
