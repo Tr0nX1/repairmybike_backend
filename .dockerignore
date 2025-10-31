@@ -1,74 +1,21 @@
-# Git
-.git
-.gitignore
-README.md
+# Exclude virtual environments
+v-env/
 
-# Python
-__pycache__
+# Exclude Python cache files
 *.pyc
-*.pyo
-*.pyd
-.Python
-env
-pip-log.txt
-pip-delete-this-directory.txt
-.tox
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git
-.mypy_cache
-.pytest_cache
-.hypothesis
+__pycache__/
 
-# Virtual environments
-venv/
-env/
-ENV/
-.venv/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Django
-*.log
-local_settings.py
+# Exclude database files
 db.sqlite3
-db.sqlite3-journal
-media/
 
-# Node.js (if any)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Exclude local certificates
+cert.crt
+cert.key
 
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
+# Exclude node_modules
+frontend/node_modules
 
-# Documentation
-docs/_build/
-
-# Temporary files
-*.tmp
-*.temp
+# Exclude other unnecessary files
+*.log
+*.env
+*.DS_Store
