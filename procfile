@@ -1,1 +1,2 @@
-web: gunicorn backend.wsgi --log-file -
+release: python manage.py wait_for_db --timeout 60 && python manage.py migrate
+web: gunicorn repairmybike.wsgi:application --bind 0.0.0.0:$PORT

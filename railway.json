@@ -5,7 +5,7 @@
     "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT",
+    "startCommand": "python manage.py wait_for_db --timeout 60 && python manage.py migrate && gunicorn repairmybike.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120",
     "healthcheckPath": "/health/",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
@@ -14,7 +14,7 @@
   "environments": {
     "production": {
       "variables": {
-        "DJANGO_SETTINGS_MODULE": "backend.settings",
+        "DJANGO_SETTINGS_MODULE": "repairmybike.settings",
         "PYTHONPATH": "/app",
         "PYTHONUNBUFFERED": "1",
         "DEBUG": "False",
@@ -24,7 +24,7 @@
     },
     "staging": {
       "variables": {
-        "DJANGO_SETTINGS_MODULE": "backend.settings",
+        "DJANGO_SETTINGS_MODULE": "repairmybike.settings",
         "PYTHONPATH": "/app",
         "PYTHONUNBUFFERED": "1",
         "DEBUG": "True",
@@ -41,7 +41,7 @@
         "repo": "repairmybike/backend"
       },
       "variables": {
-        "DJANGO_SETTINGS_MODULE": "backend.settings",
+        "DJANGO_SETTINGS_MODULE": "repairmybike.settings",
         "PYTHONPATH": "/app",
         "PYTHONUNBUFFERED": "1"
       }
