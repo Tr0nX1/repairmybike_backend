@@ -37,3 +37,5 @@ INFO 2025-10-31 20:48:31,980 basehttp 27864 29492 code 400, message Bad HTTP/0.9
 ERROR 2025-10-31 20:48:31,980 basehttp 27864 29492 You're accessing the development server over HTTPS, but it only supports HTTP.
 INFO 2025-10-31 20:48:31,982 basehttp 27864 30276 code 400, message Bad request version ('¢31þS£\x8f\x8b\x80\xad~Ð\x0eG\x9b')
 ERROR 2025-10-31 20:48:31,982 basehttp 27864 30276 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-10-31 21:43:23,142 autoreload 9 134492229307264 Watching for file changes with StatReloader
+INFO 2025-10-31 21:46:43,819 autoreload 9 125655403322240 Watching for file changes with StatReloader
