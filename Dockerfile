@@ -2,33 +2,37 @@
 FROM python:3.11-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=repairmybike.settings
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
 
-# Set work directory
-WORKDIR /app
+# Create and activate virtual environment
+RUN python -m venv /opt/venv
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    postgresql-client \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Create and set working directory
+WORKDIR /app
 
-# Copy project
-COPY . .
+# Install Python dependencies
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Create directories
-RUN mkdir -p /app/static /app/media
+# Copy project files
+COPY . /app
 
-# Expose port
-EXPOSE 8000
+# Create startup script
+RUN echo '#!/bin/bash\n\
+RUN_PORT="${PORT:-8000}"\n\
+python manage.py migrate --no-input\n\
+python manage.py collectstatic --no-input\n\
+gunicorn repairmybike.wsgi:application --bind "[::]:$RUN_PORT" --workers 2 --timeout 120' > start.sh && \
+    chmod +x start.sh
 
-# Simple startup command
-CMD python manage.py migrate && \
-    python manage.py collectstatic --noinput && \
-    gunicorn repairmybike.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120
+# Run the application
+CMD ["/bin/bash", "./start.sh"]

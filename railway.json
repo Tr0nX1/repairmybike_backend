@@ -1,12 +1,27 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
-  "build": {
-    "builder": "DOCKERFILE"
-  },
-  "deploy": {
-    "healthcheckPath": "/health/",
-    "healthcheckTimeout": 300,
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
-  }
+    "$schema": "https://railway.app/railway.schema.json",
+    "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "Dockerfile",
+        "watchPatterns": [
+            "requirements.txt",
+            "repairmybike/**",
+            "railway.json",
+            "Dockerfile",
+            "authentication/**",
+            "services/**",
+            "vehicles/**",
+            "bookings/**",
+            "payments/**",
+            "staff/**",
+            "shop/**",
+            "manage.py",
+            ".env.example"
+        ]
+    },
+    "deploy": {
+        "startCommand": "./start.sh",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+    }
 }

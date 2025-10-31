@@ -1,85 +1,17 @@
-version: '3.8'
+version: '3'
 
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:17
-    container_name: repairmybike_db
-    environment:
-      POSTGRES_DB: railway
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    container_name: repairmybike_redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Django Web Application
-  web:
+  api:
     build: .
-    container_name: repairmybike_web
     ports:
       - "8000:8000"
-    environment:
-      - DEBUG=True
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/railway
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DB=0
-      - SECRET_KEY=docker-development-secret-key-change-in-production
-      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001
-      - DJANGO_SETTINGS_MODULE=repairmybike.settings
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+    env_file: .env
     volumes:
-      - .:/code
-      - /code/venv  # Exclude virtual environment from volume mount
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
-
-  # Optional: pgAdmin for database management
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: repairmybike_pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@repairmybike.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-    profiles:
-      - tools  # Only start with: docker-compose --profile tools up
-
-volumes:
-  postgres_data:
-  redis_data:
+      - .:/app
+    command: /bin/bash -c "python manage.py migrate && python manage.py collectstatic --no-input && python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - repairmybike-network
 
 networks:
-  default:
-    name: repairmybike_network
+  repairmybike-network:
+    driver: bridge

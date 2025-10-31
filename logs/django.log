@@ -26,3 +26,4 @@ WARNING 2025-10-31 19:43:44,538 basehttp 24552 11332 "GET /?ide_webview_request_
 WARNING 2025-10-31 19:43:45,413 log 24552 11332 Not Found: /@vite/client
 WARNING 2025-10-31 19:43:45,414 basehttp 24552 11332 "GET /@vite/client HTTP/1.1" 404 3642
 INFO 2025-10-31 19:43:56,047 basehttp 24552 9640 "GET /health/ HTTP/1.1" 200 88
+INFO 2025-10-31 20:36:40,717 autoreload 9 132759644343168 Watching for file changes with StatReloader
