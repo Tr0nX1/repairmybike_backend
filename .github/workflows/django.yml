@@ -213,20 +213,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: railway
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # Removed PostgreSQL service - using SQLite for CI/CD testing
 
     steps:
       - name: Checkout code
@@ -242,13 +229,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools
           pip install -r requirements.txt
-          pip install psycopg[binary]
+          # Removed psycopg[binary] - using SQLite for CI/CD testing
 
       - name: Set environment variables
         run: |
           echo "SECRET_KEY=test-secret-key-for-github-actions-$(date +%s)" >> $GITHUB_ENV
           echo "DEBUG=True" >> $GITHUB_ENV
-          echo "DATABASE_URL=postgresql://postgres:IjPyvqxtRYYbdpCHdGVVoLuUiwkMJRTs@yamabiko.proxy.rlwy.net:56372/railway" >> $GITHUB_ENV
+          # Use SQLite for CI/CD testing - don't set DATABASE_URL so Django uses SQLite fallback
           echo "CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://repairmybike_backend.railway.internal" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=localhost,127.0.0.1,testserver" >> $GITHUB_ENV
 
