@@ -6,9 +6,10 @@ from .models import ServiceCategory, Service, ServicePricing
 from .serializers import ServiceCategorySerializer, ServiceSerializer, ServicePricingSerializer
 
 
-class ServiceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class ServiceCategoryViewSet(viewsets.ModelViewSet):
     queryset = ServiceCategory.objects.all()
     serializer_class = ServiceCategorySerializer
+    permission_classes = []  # Temporarily removed for testing
     
     def list(self, request, *args, **kwargs):
         print("🔍 ServiceCategoryViewSet.list() called")
@@ -43,10 +44,10 @@ class ServiceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
         })
 
 
-class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Service.objects.select_related('service_category').all()
+class ServiceViewSet(viewsets.ModelViewSet):
+    queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    filterset_fields = ['service_category']
+    permission_classes = []  # Temporarily removed for testing
     
     def get_queryset(self):
         queryset = super().get_queryset()
