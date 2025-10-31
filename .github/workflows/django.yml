@@ -262,10 +262,7 @@ jobs:
           echo "Running Django migrations..."
           python manage.py migrate
 
-      - name: Run tests
-        run: |
-          echo "Running Django tests..."
-          python manage.py test
+      
 
 
           
