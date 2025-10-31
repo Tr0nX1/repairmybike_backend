@@ -88,7 +88,7 @@ COPY ./ /code
 RUN pip install -r /tmp/requirements.txt
 
 # Set the Django default project name
-ARG PROJ_NAME="authback"
+ARG PROJ_NAME="repairmybike"
 
 # Update the bash script to bind Gunicorn to the correct port
 RUN printf "#!/bin/bash\n" > ./paracord_runner.sh && \
