@@ -48,6 +48,15 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ServiceSerializer
     filterset_fields = ['service_category']
     
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category_name = self.request.query_params.get('category', None)
+        
+        if category_name:
+            queryset = queryset.filter(service_category__name=category_name)
+            
+        return queryset
+    
     def list(self, request, *args, **kwargs):
         print("🔍 ServiceViewSet.list() called")
         print(f"📊 Request method: {request.method}")
