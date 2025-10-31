@@ -249,7 +249,7 @@ jobs:
           echo "SECRET_KEY=test-secret-key-for-github-actions-$(date +%s)" >> $GITHUB_ENV
           echo "DEBUG=True" >> $GITHUB_ENV
           echo "DATABASE_URL=postgresql://postgres:IjPyvqxtRYYbdpCHdGVVoLuUiwkMJRTs@yamabiko.proxy.rlwy.net:56372/railway" >> $GITHUB_ENV
-          echo "CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000" >> $GITHUB_ENV
+          echo "CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://repairmybike_backend.railway.internal" >> $GITHUB_ENV
           echo "ALLOWED_HOSTS=localhost,127.0.0.1,testserver" >> $GITHUB_ENV
 
       - name: Run Django checks
