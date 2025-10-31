@@ -244,17 +244,28 @@ jobs:
           pip install -r requirements.txt
           pip install psycopg[binary]
 
-      - name: Run migrations
-        env:
-          DATABASE_URL: postgresql://postgres:IjPyvqxtRYYbdpCHdGVVoLuUiwkMJRTs@yamabiko.proxy.rlwy.net:56372/railway
+      - name: Set environment variables
         run: |
+          echo "SECRET_KEY=test-secret-key-for-github-actions-$(date +%s)" >> $GITHUB_ENV
+          echo "DEBUG=True" >> $GITHUB_ENV
+          echo "DATABASE_URL=postgresql://postgres:IjPyvqxtRYYbdpCHdGVVoLuUiwkMJRTs@yamabiko.proxy.rlwy.net:56372/railway" >> $GITHUB_ENV
+          echo "CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000" >> $GITHUB_ENV
+          echo "ALLOWED_HOSTS=localhost,127.0.0.1,testserver" >> $GITHUB_ENV
+
+      - name: Run Django checks
+        run: |
+          echo "Running Django system checks..."
+          python manage.py check
+
+      - name: Run migrations
+        run: |
+          echo "Running Django migrations..."
           python manage.py migrate
 
       - name: Run tests
-        env:
-          DATABASE_URL: postgresql://postgres:IjPyvqxtRYYbdpCHdGVVoLuUiwkMJRTs@yamabiko.proxy.rlwy.net:56372/railway
         run: |
-          python -m pytest -c pytest.ini
+          echo "Running Django tests..."
+          python manage.py test
 
 
           
