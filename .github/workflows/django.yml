@@ -248,14 +248,12 @@ jobs:
           
 
       - name: Run migrations
-        working-directory: ./backend
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
         run: |
           python manage.py migrate
 
       - name: Run tests
-        working-directory: ./backend
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
         run: |
