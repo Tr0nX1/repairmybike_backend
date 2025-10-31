@@ -1,0 +1,91 @@
+name: Dependency Updates & Security
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install pip-audit
+      run: |
+        python -m pip install --upgrade pip
+        pip install pip-audit
+
+    - name: Run dependency vulnerability scan
+      run: |
+        pip-audit --requirement requirements.txt --format=json --output=vulnerability-report.json || true
+        pip-audit --requirement requirements.txt
+
+    - name: Upload vulnerability report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: vulnerability-report
+        path: vulnerability-report.json
+
+    - name: Create issue on vulnerabilities
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '🚨 Security vulnerabilities detected in dependencies',
+            body: `Security vulnerabilities have been detected in the project dependencies.
+            
+            Please check the vulnerability report in the latest workflow run:
+            ${context.payload.repository.html_url}/actions/runs/${context.runId}
+            
+            **Action Required:**
+            1. Review the vulnerability report
+            2. Update affected dependencies
+            3. Test the application thoroughly
+            4. Close this issue once resolved
+            
+            This issue was automatically created by the dependency security workflow.`,
+            labels: ['security', 'dependencies', 'automated']
+          })
+
+  outdated-dependencies:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pip-check-updates
+
+    - name: Check for outdated packages
+      run: |
+        pip list --outdated --format=json > outdated-packages.json || true
+        pip list --outdated
+
+    - name: Upload outdated packages report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: outdated-packages-report
+        path: outdated-packages.json
