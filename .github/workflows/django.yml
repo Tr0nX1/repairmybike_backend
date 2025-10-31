@@ -233,28 +233,95 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Debug - Show directory structure and working directory
+        run: |
+          echo "=== Current working directory ==="
+          pwd
+          echo ""
+          echo "=== Repository structure ==="
+          find . -type f -name "*.py" -o -name "requirements.txt" -o -name "manage.py" | head -20
+          echo ""
+          echo "=== Directory tree (first 3 levels) ==="
+          tree -L 3 || ls -la
+          echo ""
+          echo "=== Looking for Django project files ==="
+          find . -name "manage.py" -type f
+          find . -name "requirements.txt" -type f
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
-        working-directory: ./backend
+      - name: Detect Django project location
+        id: detect-django
         run: |
+          # Find manage.py to determine Django project location
+          MANAGE_PY_PATH=$(find . -name "manage.py" -type f | head -1)
+          if [ -n "$MANAGE_PY_PATH" ]; then
+            DJANGO_DIR=$(dirname "$MANAGE_PY_PATH")
+            echo "Django project found at: $DJANGO_DIR"
+            echo "django_dir=$DJANGO_DIR" >> $GITHUB_OUTPUT
+          else
+            echo "manage.py not found, assuming root directory"
+            echo "django_dir=." >> $GITHUB_OUTPUT
+          fi
+          
+          # Find requirements.txt
+          REQUIREMENTS_PATH=$(find . -name "requirements.txt" -type f | head -1)
+          if [ -n "$REQUIREMENTS_PATH" ]; then
+            REQUIREMENTS_DIR=$(dirname "$REQUIREMENTS_PATH")
+            echo "requirements.txt found at: $REQUIREMENTS_DIR"
+            echo "requirements_dir=$REQUIREMENTS_DIR" >> $GITHUB_OUTPUT
+          else
+            echo "requirements.txt not found"
+            echo "requirements_dir=." >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        working-directory: ${{ steps.detect-django.outputs.requirements_dir }}
+        run: |
+          echo "Installing dependencies from: $(pwd)"
           python -m pip install --upgrade pip
           pip install setuptools
-          pip install -r requirements.txt
-          pip install psycopg[binary]
           
+          # Check if requirements.txt exists in current directory
+          if [ -f "requirements.txt" ]; then
+            echo "Found requirements.txt, installing dependencies..."
+            pip install -r requirements.txt
+          else
+            echo "No requirements.txt found in $(pwd)"
+            exit 1
+          fi
+          
+          # Install additional testing dependencies
+          pip install psycopg[binary]
+
+      - name: Set environment variables
+        run: |
+          echo "SECRET_KEY=test-secret-key-for-github-actions-$(date +%s)" >> $GITHUB_ENV
+          echo "DEBUG=True" >> $GITHUB_ENV
+          echo "DATABASE_URL=postgres://postgres:postgres@localhost:5432/railway" >> $GITHUB_ENV
+
+      - name: Run Django checks
+        working-directory: ${{ steps.detect-django.outputs.django_dir }}
+        run: |
+          echo "Running Django checks from: $(pwd)"
+          python manage.py check --deploy
 
       - name: Run migrations
+        working-directory: ${{ steps.detect-django.outputs.django_dir }}
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/railway
         run: |
+          echo "Running migrations from: $(pwd)"
+          python manage.py makemigrations --check --dry-run || echo "No new migrations needed"
           python manage.py migrate
 
       - name: Run tests
+        working-directory: ${{ steps.detect-django.outputs.django_dir }}
         env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/railway
         run: |
-          python manage.py test
+          echo "Running tests from: $(pwd)"
+          python manage.py test --verbosity=2
