@@ -116,25 +116,45 @@ else:
 
 
 # Redis Cache Configuration
-if DEBUG:
+REDIS_URL = config('REDIS_URL', default='')
+
+if DEBUG or not REDIS_URL:
+    # Local development - use in-memory cache
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'vehicle_repair_local',
         }
     }
+    print("✓ Configured local memory cache for development")
 else:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': f"redis://{config('REDIS_HOST', default='localhost')}:{config('REDIS_PORT', default='6379')}/{config('REDIS_DB', default='0')}",
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            },
-            'KEY_PREFIX': 'vehicle_repair',
-            'TIMEOUT': 300,
+    # Production - use Redis cache
+    try:
+        CACHES = {
+            'default': {
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': REDIS_URL,
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                    'CONNECTION_POOL_KWARGS': {
+                        'retry_on_timeout': True,
+                        'socket_connect_timeout': 5,
+                        'socket_timeout': 5,
+                    },
+                },
+                'KEY_PREFIX': 'vehicle_repair',
+                'TIMEOUT': 300,
+            }
         }
-    }
+        print("✓ Configured Redis cache from REDIS_URL")
+    except Exception as e:
+        print(f"⚠ Redis configuration failed, falling back to local cache: {e}")
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'vehicle_repair_fallback',
+            }
+        }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

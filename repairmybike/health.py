@@ -18,19 +18,22 @@ def health_check(request):
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
             cursor.fetchone()
+        db_status = 'connected'
         
-        # Check cache connectivity (if not in debug mode)
+        # Check cache connectivity (gracefully handle failures)
+        cache_status = 'disconnected'
         try:
             cache.set('health_check', 'ok', 30)
-            cache_status = cache.get('health_check') == 'ok'
+            if cache.get('health_check') == 'ok':
+                cache_status = 'connected'
         except Exception as e:
             logger.warning(f"Cache check failed: {e}")
-            cache_status = False
+            # Don't fail health check if cache is down
         
         return JsonResponse({
             'status': 'healthy',
-            'database': 'connected',
-            'cache': 'connected' if cache_status else 'disconnected',
+            'database': db_status,
+            'cache': cache_status,
             'version': '1.0.0'
         })
         
@@ -38,7 +41,9 @@ def health_check(request):
         logger.error(f"Health check failed: {e}")
         return JsonResponse({
             'status': 'unhealthy',
-            'error': str(e)
+            'error': str(e),
+            'database': 'disconnected',
+            'cache': 'unknown'
         }, status=503)
 
 def readiness_check(request):
