@@ -10,6 +10,7 @@ from .serializers import (
 )
 from services.models import ServicePricing
 from vehicles.models import VehicleModel
+from subscriptions.models import Subscription
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -65,7 +66,7 @@ class BookingViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         data = serializer.validated_data
         
         # Verify vehicle model exists
@@ -111,6 +112,25 @@ class BookingViewSet(viewsets.ModelViewSet):
                     'message': f'Service pricing not found for service ID {service_id} and selected vehicle'
                 }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Optional subscription linkage
+        subscription = None
+        if data.get('subscription_id'):
+            try:
+                subscription = Subscription.objects.select_related('plan').get(id=data['subscription_id'])
+            except Subscription.DoesNotExist:
+                return Response({
+                    'error': True,
+                    'message': 'Invalid subscription'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            # Enforce remaining visits if plan includes visit limits
+            included = subscription.plan.included_visits or 0
+            consumed = subscription.visits_consumed or 0
+            if included > 0 and consumed >= included:
+                return Response({
+                    'error': True,
+                    'message': 'No subscription visits remaining'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
         # Create booking
         booking = Booking.objects.create(
             customer=customer,
@@ -121,6 +141,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             appointment_time=data['appointment_time'],
             total_amount=total_amount,
             payment_method=data.get('payment_method', 'cash'),
+            subscription=subscription,
             notes=data.get('notes', '')
         )
         

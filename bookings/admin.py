@@ -29,6 +29,8 @@ class BookingAdmin(admin.ModelAdmin):
         "total_amount",
         "payment_status",
         "booking_status",
+        "subscription",
+        "subscription_visit_consumed",
         "created_at",
     )
     list_filter = (

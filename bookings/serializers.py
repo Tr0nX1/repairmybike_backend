@@ -46,6 +46,8 @@ class BookingCreateSerializer(serializers.Serializer):
     # Payment
     payment_method = serializers.ChoiceField(choices=['cash', 'razorpay'], default='cash')
     notes = serializers.CharField(required=False, allow_blank=True)
+    # Optional subscription linkage for consuming visits
+    subscription_id = serializers.IntegerField(required=False)
     
     def validate_customer_phone(self, value):
         # Basic phone validation
@@ -72,6 +74,7 @@ class BookingListSerializer(serializers.ModelSerializer):
     booking_services = BookingServiceSerializer(many=True, read_only=True)
     vehicle_model_name = serializers.CharField(source='vehicle_model.name', read_only=True)
     vehicle_brand_name = serializers.CharField(source='vehicle_model.vehicle_brand.name', read_only=True)
+    subscription_remaining_visits = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Booking
@@ -79,9 +82,20 @@ class BookingListSerializer(serializers.ModelSerializer):
             'id', 'customer', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
             'service_location', 'address', 'appointment_date', 'appointment_time',
             'total_amount', 'payment_method', 'payment_status', 'booking_status',
+            'subscription', 'subscription_remaining_visits',
             'notes', 'booking_services', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_subscription_remaining_visits(self, obj):
+        try:
+            if not obj.subscription:
+                return None
+            included = obj.subscription.plan.included_visits or 0
+            consumed = obj.subscription.visits_consumed or 0
+            return max(0, included - consumed)
+        except Exception:
+            return None
 
 
 class BookingDetailSerializer(serializers.ModelSerializer):
@@ -90,6 +104,7 @@ class BookingDetailSerializer(serializers.ModelSerializer):
     vehicle_model_name = serializers.CharField(source='vehicle_model.name', read_only=True)
     vehicle_brand_name = serializers.CharField(source='vehicle_model.vehicle_brand.name', read_only=True)
     vehicle_type_name = serializers.CharField(source='vehicle_model.vehicle_brand.vehicle_type.name', read_only=True)
+    subscription_remaining_visits = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Booking
@@ -97,6 +112,17 @@ class BookingDetailSerializer(serializers.ModelSerializer):
             'id', 'customer', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
             'vehicle_type_name', 'service_location', 'address', 'appointment_date',
             'appointment_time', 'total_amount', 'payment_method', 'payment_status',
-            'booking_status', 'notes', 'booking_services', 'created_at', 'updated_at'
+            'booking_status', 'subscription', 'subscription_remaining_visits',
+            'notes', 'booking_services', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_subscription_remaining_visits(self, obj):
+        try:
+            if not obj.subscription:
+                return None
+            included = obj.subscription.plan.included_visits or 0
+            consumed = obj.subscription.visits_consumed or 0
+            return max(0, included - consumed)
+        except Exception:
+            return None

@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from vehicles.models import VehicleModel
 from services.models import Service
+from subscriptions.models import Subscription
 
 
 phone_regex = RegexValidator(
@@ -59,6 +60,10 @@ class Booking(models.Model):
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='cash')
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='pending')
     booking_status = models.CharField(max_length=15, choices=BOOKING_STATUS_CHOICES, default='pending')
+    # Optional link to a subscription; when completed, consumes a visit
+    subscription = models.ForeignKey(Subscription, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
+    # Internal flag to avoid double-counting visit consumption
+    subscription_visit_consumed = models.BooleanField(default=False)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
