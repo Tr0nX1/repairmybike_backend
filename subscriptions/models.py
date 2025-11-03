@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.core.validators import RegexValidator
 
 
 class Plan(models.Model):
@@ -48,6 +49,18 @@ class Subscription(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.PROTECT, related_name="subscriptions")
     user = models.ForeignKey(getattr(settings, "AUTH_USER_MODEL", "auth.User"), on_delete=models.SET_NULL, null=True, blank=True, related_name="subscriptions")
     contact_email = models.EmailField(blank=True, null=True)
+    contact_phone = models.CharField(
+        max_length=17,
+        blank=True,
+        null=True,
+        validators=[
+            RegexValidator(
+                regex=r'^\+?1?\d{9,15}$',
+                message="Phone number must be in the format '+999999999' (up to 15 digits).",
+            )
+        ],
+        db_index=True,
+    )
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default="pending")
     auto_renew = models.BooleanField(default=True)
     start_date = models.DateTimeField(default=timezone.now)
@@ -64,6 +77,7 @@ class Subscription(models.Model):
         indexes = [
             models.Index(fields=["status"], name="subscriptions_status_idx"),
             models.Index(fields=["user"], name="subscriptions_user_idx"),
+            models.Index(fields=["contact_phone"], name="subscriptions_phone_idx"),
         ]
 
     def __str__(self):

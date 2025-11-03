@@ -29,16 +29,19 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     serializer_class = SubscriptionSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
-    search_fields = ["contact_email", "plan__name", "status"]
+    search_fields = ["contact_email", "contact_phone", "plan__name", "status"]
 
     def get_queryset(self):
         qs = super().get_queryset()
         email = self.request.query_params.get("email")
         user_id = self.request.query_params.get("user_id")
+        phone = self.request.query_params.get("phone")
         if email:
             qs = qs.filter(contact_email=email)
         if user_id:
             qs = qs.filter(user_id=user_id)
+        if phone:
+            qs = qs.filter(contact_phone=phone)
         return qs
 
     @action(detail=True, methods=["post"])

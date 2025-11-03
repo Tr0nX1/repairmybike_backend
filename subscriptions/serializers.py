@@ -36,6 +36,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             "plan_name",
             "user",
             "contact_email",
+            "contact_phone",
             "status",
             "auto_renew",
             "start_date",
@@ -55,6 +56,14 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         if plan and not plan.active:
             raise serializers.ValidationError("Selected plan is not active.")
         return attrs
+
+    def validate_contact_phone(self, value):
+        if not value:
+            return value
+        import re
+        if not re.match(r'^\+?1?\d{9,15}$', value):
+            raise serializers.ValidationError("Invalid phone number format")
+        return value
 
     def create(self, validated_data):
         subscription = Subscription(**validated_data)
