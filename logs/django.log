@@ -49,3 +49,8 @@ INFO 2025-10-31 22:07:06,922 autoreload 15 132937312885632 /app/services/seriali
 INFO 2025-10-31 22:07:08,463 autoreload 17 131913533741952 Watching for file changes with StatReloader
 INFO 2025-10-31 22:07:20,119 autoreload 17 131913533741952 /app/services/views.py changed, reloading.
 INFO 2025-10-31 22:07:22,293 autoreload 19 138818994277248 Watching for file changes with StatReloader
+INFO 2025-11-03 10:19:59,646 autoreload 29324 29332 Watching for file changes with StatReloader
+INFO 2025-11-03 10:20:08,126 basehttp 29324 29760 code 400, message Bad request version ('z\x9b/`\x13')
+ERROR 2025-11-03 10:20:08,127 basehttp 29324 29760 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-03 10:20:08,131 basehttp 29324 30552 code 400, message Bad request syntax ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03\x00»¤;xµ6?Á')
+ERROR 2025-11-03 10:20:08,132 basehttp 29324 30552 You're accessing the development server over HTTPS, but it only supports HTTP.

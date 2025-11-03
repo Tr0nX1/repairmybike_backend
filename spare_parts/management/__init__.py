@@ -1,0 +1,1 @@
+"""Management package for spare_parts."""
