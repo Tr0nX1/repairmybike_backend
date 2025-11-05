@@ -55,3 +55,21 @@ ERROR 2025-11-03 10:20:08,127 basehttp 29324 29760 You're accessing the developm
 INFO 2025-11-03 10:20:08,131 basehttp 29324 30552 code 400, message Bad request syntax ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03\x00»¤;xµ6?Á')
 ERROR 2025-11-03 10:20:08,132 basehttp 29324 30552 You're accessing the development server over HTTPS, but it only supports HTTP.
 INFO 2025-11-05 18:34:34,093 autoreload 25468 22936 Watching for file changes with StatReloader
+INFO 2025-11-05 19:31:18,891 autoreload 13004 24816 Watching for file changes with StatReloader
+WARNING 2025-11-05 19:31:34,747 log 13004 6544 Not Found: /
+WARNING 2025-11-05 19:31:34,747 basehttp 13004 6544 "GET /?ide_webview_request_time=1762351294706 HTTP/1.1" 404 4116
+WARNING 2025-11-05 19:31:34,803 log 13004 6544 Not Found: /@vite/client
+WARNING 2025-11-05 19:31:34,804 basehttp 13004 6544 "GET /@vite/client HTTP/1.1" 404 4131
+INFO 2025-11-05 19:31:35,138 basehttp 13004 23148 - Broken pipe from ('127.0.0.1', 53706)
+INFO 2025-11-05 19:31:35,651 basehttp 13004 22428 - Broken pipe from ('127.0.0.1', 59556)
+INFO 2025-11-05 19:31:51,837 autoreload 24032 12660 Watching for file changes with StatReloader
+INFO 2025-11-05 19:32:15,166 basehttp 24032 17864 code 400, message Bad request version ("MÕ\x82lÊJ\x15\x08Z=ô\x11\x13ÆØôP\x98\x8c²ð2Oæ´C\x81&\x8f×'\x0fö\x98\x9c¾·\x8aÛýØ")
+ERROR 2025-11-05 19:32:15,167 basehttp 24032 17864 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-05 19:32:15,168 basehttp 24032 14712 code 400, message Bad request version ('\x00\x02\x01\x00\x00\x05\x00\x05\x01\x00\x00\x00\x00\x00')
+ERROR 2025-11-05 19:32:15,168 basehttp 24032 14712 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-05 19:37:35,770 autoreload 24032 12660 D:\developer\31oct\3nov\backend\repairmybike_backend\spare_parts\serializers.py changed, reloading.
+INFO 2025-11-05 19:37:36,487 autoreload 26196 13144 Watching for file changes with StatReloader
+INFO 2025-11-05 19:37:49,615 autoreload 26196 13144 D:\developer\31oct\3nov\backend\repairmybike_backend\vehicles\serializers.py changed, reloading.
+INFO 2025-11-05 19:37:50,366 autoreload 25400 10176 Watching for file changes with StatReloader
+INFO 2025-11-05 19:38:24,895 autoreload 19840 26896 Watching for file changes with StatReloader
+INFO 2025-11-05 19:39:00,639 autoreload 27252 352 Watching for file changes with StatReloader

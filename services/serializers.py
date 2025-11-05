@@ -44,18 +44,26 @@ class ServiceSerializer(serializers.ModelSerializer):
         if not isinstance(imgs, list):
             return []
 
-        # Prefer Cloudinary when enabled
+        # Prefer Cloudinary when enabled, but preserve existing local paths
         if getattr(settings, 'USE_CLOUDINARY', False) and _cloudinary_url:
-            def _to_abs_cloudinary(u: str):
+            def _to_abs_cloudinary_or_local(u: str):
                 if not u:
                     return None
                 u = u.strip()
                 if u.startswith('http://') or u.startswith('https://'):
                     return u
-                # Treat non-absolute strings as public IDs/paths
+                # If the value looks like a local media path, keep MEDIA_URL join
+                if u.startswith('/') or 'media/' in u or u.startswith('media/'):
+                    base_local = getattr(settings, 'MEDIA_URL', '/')
+                    if base_local.startswith('http://') or base_local.startswith('https://'):
+                        if u.startswith('/'):
+                            return f"{base_local.rstrip('/')}{u}"
+                        return f"{base_local.rstrip('/')}/{u}"
+                    return u  # relative fallback
+                # Otherwise treat as Cloudinary public ID
                 return _cloudinary_url(u)[0]
 
-            return [x for x in (_to_abs_cloudinary(u) for u in imgs) if x]
+            return [x for x in (_to_abs_cloudinary_or_local(u) for u in imgs) if x]
 
         # Fallback to joining with MEDIA_URL (R2/local)
         base = getattr(settings, 'MEDIA_URL', '/')

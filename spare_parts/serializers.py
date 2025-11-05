@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.conf import settings
 from .models import (
     SparePartCategory,
     SparePartBrand,
@@ -11,24 +12,102 @@ from .models import (
 
 
 class SparePartCategorySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = SparePartCategory
         fields = ['id', 'name', 'slug', 'description', 'image', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    def _abs_url(self, url: str):
+        if not url:
+            return None
+        if url.startswith('http://') or url.startswith('https://'):
+            return url
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            try:
+                return request.build_absolute_uri(url)
+            except Exception:
+                pass
+        base = getattr(settings, 'MEDIA_URL', '/')
+        if base.startswith('http://') or base.startswith('https://'):
+            if url.startswith('/'):
+                return f"{base.rstrip('/')}{url}"
+            return f"{base.rstrip('/')}/{url}"
+        return url
+
+    def get_image(self, obj):
+        try:
+            return self._abs_url(obj.image.url) if obj.image else None
+        except Exception:
+            return None
+
 
 class SparePartBrandSerializer(serializers.ModelSerializer):
+    logo = serializers.SerializerMethodField()
+
     class Meta:
         model = SparePartBrand
         fields = ['id', 'name', 'slug', 'logo', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    def _abs_url(self, url: str):
+        if not url:
+            return None
+        if url.startswith('http://') or url.startswith('https://'):
+            return url
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            try:
+                return request.build_absolute_uri(url)
+            except Exception:
+                pass
+        base = getattr(settings, 'MEDIA_URL', '/')
+        if base.startswith('http://') or base.startswith('https://'):
+            if url.startswith('/'):
+                return f"{base.rstrip('/')}{url}"
+            return f"{base.rstrip('/')}/{url}"
+        return url
+
+    def get_logo(self, obj):
+        try:
+            return self._abs_url(obj.logo.url) if obj.logo else None
+        except Exception:
+            return None
+
 
 class SparePartImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = SparePartImage
         fields = ['id', 'image', 'alt_text', 'is_primary', 'sort_order']
         read_only_fields = ['id']
+
+    def _abs_url(self, url: str):
+        if not url:
+            return None
+        if url.startswith('http://') or url.startswith('https://'):
+            return url
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            try:
+                return request.build_absolute_uri(url)
+            except Exception:
+                pass
+        base = getattr(settings, 'MEDIA_URL', '/')
+        if base.startswith('http://') or base.startswith('https://'):
+            if url.startswith('/'):
+                return f"{base.rstrip('/')}{url}"
+            return f"{base.rstrip('/')}/{url}"
+        return url
+
+    def get_image(self, obj):
+        try:
+            return self._abs_url(obj.image.url) if obj.image else None
+        except Exception:
+            return None
 
 
 class SparePartListSerializer(serializers.ModelSerializer):
@@ -45,9 +124,30 @@ class SparePartListSerializer(serializers.ModelSerializer):
             'rating_average', 'rating_count', 'thumbnail', 'created_at', 'updated_at'
         ]
 
+    def _abs_url(self, url: str):
+        if not url:
+            return None
+        if url.startswith('http://') or url.startswith('https://'):
+            return url
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            try:
+                return request.build_absolute_uri(url)
+            except Exception:
+                pass
+        base = getattr(settings, 'MEDIA_URL', '/')
+        if base.startswith('http://') or base.startswith('https://'):
+            if url.startswith('/'):
+                return f"{base.rstrip('/')}{url}"
+            return f"{base.rstrip('/')}/{url}"
+        return url
+
     def get_thumbnail(self, obj):
         primary = obj.images.filter(is_primary=True).first()
-        return primary.image.url if primary and primary.image else None
+        try:
+            return self._abs_url(primary.image.url) if primary and primary.image else None
+        except Exception:
+            return None
 
 
 class SparePartDetailSerializer(serializers.ModelSerializer):
