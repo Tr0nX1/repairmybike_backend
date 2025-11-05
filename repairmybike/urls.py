@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from .health import health_check, readiness_check
 
 urlpatterns = [
@@ -16,3 +18,7 @@ urlpatterns = [
     path('api/spare-parts/', include('spare_parts.urls')),
     path('api/subscriptions/', include('subscriptions.urls')),
 ]
+
+# Serve media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

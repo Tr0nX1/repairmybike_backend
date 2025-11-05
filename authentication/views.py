@@ -137,26 +137,37 @@ class UserLogoutView(APIView):
     
     def post(self, request):
         try:
-            # Get session token from request
-            session_token = request.META.get('HTTP_AUTHORIZATION', '').replace('Bearer ', '')
-            
-            if session_token:
-                descope_client = create_descope_client()
-                descope_client.logout(refresh_token=session_token)
-                
-                # Deactivate session in Django
+            descope_client = create_descope_client()
+
+            # Prefer refresh_token from request body
+            refresh_token = None
+            if isinstance(request.data, dict):
+                refresh_token = request.data.get('refresh_token')
+
+            # Fallback: Authorization header may carry a session token
+            auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+            session_token = None
+            if auth_header.startswith('Bearer '):
+                session_token = auth_header.split(' ', 1)[1]
+
+            # Use refresh token for Descope logout when available
+            if refresh_token:
+                try:
+                    descope_client.logout(refresh_token=refresh_token)
+                except Exception as descope_err:
+                    # Log but continue to deactivate locally
+                    logger.warning(f"Descope logout with refresh token failed: {descope_err}")
+                # Deactivate session locally
+                UserSession.objects.filter(refresh_token=refresh_token).update(is_active=False)
+            elif session_token:
+                # If only session token is provided, deactivate locally
                 UserSession.objects.filter(session_token=session_token).update(is_active=False)
-            
-            return Response({
-                'message': 'Logout successful'
-            }, status=status.HTTP_200_OK)
-            
+
+            return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+
         except Exception as e:
             logger.error(f"Logout failed: {str(e)}")
-            return Response({
-                'error': 'Logout failed',
-                'details': str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Logout failed', 'details': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfileView(RetrieveUpdateAPIView):
@@ -380,6 +391,21 @@ class PhoneOTPVerifyView(APIView):
                         phone_number=phone_number,
                         is_verified=False
                     ).update(is_verified=True)
+                    # Persist session
+                    try:
+                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                        UserSession.objects.update_or_create(
+                            user=user,
+                            session_token=session_jwt,
+                            defaults={
+                                'refresh_token': refresh_jwt,
+                                'expires_at': timezone.now() + timedelta(hours=8),
+                                'is_active': True,
+                            }
+                        )
+                    except Exception as persist_err:
+                        logger.warning(f"Failed to persist session: {persist_err}")
                     
                     return Response({
                         'message': 'OTP verified successfully',
@@ -460,7 +486,21 @@ class PhoneLoginView(APIView):
                 if auth_response:
                     # Get or create user
                     user, created = self._get_or_create_user_from_phone(phone_number, auth_response)
-                    
+                    # Persist session
+                    try:
+                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                        UserSession.objects.update_or_create(
+                            user=user,
+                            session_token=session_jwt,
+                            defaults={
+                                'refresh_token': refresh_jwt,
+                                'expires_at': timezone.now() + timedelta(hours=8),
+                                'is_active': True,
+                            }
+                        )
+                    except Exception as persist_err:
+                        logger.warning(f"Failed to persist session: {persist_err}")
                     return Response({
                         'message': 'Login successful',
                         'user': UserSerializer(user).data,
@@ -937,6 +977,21 @@ class UnifiedOTPVerifyView(APIView):
                             email=identifier,
                             is_verified=False
                         ).update(is_verified=True)
+                    # Persist session
+                    try:
+                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                        UserSession.objects.update_or_create(
+                            user=user,
+                            session_token=session_jwt,
+                            defaults={
+                                'refresh_token': refresh_jwt,
+                                'expires_at': timezone.now() + timedelta(hours=8),
+                                'is_active': True,
+                            }
+                        )
+                    except Exception as persist_err:
+                        logger.warning(f"Failed to persist session: {persist_err}")
                     
                     return Response({
                         'message': 'OTP verified successfully',

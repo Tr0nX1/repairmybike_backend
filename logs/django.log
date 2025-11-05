@@ -54,3 +54,4 @@ INFO 2025-11-03 10:20:08,126 basehttp 29324 29760 code 400, message Bad request 
 ERROR 2025-11-03 10:20:08,127 basehttp 29324 29760 You're accessing the development server over HTTPS, but it only supports HTTP.
 INFO 2025-11-03 10:20:08,131 basehttp 29324 30552 code 400, message Bad request syntax ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03\x00»¤;xµ6?Á')
 ERROR 2025-11-03 10:20:08,132 basehttp 29324 30552 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2025-11-05 18:34:34,093 autoreload 25468 22936 Watching for file changes with StatReloader
