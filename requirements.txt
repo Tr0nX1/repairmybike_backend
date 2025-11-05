@@ -29,6 +29,14 @@ razorpay==2.0.0
 gunicorn==23.0.0
 whitenoise==6.11.0
 
+# Media Storage (Cloudflare R2 via S3)
+django-storages==1.14.3
+boto3==1.34.44
+
+# Media Storage (Cloudinary)
+cloudinary==1.41.0
+django-cloudinary-storage==0.3.0
+
 # Task Scheduling
 APScheduler==3.10.1
 
