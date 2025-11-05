@@ -73,7 +73,7 @@ class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
         if vehicle_model_id:
             qs = qs.filter(fitments__vehicle_model_id=vehicle_model_id)
 
-        serializer = SparePartListSerializer(qs.distinct(), many=True)
+        serializer = SparePartListSerializer(qs.distinct(), many=True, context={'request': request})
         return Response({
             'error': False,
             'message': 'Spare parts retrieved successfully',

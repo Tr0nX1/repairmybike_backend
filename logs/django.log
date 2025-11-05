@@ -73,3 +73,51 @@ INFO 2025-11-05 19:37:49,615 autoreload 26196 13144 D:\developer\31oct\3nov\back
 INFO 2025-11-05 19:37:50,366 autoreload 25400 10176 Watching for file changes with StatReloader
 INFO 2025-11-05 19:38:24,895 autoreload 19840 26896 Watching for file changes with StatReloader
 INFO 2025-11-05 19:39:00,639 autoreload 27252 352 Watching for file changes with StatReloader
+WARNING 2025-11-05 19:39:30,974 log 25400 26112 Not Found: /
+WARNING 2025-11-05 19:39:30,975 basehttp 25400 26112 "GET /?ide_webview_request_time=1762351294706 HTTP/1.1" 404 4116
+INFO 2025-11-05 19:40:10,874 basehttp 25400 2088 "GET /api/spare-parts/parts/ HTTP/1.1" 200 5959
+INFO 2025-11-05 19:40:11,806 basehttp 25400 2088 "GET /api/spare-parts/categories/ HTTP/1.1" 200 1906
+INFO 2025-11-05 19:40:12,403 basehttp 25400 2088 "GET /api/vehicles/vehicle-types/ HTTP/1.1" 200 347
+INFO 2025-11-05 19:40:38,792 autoreload 27252 352 D:\developer\31oct\3nov\backend\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2025-11-05 19:40:38,810 autoreload 25400 10176 D:\developer\31oct\3nov\backend\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2025-11-05 19:40:39,572 autoreload 22988 2828 Watching for file changes with StatReloader
+INFO 2025-11-05 19:40:39,581 autoreload 18244 25240 Watching for file changes with StatReloader
+INFO 2025-11-05 19:40:52,588 basehttp 22988 26892 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:46:29,082 basehttp 22988 23628 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:46:32,360 basehttp 22988 23628 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:46:32,886 basehttp 22988 28260 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:33,100 basehttp 22988 28260 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:33,517 basehttp 22988 28260 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:34,345 basehttp 22988 28536 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:35,820 basehttp 22988 23628 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:46:35,962 basehttp 22988 23628 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:39,186 basehttp 22988 28536 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:39,733 basehttp 22988 23628 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:46:44,418 basehttp 22988 23628 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:46:45,609 basehttp 22988 28536 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:52,338 basehttp 22988 18376 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:52,952 basehttp 22988 28536 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:46:58,762 basehttp 22988 18376 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:46:59,665 basehttp 22988 28388 - Broken pipe from ('127.0.0.1', 62605)
+INFO 2025-11-05 19:47:05,481 basehttp 22988 24248 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:47:07,145 basehttp 22988 24248 "GET /api/services/services/ HTTP/1.1" 200 14332
+INFO 2025-11-05 19:47:07,934 basehttp 22988 28260 - Broken pipe from ('127.0.0.1', 59616)
+INFO 2025-11-05 19:47:08,520 basehttp 22988 23628 - Broken pipe from ('127.0.0.1', 53771)
+INFO 2025-11-05 19:47:10,361 basehttp 22988 24248 "GET /api/services/services/ HTTP/1.1" 200 14332
+INFO 2025-11-05 19:47:10,859 basehttp 22988 18376 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:47:11,902 basehttp 22988 18376 "GET /api/services/service-categories/ HTTP/1.1" 200 3223
+INFO 2025-11-05 19:47:16,795 basehttp 22988 18376 "GET /api/services/services/ HTTP/1.1" 200 14332
+INFO 2025-11-05 19:47:21,316 basehttp 22988 28536 - Broken pipe from ('127.0.0.1', 63154)
+INFO 2025-11-05 19:47:23,215 basehttp 22988 24248 "GET /api/services/services/ HTTP/1.1" 200 14332
+INFO 2025-11-05 19:47:24,488 basehttp 22988 18376 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:47:29,647 basehttp 22988 18376 "GET /api/services/services/ HTTP/1.1" 200 14332
+INFO 2025-11-05 19:47:36,061 basehttp 22988 24248 "GET /api/services/services/ HTTP/1.1" 200 14332
+INFO 2025-11-05 19:47:38,477 basehttp 22988 18376 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:47:42,479 basehttp 22988 18376 "GET /api/services/services/ HTTP/1.1" 200 14332
+INFO 2025-11-05 19:47:52,083 basehttp 22988 18376 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:48:05,479 basehttp 22988 18376 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:49:44,821 basehttp 22988 24984 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:49:56,780 basehttp 22988 24984 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:50:18,990 basehttp 22988 24984 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
+INFO 2025-11-05 19:50:19,046 basehttp 22988 24984 "GET /media/spare_parts/images/amaron_battery_primary.png HTTP/1.1" 200 68
+INFO 2025-11-05 20:01:09,213 autoreload 27688 21992 Watching for file changes with StatReloader
