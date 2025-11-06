@@ -38,6 +38,21 @@ class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
+class StaffOtpLoginSerializer(serializers.Serializer):
+    """Serializer for staff/admin OTP login"""
+    method = serializers.ChoiceField(choices=["sms", "email"])
+    identifier = serializers.CharField()
+    otp_code = serializers.CharField()
+    device_id = serializers.CharField(required=False, allow_blank=True)
+
+
+class StaffPasswordLoginSerializer(serializers.Serializer):
+    """Serializer for staff/admin password login"""
+    identifier = serializers.CharField()  # username or email
+    password = serializers.CharField(write_only=True)
+    device_id = serializers.CharField(required=False, allow_blank=True)
+
+
 class PasswordResetConfirmSerializer(serializers.Serializer):
     """Serializer for password reset confirmation"""
     token = serializers.CharField()

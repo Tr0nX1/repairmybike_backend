@@ -25,6 +25,11 @@ class UserSession(models.Model):
     expires_at = models.DateTimeField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
+    # Optional metadata for better persistence and auditing
+    device_id = models.CharField(max_length=255, blank=True, null=True)
+    user_agent = models.CharField(max_length=500, blank=True, null=True)
+    ip_address = models.CharField(max_length=100, blank=True, null=True)
+    last_activity = models.DateTimeField(blank=True, null=True)
     
     class Meta:
         ordering = ['-created_at']
@@ -113,3 +118,22 @@ class OTPAttempt(models.Model):
     
     def __str__(self):
         return f"{self.identifier} ({self.attempt_type}) - {self.attempts_count} attempts"
+
+
+class StaffDirectory(models.Model):
+    """Pre-provisioned staff directory to allow login without manual registration."""
+    identifier = models.CharField(max_length=255, unique=True)  # email or phone
+    name = models.CharField(max_length=255, blank=True, null=True)
+    employee_id = models.CharField(max_length=100, blank=True, null=True)
+    role = models.CharField(max_length=100, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["identifier", "is_active"]),
+        ]
+
+    def __str__(self):
+        return f"{self.identifier} ({'active' if self.is_active else 'inactive'})"

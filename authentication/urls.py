@@ -33,4 +33,9 @@ urlpatterns = [
     # Session management endpoints
     path('sessions/', views.user_sessions, name='user-sessions'),
     path('sessions/<int:session_id>/revoke/', views.revoke_session, name='revoke-session'),
+    # Staff/Admin login endpoints
+    path('staff/login/', views.StaffLoginView.as_view(), name='staff-login'),
+    path('admin/login/', views.AdminLoginView.as_view(), name='admin-login'),
+    path('staff/login/password/', views.StaffPasswordLoginView.as_view(), name='staff-password-login'),
+    path('admin/login/password/', views.AdminPasswordLoginView.as_view(), name='admin-password-login'),
 ]

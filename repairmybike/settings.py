@@ -270,6 +270,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'authentication.authentication.PasswordSessionAuthentication',
+        'authentication.authentication.DescopeAuthentication',
+        'authentication.authentication.DescopeSessionAuthentication',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': [
@@ -291,6 +296,14 @@ CORS_ALLOWED_ORIGINS = config(
     default='http://localhost:3000,http://127.0.0.1:3000,https://repairmybikebackend-production.up.railway.app',
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
+
+# Allow any localhost/127.0.0.1 port for Flutter web/dev servers
+from corsheaders.defaults import default_headers
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost(?::\d+)?$",
+    r"^http://127\.0\.0\.1(?::\d+)?$",
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF Configuration

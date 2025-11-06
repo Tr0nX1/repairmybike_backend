@@ -4,14 +4,15 @@ from rest_framework.decorators import action
 from django.db.models import Q
 from bookings.models import Booking
 from bookings.serializers import BookingDetailSerializer
-from .permissions import IsStaffAPIKey
+from rest_framework import permissions
+from .permissions import IsStaffAuthenticated
 
 
 class StaffBookingViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Staff endpoints to manage bookings
     """
-    permission_classes = [IsStaffAPIKey]
+    permission_classes = [permissions.IsAuthenticated, IsStaffAuthenticated]
     queryset = Booking.objects.select_related(
         'customer',
         'vehicle_model__vehicle_brand__vehicle_type'

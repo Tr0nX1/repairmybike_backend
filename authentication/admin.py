@@ -7,6 +7,7 @@ from .models import (
     PhoneOTP,
     EmailOTP,
     OTPAttempt,
+    StaffDirectory,
 )
 
 
@@ -150,4 +151,20 @@ class OTPAttemptAdmin(admin.ModelAdmin):
     )
     list_filter = ("attempt_type", "is_blocked", "created_at")
     search_fields = ("identifier",)
+    readonly_fields = ("created_at",)
+
+
+@admin.register(StaffDirectory)
+class StaffDirectoryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "identifier",
+        "name",
+        "employee_id",
+        "role",
+        "is_active",
+        "created_at",
+    )
+    list_filter = ("is_active", "created_at")
+    search_fields = ("identifier", "name", "employee_id", "role")
     readonly_fields = ("created_at",)

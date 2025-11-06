@@ -3,7 +3,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import get_user_model
 from descope import DescopeClient
 from django.conf import settings
+from django.utils import timezone
 import logging
+from .models import UserSession
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -155,4 +157,44 @@ class DescopeSessionAuthentication(BaseAuthentication):
                 
         except Exception as e:
             logger.error(f"Session authentication failed: {str(e)}")
+            return None
+
+
+class PasswordSessionAuthentication(BaseAuthentication):
+    """
+    Password-based session authentication using locally stored UserSession.
+    Accepts token from Authorization header (Bearer) or X-Session-Token header.
+    """
+
+    def authenticate(self, request):
+        # Extract token
+        token = None
+        auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+        if auth_header.startswith('Bearer '):
+            token = auth_header.split(' ', 1)[1]
+        if not token:
+            token = request.META.get('HTTP_X_SESSION_TOKEN')
+
+        if not token:
+            return None
+
+        try:
+            # Look up an active, non-expired session
+            session = UserSession.objects.filter(
+                session_token=token,
+                is_active=True,
+                expires_at__gt=timezone.now(),
+            ).select_related('user').first()
+
+            if not session:
+                return None
+
+            user = session.user
+            if not user.is_active:
+                return None
+
+            return (user, token)
+
+        except Exception as e:
+            logger.error(f"PasswordSessionAuthentication failed: {e}")
             return None

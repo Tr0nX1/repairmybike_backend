@@ -5,7 +5,9 @@ from datetime import timedelta
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate
 from django.db import transaction
+from django.db.models import Q
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -18,9 +20,11 @@ from .serializers import (
     UserProfileUpdateSerializer, PhoneOTPRequestSerializer,
     PhoneOTPVerifySerializer, PhoneLoginSerializer,
     EmailOTPRequestSerializer, EmailOTPVerifySerializer, EmailLoginSerializer,
-    UnifiedOTPRequestSerializer, UnifiedOTPVerifySerializer
+    UnifiedOTPRequestSerializer, UnifiedOTPVerifySerializer,
+    StaffOtpLoginSerializer,
+    StaffPasswordLoginSerializer
 )
-from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt
+from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, StaffDirectory
 from .authentication import DescopeAuthentication
 
 logger = logging.getLogger(__name__)
@@ -172,6 +176,7 @@ class UserLogoutView(APIView):
 
 class UserProfileView(RetrieveUpdateAPIView):
     """Handle user profile retrieval and updates"""
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
     
     def get_object(self):
@@ -566,6 +571,277 @@ def phone_verification_status(request):
     })
 
 
+class StaffLoginView(APIView):
+    """OTP-based login for staff users (is_staff or is_superuser)."""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = StaffOtpLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        method = serializer.validated_data['method']
+        identifier = serializer.validated_data['identifier']
+        otp_code = serializer.validated_data['otp_code']
+        device_id = serializer.validated_data.get('device_id')
+
+        descope_client = DescopeClient(project_id=settings.DESCOPE_PROJECT_ID)
+
+        try:
+            delivery = DeliveryMethod.SMS if method == 'sms' else DeliveryMethod.EMAIL
+            auth_response = descope_client.otp.verify_code(
+                method=delivery,
+                login_id=identifier,
+                code=otp_code
+            )
+
+            if not auth_response:
+                return Response({'error': 'Invalid OTP code'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            # Only allow existing staff/admin users
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            qs = User.objects.filter(
+                (Q(email=identifier) | Q(phone_number=identifier)),
+                is_active=True
+            )
+            try:
+                user = qs.get()
+            except User.DoesNotExist:
+                # Just-in-time provision staff user if present in StaffDirectory
+                try:
+                    directory_entry = StaffDirectory.objects.get(identifier=identifier, is_active=True)
+                except StaffDirectory.DoesNotExist:
+                    return Response({'error': 'User not found or not permitted'}, status=status.HTTP_403_FORBIDDEN)
+
+                # Determine username and fields based on identifier type
+                username = identifier
+                email = identifier if '@' in identifier else ''
+                phone_number = '' if '@' in identifier else identifier
+                first_name = ''
+                last_name = ''
+                if directory_entry.name:
+                    parts = directory_entry.name.split(' ', 1)
+                    first_name = parts[0]
+                    last_name = parts[1] if len(parts) > 1 else ''
+
+                # Create staff user (is_staff=True) without manual registration
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone_number=phone_number,
+                    is_active=True,
+                    is_staff=True,
+                )
+
+            if not (user.is_staff or user.is_superuser):
+                return Response({'error': 'Staff privileges required'}, status=status.HTTP_403_FORBIDDEN)
+
+            # Persist session with metadata
+            try:
+                session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+                refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                UserSession.objects.update_or_create(
+                    user=user,
+                    session_token=session_jwt,
+                    defaults={
+                        'refresh_token': refresh_jwt,
+                        'expires_at': timezone.now() + timedelta(hours=8),
+                        'is_active': True,
+                        'device_id': device_id,
+                        'user_agent': request.META.get('HTTP_USER_AGENT'),
+                        'ip_address': request.META.get('REMOTE_ADDR'),
+                        'last_activity': timezone.now(),
+                    }
+                )
+            except Exception as persist_err:
+                logger.warning(f"Failed to persist staff session: {persist_err}")
+
+            return Response({
+                'message': 'Staff login successful',
+                'user': UserSerializer(user).data,
+                'session_token': auth_response[SESSION_TOKEN_NAME]["jwt"],
+                'refresh_token': auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Staff login failed: {str(e)}")
+            return Response({'error': 'Login failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class StaffPasswordLoginView(APIView):
+    """Password-based login for staff users."""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = StaffPasswordLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        identifier = serializer.validated_data['identifier']
+        password = serializer.validated_data['password']
+        device_id = serializer.validated_data.get('device_id')
+
+        user = authenticate(request, username=identifier, password=password)
+        if not user:
+            try:
+                candidate = User.objects.get(email=identifier)
+                user = authenticate(request, username=candidate.username, password=password)
+            except User.DoesNotExist:
+                user = None
+
+        if not user:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not (user.is_staff or user.is_superuser):
+            return Response({'error': 'Staff privileges required'}, status=status.HTTP_403_FORBIDDEN)
+
+        token = uuid.uuid4().hex
+        try:
+            UserSession.objects.update_or_create(
+                user=user,
+                session_token=token,
+                defaults={
+                    'refresh_token': None,
+                    'expires_at': timezone.now() + timedelta(hours=8),
+                    'is_active': True,
+                    'device_id': device_id,
+                    'user_agent': request.META.get('HTTP_USER_AGENT'),
+                    'ip_address': request.META.get('REMOTE_ADDR'),
+                    'last_activity': timezone.now(),
+                }
+            )
+        except Exception as persist_err:
+            logger.warning(f"Failed to persist password session: {persist_err}")
+
+        return Response({
+            'message': 'Staff password login successful',
+            'user': UserSerializer(user).data,
+            'session_token': token,
+        }, status=status.HTTP_200_OK)
+
+
+class AdminLoginView(APIView):
+    """OTP-based login strictly for superusers."""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = StaffOtpLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        method = serializer.validated_data['method']
+        identifier = serializer.validated_data['identifier']
+        otp_code = serializer.validated_data['otp_code']
+        device_id = serializer.validated_data.get('device_id')
+
+        descope_client = DescopeClient(project_id=settings.DESCOPE_PROJECT_ID)
+
+        try:
+            delivery = DeliveryMethod.SMS if method == 'sms' else DeliveryMethod.EMAIL
+            auth_response = descope_client.otp.verify_code(
+                method=delivery,
+                login_id=identifier,
+                code=otp_code
+            )
+
+            if not auth_response:
+                return Response({'error': 'Invalid OTP code'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            qs = User.objects.filter(
+                (Q(email=identifier) | Q(phone_number=identifier)),
+                is_active=True,
+                is_superuser=True
+            )
+            try:
+                user = qs.get()
+            except User.DoesNotExist:
+                return Response({'error': 'Admin privileges required'}, status=status.HTTP_403_FORBIDDEN)
+
+            # Persist session with metadata
+            try:
+                session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+                refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                UserSession.objects.update_or_create(
+                    user=user,
+                    session_token=session_jwt,
+                    defaults={
+                        'refresh_token': refresh_jwt,
+                        'expires_at': timezone.now() + timedelta(hours=8),
+                        'is_active': True,
+                        'device_id': device_id,
+                        'user_agent': request.META.get('HTTP_USER_AGENT'),
+                        'ip_address': request.META.get('REMOTE_ADDR'),
+                        'last_activity': timezone.now(),
+                    }
+                )
+            except Exception as persist_err:
+                logger.warning(f"Failed to persist admin session: {persist_err}")
+
+            return Response({
+                'message': 'Admin login successful',
+                'user': UserSerializer(user).data,
+                'session_token': auth_response[SESSION_TOKEN_NAME]["jwt"],
+                'refresh_token': auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Admin login failed: {str(e)}")
+            return Response({'error': 'Login failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class AdminPasswordLoginView(APIView):
+    """Password-based login for admin (superuser)."""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = StaffPasswordLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        identifier = serializer.validated_data['identifier']
+        password = serializer.validated_data['password']
+        device_id = serializer.validated_data.get('device_id')
+
+        user = authenticate(request, username=identifier, password=password)
+        if not user:
+            try:
+                candidate = User.objects.get(email=identifier)
+                user = authenticate(request, username=candidate.username, password=password)
+            except User.DoesNotExist:
+                user = None
+
+        if not user:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.is_superuser:
+            return Response({'error': 'Admin privileges required'}, status=status.HTTP_403_FORBIDDEN)
+
+        token = uuid.uuid4().hex
+        try:
+            UserSession.objects.update_or_create(
+                user=user,
+                session_token=token,
+                defaults={
+                    'refresh_token': None,
+                    'expires_at': timezone.now() + timedelta(hours=8),
+                    'is_active': True,
+                    'device_id': device_id,
+                    'user_agent': request.META.get('HTTP_USER_AGENT'),
+                    'ip_address': request.META.get('REMOTE_ADDR'),
+                    'last_activity': timezone.now(),
+                }
+            )
+        except Exception as persist_err:
+            logger.warning(f"Failed to persist password session: {persist_err}")
+
+        return Response({
+            'message': 'Admin password login successful',
+            'user': UserSerializer(user).data,
+            'session_token': token,
+        }, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def resend_phone_otp(request):
@@ -716,6 +992,25 @@ class EmailOTPVerifyView(APIView):
                         email=email,
                         is_verified=False
                     ).update(is_verified=True)
+
+                    # Persist session
+                    try:
+                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                        UserSession.objects.update_or_create(
+                            user=user,
+                            session_token=session_jwt,
+                            defaults={
+                                'refresh_token': refresh_jwt,
+                                'expires_at': timezone.now() + timedelta(hours=8),
+                                'is_active': True,
+                                'user_agent': request.META.get('HTTP_USER_AGENT'),
+                                'ip_address': request.META.get('REMOTE_ADDR'),
+                                'last_activity': timezone.now(),
+                            }
+                        )
+                    except Exception as persist_err:
+                        logger.warning(f"Failed to persist session: {persist_err}")
                     
                     return Response({
                         'message': 'OTP verified successfully',
@@ -796,6 +1091,24 @@ class EmailLoginView(APIView):
                 if auth_response:
                     # Get or create user
                     user, created = self._get_or_create_user_from_email(email, auth_response)
+                    # Persist session
+                    try:
+                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                        UserSession.objects.update_or_create(
+                            user=user,
+                            session_token=session_jwt,
+                            defaults={
+                                'refresh_token': refresh_jwt,
+                                'expires_at': timezone.now() + timedelta(hours=8),
+                                'is_active': True,
+                                'user_agent': request.META.get('HTTP_USER_AGENT'),
+                                'ip_address': request.META.get('REMOTE_ADDR'),
+                                'last_activity': timezone.now(),
+                            }
+                        )
+                    except Exception as persist_err:
+                        logger.warning(f"Failed to persist session: {persist_err}")
                     
                     return Response({
                         'message': 'Login successful',

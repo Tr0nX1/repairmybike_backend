@@ -121,3 +121,64 @@ INFO 2025-11-05 19:49:56,780 basehttp 22988 24984 "GET /api/spare-parts/parts/ H
 INFO 2025-11-05 19:50:18,990 basehttp 22988 24984 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6169
 INFO 2025-11-05 19:50:19,046 basehttp 22988 24984 "GET /media/spare_parts/images/amaron_battery_primary.png HTTP/1.1" 200 68
 INFO 2025-11-05 20:01:09,213 autoreload 27688 21992 Watching for file changes with StatReloader
+WARNING 2025-11-05 20:01:40,668 log 22988 25124 Not Found: /
+WARNING 2025-11-05 20:01:40,669 basehttp 22988 25124 "GET / HTTP/1.1" 404 4077
+WARNING 2025-11-05 20:01:40,753 log 22988 25124 Not Found: /favicon.ico
+WARNING 2025-11-05 20:01:40,754 basehttp 22988 25124 "GET /favicon.ico HTTP/1.1" 404 4128
+WARNING 2025-11-05 20:01:47,825 log 22988 25124 Not Found: /^media/
+WARNING 2025-11-05 20:01:47,826 basehttp 22988 25124 "GET /%5Emedia/ HTTP/1.1" 404 4118
+INFO 2025-11-05 20:11:58,948 autoreload 18244 25240 D:\developer\31oct\3nov\backend\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2025-11-05 20:11:59,024 autoreload 27688 21992 D:\developer\31oct\3nov\backend\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2025-11-05 20:11:59,126 autoreload 22988 2828 D:\developer\31oct\3nov\backend\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2025-11-05 20:12:00,319 autoreload 16876 28008 Watching for file changes with StatReloader
+INFO 2025-11-05 20:12:00,523 autoreload 28932 18984 Watching for file changes with StatReloader
+INFO 2025-11-05 20:12:00,533 autoreload 28192 25348 Watching for file changes with StatReloader
+INFO 2025-11-05 20:12:14,514 autoreload 12328 29632 Watching for file changes with StatReloader
+INFO 2025-11-05 20:12:37,505 basehttp 28192 3088 "GET /media/spare_parts/images/amaron_battery_primary.png HTTP/1.1" 200 68
+INFO 2025-11-06 22:14:57,737 autoreload 23632 7984 Watching for file changes with StatReloader
+WARNING 2025-11-06 22:15:08,730 log 23632 13492 Not Found: /
+WARNING 2025-11-06 22:15:08,731 basehttp 23632 13492 "GET /?ide_webview_request_time=1762447508387 HTTP/1.1" 404 4116
+WARNING 2025-11-06 22:15:09,749 log 23632 13492 Not Found: /@vite/client
+WARNING 2025-11-06 22:15:09,750 basehttp 23632 13492 "GET /@vite/client HTTP/1.1" 404 4131
+WARNING 2025-11-06 22:16:09,901 log 23632 22364 Forbidden: /api/auth/profile/
+WARNING 2025-11-06 22:16:09,901 basehttp 23632 22364 "GET /api/auth/profile/ HTTP/1.1" 403 58
+WARNING 2025-11-06 22:16:19,848 log 23632 22364 Not Found: /api/staff/bookings/
+WARNING 2025-11-06 22:16:19,849 basehttp 23632 22364 "GET /api/staff/bookings/ HTTP/1.1" 404 8023
+INFO 2025-11-06 22:16:36,079 autoreload 23632 7984 D:\developer\31oct\3nov\backend\repairmybike_backend\staff\urls.py changed, reloading.
+INFO 2025-11-06 22:16:36,718 autoreload 10148 15252 Watching for file changes with StatReloader
+WARNING 2025-11-06 22:16:42,770 log 10148 20700 Forbidden: /api/staff/bookings/
+WARNING 2025-11-06 22:16:42,771 basehttp 10148 20700 "GET /api/staff/bookings/ HTTP/1.1" 403 58
+INFO 2025-11-06 22:17:07,340 basehttp 10148 20700 "POST /api/auth/otp/request/ HTTP/1.1" 200 105
+ERROR 2025-11-06 22:17:18,882 views 10148 20700 Unified OTP verification failed: {'status_code': 401, 'error_type': 'server error', 'error_message': '{"errorCode":"E061102","errorDescription":"One time code is invalid"}'}
+WARNING 2025-11-06 22:17:18,883 log 10148 20700 Bad Request: /api/auth/otp/verify/
+WARNING 2025-11-06 22:17:18,883 basehttp 10148 20700 "POST /api/auth/otp/verify/ HTTP/1.1" 400 196
+ERROR 2025-11-06 22:17:32,360 views 10148 20700 Email OTP verification failed: {'status_code': 401, 'error_type': 'server error', 'error_message': '{"errorCode":"E061102","errorDescription":"One time code is invalid"}'}
+WARNING 2025-11-06 22:17:32,361 log 10148 20700 Bad Request: /api/auth/email/verify-otp/
+WARNING 2025-11-06 22:17:32,361 basehttp 10148 20700 "POST /api/auth/email/verify-otp/ HTTP/1.1" 400 196
+INFO 2025-11-06 22:21:39,878 autoreload 10148 15252 D:\developer\31oct\3nov\backend\repairmybike_backend\authentication\models.py changed, reloading.
+INFO 2025-11-06 22:21:40,544 autoreload 5900 5296 Watching for file changes with StatReloader
+INFO 2025-11-06 22:21:46,481 autoreload 5900 5296 D:\developer\31oct\3nov\backend\repairmybike_backend\authentication\admin.py changed, reloading.
+INFO 2025-11-06 22:21:47,133 autoreload 8156 8440 Watching for file changes with StatReloader
+INFO 2025-11-06 22:22:00,394 autoreload 8156 8440 D:\developer\31oct\3nov\backend\repairmybike_backend\authentication\views.py changed, reloading.
+INFO 2025-11-06 22:22:00,991 autoreload 14420 24340 Watching for file changes with StatReloader
+INFO 2025-11-06 22:41:30,613 autoreload 14420 24340 D:\developer\31oct\3nov\backend\repairmybike_backend\authentication\authentication.py changed, reloading.
+INFO 2025-11-06 22:41:31,237 autoreload 4176 23040 Watching for file changes with StatReloader
+INFO 2025-11-06 22:41:36,244 autoreload 4176 23040 D:\developer\31oct\3nov\backend\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2025-11-06 22:41:36,859 autoreload 12540 14936 Watching for file changes with StatReloader
+INFO 2025-11-06 22:41:41,857 autoreload 12540 14936 D:\developer\31oct\3nov\backend\repairmybike_backend\authentication\serializers.py changed, reloading.
+INFO 2025-11-06 22:41:42,460 autoreload 24020 13052 Watching for file changes with StatReloader
+INFO 2025-11-06 22:42:10,186 autoreload 24020 13052 D:\developer\31oct\3nov\backend\repairmybike_backend\authentication\views.py changed, reloading.
+INFO 2025-11-06 22:42:10,775 autoreload 924 22088 Watching for file changes with StatReloader
+INFO 2025-11-06 22:42:20,040 autoreload 924 22088 D:\developer\31oct\3nov\backend\repairmybike_backend\authentication\urls.py changed, reloading.
+INFO 2025-11-06 22:42:20,627 autoreload 4840 22068 Watching for file changes with StatReloader
+INFO 2025-11-06 22:42:55,426 autoreload 6836 22404 Watching for file changes with StatReloader
+INFO 2025-11-06 22:43:25,228 basehttp 4840 14948 "POST /api/auth/staff/login/password/ HTTP/1.1" 200 369
+INFO 2025-11-06 22:43:39,793 basehttp 4840 14948 "POST /api/auth/staff/login/password/ HTTP/1.1" 200 369
+INFO 2025-11-06 22:43:54,225 basehttp 4840 14948 "GET /api/auth/profile/ HTTP/1.1" 200 265
+INFO 2025-11-06 22:44:08,810 basehttp 4840 14948 "POST /api/auth/admin/login/password/ HTTP/1.1" 200 369
+INFO 2025-11-06 22:44:29,570 basehttp 4840 14948 "GET /api/staff/bookings/ HTTP/1.1" 200 954
+WARNING 2025-11-06 23:00:20,372 log 4840 6192 Bad Request: /api/auth/staff/login/password/
+WARNING 2025-11-06 23:00:20,372 basehttp 4840 6192 "POST /api/auth/staff/login/password/ HTTP/1.1" 400 107
+INFO 2025-11-06 23:00:20,517 basehttp 4840 6192 - Broken pipe from ('127.0.0.1', 54296)
+WARNING 2025-11-06 23:02:12,878 log 4840 1400 Bad Request: /api/auth/staff/login/password/
+WARNING 2025-11-06 23:02:12,878 basehttp 4840 1400 "POST /api/auth/staff/login/password/ HTTP/1.1" 400 107

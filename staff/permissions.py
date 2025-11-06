@@ -15,3 +15,16 @@ class IsStaffAPIKey(permissions.BasePermission):
             return False
         
         return api_key == settings.STAFF_API_KEY
+
+
+class IsStaffAuthenticated(permissions.BasePermission):
+    """
+    Authenticated user must be staff or superuser.
+    Replaces API-key gate with identity-based authorization.
+    """
+
+    message = 'Staff access requires an authenticated staff/admin user'
+
+    def has_permission(self, request, view):
+        user = getattr(request, 'user', None)
+        return bool(user and user.is_authenticated and (user.is_staff or user.is_superuser))
