@@ -1,1 +1,1 @@
-"""Management package for spare_parts."""
+"""Django management package for spare_parts app."""

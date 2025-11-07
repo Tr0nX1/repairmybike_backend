@@ -143,9 +143,11 @@ class SparePartListSerializer(serializers.ModelSerializer):
         return url
 
     def get_thumbnail(self, obj):
+        # Prefer explicitly marked primary image; otherwise fall back to first by sort_order
         primary = obj.images.filter(is_primary=True).first()
+        candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
         try:
-            return self._abs_url(primary.image.url) if primary and primary.image else None
+            return self._abs_url(candidate.image.url) if candidate and candidate.image else None
         except Exception:
             return None
 

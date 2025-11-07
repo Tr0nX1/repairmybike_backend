@@ -1,1 +1,1 @@
-"""Commands for seeding and utilities."""
+"""Commands for fetching and maintaining spare part assets."""
