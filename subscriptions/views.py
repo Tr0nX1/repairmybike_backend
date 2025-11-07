@@ -44,6 +44,23 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
             qs = qs.filter(contact_phone=phone)
         return qs
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return Response({
+                'error': False,
+                'message': 'Subscriptions retrieved successfully',
+                'data': serializer.data,
+            })
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'error': False,
+            'message': 'Subscriptions retrieved successfully',
+            'data': serializer.data,
+        })
+
     @action(detail=True, methods=["post"])
     def cancel(self, request, pk=None):
         sub = self.get_object()

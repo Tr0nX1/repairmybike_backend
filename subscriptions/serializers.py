@@ -27,6 +27,7 @@ class PlanSerializer(serializers.ModelSerializer):
 class SubscriptionSerializer(serializers.ModelSerializer):
     plan_name = serializers.CharField(source="plan.name", read_only=True)
     remaining_visits = serializers.SerializerMethodField(read_only=True)
+    is_active = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Subscription
@@ -38,6 +39,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             "contact_email",
             "contact_phone",
             "status",
+            "is_active",
             "auto_renew",
             "start_date",
             "end_date",
@@ -80,3 +82,15 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             return max(0, remaining)
         except Exception:
             return 0
+
+    def get_is_active(self, obj):
+        try:
+            # Active if not expired and status is not 'expired'
+            # If canceled, remains active until end_date passes
+            if obj.end_date is None:
+                # No end date set yet (recurring or pending start), treat as active unless explicitly expired
+                return obj.status != "expired"
+            from django.utils import timezone
+            return obj.end_date > timezone.now() and obj.status != "expired"
+        except Exception:
+            return False
