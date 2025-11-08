@@ -5,6 +5,10 @@ from django.core.validators import RegexValidator
 
 
 class Plan(models.Model):
+    TIER_CHOICES = [
+        ("basic", "Basic"),
+        ("premium", "Premium"),
+    ]
     BILLING_PERIOD_CHOICES = [
         ("monthly", "Monthly"),
         ("quarterly", "Quarterly"),
@@ -17,6 +21,8 @@ class Plan(models.Model):
     name = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(max_length=128, unique=True)
     description = models.TextField(blank=True)
+    # High-level tier to group related durations (Basic/Premium)
+    tier = models.CharField(max_length=16, choices=TIER_CHOICES, default="basic", db_index=True)
     benefits = models.JSONField(default=dict, blank=True)
     # List of included service names for membership display
     services = models.JSONField(default=list, blank=True)
@@ -34,6 +40,7 @@ class Plan(models.Model):
         indexes = [
             models.Index(fields=["slug"], name="subscriptions_plan_slug_idx"),
             models.Index(fields=["active"], name="subscriptions_plan_active_idx"),
+            models.Index(fields=["tier"], name="subscriptions_plan_tier_idx"),
         ]
 
     def __str__(self):

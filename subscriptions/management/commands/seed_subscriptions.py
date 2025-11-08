@@ -8,87 +8,90 @@ class Command(BaseCommand):
     help = "Seed sample subscription plans"
 
     def handle(self, *args, **options):
-        basic_monthly, created1 = Plan.objects.get_or_create(
-            slug="basic-monthly",
-            defaults={
-                "name": "Basic Monthly",
-                "description": "Essential maintenance tips and booking priority.",
-                "benefits": {
-                    "priority_booking": True,
-                    "reminders": ["service_due", "insurance_renewal"],
-                    "discounts": {"services": 5},
+        # Define common services per tier
+        basic_services = [
+            "Brake adjustment and tightening",
+            "Lubrication",
+            "Screw tightening",
+            "Chain adjustment and lubrication",
+            "Air filter cleaning",
+            "Engine oil (on MRP)",
+        ]
+        premium_services = [
+            "Priority support",
+            "Brake adjustment and tightening",
+            "Lubrication",
+            "Screw tightening",
+            "Air filter cleaning",
+            "Washing",
+            "Polishing",
+            "Engine oil (5% off on MRP)",
+            "General bike inspection",
+            "Chain lubrication and adjustment",
+        ]
+
+        def upsert_plan(slug, name, tier, price, period, visits, services, benefits):
+            obj, created = Plan.objects.get_or_create(
+                slug=slug,
+                defaults={
+                    "name": name,
+                    "tier": tier,
+                    "description": f"{name} membership plan",
+                    "benefits": benefits,
+                    "services": services,
+                    "price": Decimal(str(price)),
+                    "currency": "INR",
+                    "billing_period": period,
+                    "included_visits": visits,
+                    "active": True,
                 },
-                "services": [
-                    "Free Pickup & Drop (1x)",
-                    "Engine Oil Replacement",
-                    "Chain Cleaning & Lubrication",
-                    "Brake Pad Check & Adjustment",
-                ],
-                "price": Decimal("99.00"),
-                "currency": "INR",
-                "billing_period": "monthly",
-                "included_visits": 0,
-                "active": True,
-            },
-        )
+            )
+            if not created:
+                obj.name = name
+                obj.tier = tier
+                obj.benefits = benefits
+                obj.services = services
+                obj.price = Decimal(str(price))
+                obj.currency = "INR"
+                obj.billing_period = period
+                obj.included_visits = visits
+                obj.active = True
+                obj.save()
+            return obj, created
 
         # Ensure annual plan is migrated to yearly
         premium_annual = Plan.objects.filter(slug="premium-annual").first()
-        premium_yearly, created2 = Plan.objects.get_or_create(
-            slug="premium-yearly",
-            defaults={
-                "name": "Premium Yearly",
-                "description": "Comprehensive benefits with bigger discounts.",
-                "benefits": {
-                    "priority_booking": True,
-                    "reminders": ["service_due", "insurance_renewal", "pollution_check"],
-                    "discounts": {"services": 15, "spare_parts": 10},
-                    "free_pickup": True,
-                },
-                "services": [
-                    "Unlimited Pickup & Drop",
-                    "Comprehensive Service Package",
-                    "Priority Support",
-                    "Free Wash (Quarterly)",
-                ],
-                "price": Decimal("999.00"),
-                "currency": "INR",
-                "billing_period": "yearly",
-                "included_visits": 12,
-                "active": True,
-            },
+        # Create Basic plans (3, 6, 12 months)
+        bq, c_bq = upsert_plan(
+            "basic-quarterly", "Basic Plan", "basic", 499, "quarterly", 1, basic_services,
+            {"discounts": {"labour": 10}, "notes": "Max 1 service in 3 months"}
         )
-        if premium_annual and premium_annual.slug != "premium-yearly" and not Plan.objects.filter(slug="premium-yearly").exists():
-            # Update existing record to align with new period naming
-            premium_annual.slug = "premium-yearly"
-            premium_annual.name = "Premium Yearly"
-            premium_annual.billing_period = "yearly"
-            premium_annual.included_visits = 12
-            premium_annual.save()
+        bh, c_bh = upsert_plan(
+            "basic-half-yearly", "Basic Plan", "basic", 899, "half_yearly", 3, basic_services,
+            {"discounts": {"labour": 10}, "notes": "Max 3 services in 6 months"}
+        )
+        by, c_by = upsert_plan(
+            "basic-yearly", "Basic Plan", "basic", 1699, "yearly", 6, basic_services,
+            {"discounts": {"labour": 10}, "notes": "Max 6 services in 12 months"}
+        )
+
+        # Create Premium plans (3, 6, 12 months)
+        pq, c_pq = upsert_plan(
+            "premium-quarterly", "Premium Plan", "premium", 699, "quarterly", 1, premium_services,
+            {"discounts": {"labour": 15, "spare_parts": 10}, "priority_booking": True}
+        )
+        ph, c_ph = upsert_plan(
+            "premium-half-yearly", "Premium Plan", "premium", 1299, "half_yearly", 3, premium_services,
+            {"discounts": {"labour": 15, "spare_parts": 10}, "priority_booking": True}
+        )
+        py, c_py = upsert_plan(
+            "premium-yearly", "Premium Plan", "premium", 2499, "yearly", 6, premium_services,
+            {"discounts": {"labour": 15, "spare_parts": 10}, "priority_booking": True}
+        )
 
         # Add a Quarterly plan with 3 visits included
-        standard_quarterly, created3 = Plan.objects.get_or_create(
-            slug="standard-quarterly",
-            defaults={
-                "name": "Standard Quarterly",
-                "description": "Quarterly plan with 3 included service visits.",
-                "benefits": {
-                    "priority_booking": True,
-                    "reminders": ["service_due"],
-                    "discounts": {"services": 10},
-                },
-                "services": [
-                    "Priority Booking",
-                    "Three Included Service Visits",
-                    "Basic Wash (Monthly)",
-                ],
-                "price": Decimal("299.00"),
-                "currency": "INR",
-                "billing_period": "quarterly",
-                "included_visits": 3,
-                "active": True,
-            },
-        )
+        # Clean up deprecated sample plan
+        Plan.objects.filter(slug="standard-quarterly").delete()
 
         # Ensure services are populated for existing records (if they predate JSONField)
         if not created1 and (not isinstance(basic_monthly.services, list) or len(basic_monthly.services) == 0):
@@ -119,9 +122,8 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Seeded subscription plans:"))
         for plan, created in [
-            (basic_monthly, created1),
-            (premium_yearly, created2),
-            (standard_quarterly, created3),
+            (bq, c_bq), (bh, c_bh), (by, c_by),
+            (pq, c_pq), (ph, c_ph), (py, c_py),
         ]:
             self.stdout.write(self.style.SUCCESS(
                 f"- {plan.name} | period={plan.billing_period} | price={plan.price} {plan.currency} | visits={plan.included_visits} | created={bool(created)}"

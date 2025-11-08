@@ -8,6 +8,7 @@ class PlanSerializer(serializers.ModelSerializer):
         model = Plan
         fields = (
             "id",
+            "tier",
             "name",
             "slug",
             "description",
