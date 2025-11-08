@@ -18,6 +18,12 @@ class Command(BaseCommand):
                     "reminders": ["service_due", "insurance_renewal"],
                     "discounts": {"services": 5},
                 },
+                "services": [
+                    "Free Pickup & Drop (1x)",
+                    "Engine Oil Replacement",
+                    "Chain Cleaning & Lubrication",
+                    "Brake Pad Check & Adjustment",
+                ],
                 "price": Decimal("99.00"),
                 "currency": "INR",
                 "billing_period": "monthly",
@@ -39,6 +45,12 @@ class Command(BaseCommand):
                     "discounts": {"services": 15, "spare_parts": 10},
                     "free_pickup": True,
                 },
+                "services": [
+                    "Unlimited Pickup & Drop",
+                    "Comprehensive Service Package",
+                    "Priority Support",
+                    "Free Wash (Quarterly)",
+                ],
                 "price": Decimal("999.00"),
                 "currency": "INR",
                 "billing_period": "yearly",
@@ -65,6 +77,11 @@ class Command(BaseCommand):
                     "reminders": ["service_due"],
                     "discounts": {"services": 10},
                 },
+                "services": [
+                    "Priority Booking",
+                    "Three Included Service Visits",
+                    "Basic Wash (Monthly)",
+                ],
                 "price": Decimal("299.00"),
                 "currency": "INR",
                 "billing_period": "quarterly",
@@ -73,7 +90,43 @@ class Command(BaseCommand):
             },
         )
 
+        # Ensure services are populated for existing records (if they predate JSONField)
+        if not created1 and (not isinstance(basic_monthly.services, list) or len(basic_monthly.services) == 0):
+            basic_monthly.services = [
+                "Free Pickup & Drop (1x)",
+                "Engine Oil Replacement",
+                "Chain Cleaning & Lubrication",
+                "Brake Pad Check & Adjustment",
+            ]
+            basic_monthly.save()
+
+        if not created2 and (not isinstance(premium_yearly.services, list) or len(premium_yearly.services) == 0):
+            premium_yearly.services = [
+                "Unlimited Pickup & Drop",
+                "Comprehensive Service Package",
+                "Priority Support",
+                "Free Wash (Quarterly)",
+            ]
+            premium_yearly.save()
+
+        if not created3 and (not isinstance(standard_quarterly.services, list) or len(standard_quarterly.services) == 0):
+            standard_quarterly.services = [
+                "Priority Booking",
+                "Three Included Service Visits",
+                "Basic Wash (Monthly)",
+            ]
+            standard_quarterly.save()
+
         self.stdout.write(self.style.SUCCESS("Seeded subscription plans:"))
-        self.stdout.write(self.style.SUCCESS(f"  {basic_monthly.name} (created: {bool(created1)})"))
-        self.stdout.write(self.style.SUCCESS(f"  {premium_yearly.name} (created: {bool(created2)})"))
-        self.stdout.write(self.style.SUCCESS(f"  {standard_quarterly.name} (created: {bool(created3)})"))
+        for plan, created in [
+            (basic_monthly, created1),
+            (premium_yearly, created2),
+            (standard_quarterly, created3),
+        ]:
+            self.stdout.write(self.style.SUCCESS(
+                f"- {plan.name} | period={plan.billing_period} | price={plan.price} {plan.currency} | visits={plan.included_visits} | created={bool(created)}"
+            ))
+            if isinstance(plan.services, list) and plan.services:
+                self.stdout.write(self.style.SUCCESS("  services:"))
+                for s in plan.services:
+                    self.stdout.write(self.style.SUCCESS(f"    • {s}"))
