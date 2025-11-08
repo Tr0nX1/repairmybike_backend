@@ -7,12 +7,15 @@ from .models import Plan, Subscription
 from .serializers import PlanSerializer, SubscriptionSerializer
 
 
-class PlanViewSet(viewsets.ReadOnlyModelViewSet):
+class PlanViewSet(viewsets.ModelViewSet):
     queryset = Plan.objects.filter(active=True).order_by("price")
     serializer_class = PlanSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ["name", "description"]
+
+    def _clear_list_cache(self):
+        cache.delete("subscriptions_plans_list")
 
     def list(self, request, *args, **kwargs):
         key = "subscriptions_plans_list"
@@ -21,6 +24,26 @@ class PlanViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(cached)
         response = super().list(request, *args, **kwargs)
         cache.set(key, response.data, timeout=60)
+        return response
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        self._clear_list_cache()
+        return response
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        self._clear_list_cache()
+        return response
+
+    def partial_update(self, request, *args, **kwargs):
+        response = super().partial_update(request, *args, **kwargs)
+        self._clear_list_cache()
+        return response
+
+    def destroy(self, request, *args, **kwargs):
+        response = super().destroy(request, *args, **kwargs)
+        self._clear_list_cache()
         return response
 
 
