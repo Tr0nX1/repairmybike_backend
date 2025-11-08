@@ -59,33 +59,31 @@ class Command(BaseCommand):
                 obj.save()
             return obj, created
 
-        # Ensure annual plan is migrated to yearly
-        premium_annual = Plan.objects.filter(slug="premium-annual").first()
         # Create Basic plans (3, 6, 12 months)
         bq, c_bq = upsert_plan(
-            "basic-quarterly", "Basic Plan", "basic", 499, "quarterly", 1, basic_services,
+            "basic-quarterly", "Basic Membership - Quarterly", "basic", 499, "quarterly", 1, basic_services,
             {"discounts": {"labour": 10}, "notes": "Max 1 service in 3 months"}
         )
         bh, c_bh = upsert_plan(
-            "basic-half-yearly", "Basic Plan", "basic", 899, "half_yearly", 3, basic_services,
+            "basic-half-yearly", "Basic Membership - Half Yearly", "basic", 899, "half_yearly", 3, basic_services,
             {"discounts": {"labour": 10}, "notes": "Max 3 services in 6 months"}
         )
         by, c_by = upsert_plan(
-            "basic-yearly", "Basic Plan", "basic", 1699, "yearly", 6, basic_services,
+            "basic-yearly", "Basic Membership - Yearly", "basic", 1699, "yearly", 6, basic_services,
             {"discounts": {"labour": 10}, "notes": "Max 6 services in 12 months"}
         )
 
         # Create Premium plans (3, 6, 12 months)
         pq, c_pq = upsert_plan(
-            "premium-quarterly", "Premium Plan", "premium", 699, "quarterly", 1, premium_services,
+            "premium-quarterly", "Premium Membership - Quarterly", "premium", 699, "quarterly", 1, premium_services,
             {"discounts": {"labour": 15, "spare_parts": 10}, "priority_booking": True}
         )
         ph, c_ph = upsert_plan(
-            "premium-half-yearly", "Premium Plan", "premium", 1299, "half_yearly", 3, premium_services,
+            "premium-half-yearly", "Premium Membership - Half Yearly", "premium", 1299, "half_yearly", 3, premium_services,
             {"discounts": {"labour": 15, "spare_parts": 10}, "priority_booking": True}
         )
         py, c_py = upsert_plan(
-            "premium-yearly", "Premium Plan", "premium", 2499, "yearly", 6, premium_services,
+            "premium-yearly", "Premium Membership - Yearly", "premium", 2499, "yearly", 6, premium_services,
             {"discounts": {"labour": 15, "spare_parts": 10}, "priority_booking": True}
         )
 
@@ -93,32 +91,7 @@ class Command(BaseCommand):
         # Clean up deprecated sample plan
         Plan.objects.filter(slug="standard-quarterly").delete()
 
-        # Ensure services are populated for existing records (if they predate JSONField)
-        if not created1 and (not isinstance(basic_monthly.services, list) or len(basic_monthly.services) == 0):
-            basic_monthly.services = [
-                "Free Pickup & Drop (1x)",
-                "Engine Oil Replacement",
-                "Chain Cleaning & Lubrication",
-                "Brake Pad Check & Adjustment",
-            ]
-            basic_monthly.save()
-
-        if not created2 and (not isinstance(premium_yearly.services, list) or len(premium_yearly.services) == 0):
-            premium_yearly.services = [
-                "Unlimited Pickup & Drop",
-                "Comprehensive Service Package",
-                "Priority Support",
-                "Free Wash (Quarterly)",
-            ]
-            premium_yearly.save()
-
-        if not created3 and (not isinstance(standard_quarterly.services, list) or len(standard_quarterly.services) == 0):
-            standard_quarterly.services = [
-                "Priority Booking",
-                "Three Included Service Visits",
-                "Basic Wash (Monthly)",
-            ]
-            standard_quarterly.save()
+        # Legacy service population removed; all seeded plans define services explicitly above
 
         self.stdout.write(self.style.SUCCESS("Seeded subscription plans:"))
         for plan, created in [
