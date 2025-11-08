@@ -12,6 +12,7 @@ class PlanSerializer(serializers.ModelSerializer):
             "slug",
             "description",
             "benefits",
+            "services",
             "price",
             "currency",
             "billing_period",

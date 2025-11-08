@@ -18,6 +18,8 @@ class Plan(models.Model):
     slug = models.SlugField(max_length=128, unique=True)
     description = models.TextField(blank=True)
     benefits = models.JSONField(default=dict, blank=True)
+    # List of included service names for membership display
+    services = models.JSONField(default=list, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=8, default="INR")
     billing_period = models.CharField(max_length=16, choices=BILLING_PERIOD_CHOICES, default="monthly")

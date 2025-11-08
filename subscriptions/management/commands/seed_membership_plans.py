@@ -16,8 +16,16 @@ class Command(BaseCommand):
                 "priority_booking": labour_discount == 15,
                 "discounts": {"labour": labour_discount},
                 "reminders": ["service_due"],
-                "notes": "Membership plan configured via seed script",
             }
+
+        base_services = [
+            "Brake adjustment and tightening",
+            "Lubrication",
+            "Screw tightening",
+            "Chain adjustment and lubrication",
+            "Air filter cleaning",
+            "Engine oil (on MRP)",
+        ]
 
         # BASIC
         basic_quarterly, c1 = Plan.objects.update_or_create(
@@ -30,6 +38,7 @@ class Command(BaseCommand):
                 "currency": "INR",
                 "billing_period": "quarterly",
                 "included_visits": 3,
+                "services": base_services,
                 "active": True,
             },
         )
@@ -44,6 +53,7 @@ class Command(BaseCommand):
                 "currency": "INR",
                 "billing_period": "half_yearly",
                 "included_visits": 3,
+                "services": base_services,
                 "active": True,
             },
         )
@@ -58,6 +68,7 @@ class Command(BaseCommand):
                 "currency": "INR",
                 "billing_period": "yearly",
                 "included_visits": 6,
+                "services": base_services,
                 "active": True,
             },
         )
@@ -73,6 +84,7 @@ class Command(BaseCommand):
                 "currency": "INR",
                 "billing_period": "quarterly",
                 "included_visits": 3,
+                "services": base_services + ["Polishing"],
                 "active": True,
             },
         )
@@ -87,6 +99,7 @@ class Command(BaseCommand):
                 "currency": "INR",
                 "billing_period": "half_yearly",
                 "included_visits": 3,
+                "services": base_services + ["Polishing"],
                 "active": True,
             },
         )
@@ -101,6 +114,7 @@ class Command(BaseCommand):
                 "currency": "INR",
                 "billing_period": "yearly",
                 "included_visits": 6,
+                "services": base_services + ["Polishing"],
                 "active": True,
             },
         )
