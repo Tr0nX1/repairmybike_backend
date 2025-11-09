@@ -65,7 +65,13 @@ class BookingViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        # Validate and return consistent error response instead of DRF default
+        if not serializer.is_valid():
+            return Response({
+                'error': True,
+                'message': 'Invalid booking data',
+                'details': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         data = serializer.validated_data
         

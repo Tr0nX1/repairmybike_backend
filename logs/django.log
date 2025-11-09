@@ -185,3 +185,19 @@ WARNING 2025-11-06 23:02:12,878 basehttp 4840 1400 "POST /api/auth/staff/login/p
 INFO 2025-11-09 11:40:36,594 autoreload 27996 22004 Watching for file changes with StatReloader
 INFO 2025-11-09 11:40:53,925 autoreload 27996 22004 D:\developer\31oct\3nov\backend2\repairmybike_backend\services\models.py changed, reloading.
 INFO 2025-11-09 11:40:54,528 autoreload 17464 24608 Watching for file changes with StatReloader
+INFO 2025-11-09 12:21:28,440 autoreload 28000 23088 Watching for file changes with StatReloader
+INFO 2025-11-09 22:15:30,436 autoreload 15964 17536 Watching for file changes with StatReloader
+INFO 2025-11-09 22:18:10,240 basehttp 15964 1960 "GET /api/vehicles/vehicle-types/ HTTP/1.1" 200 340
+INFO 2025-11-09 22:18:30,580 basehttp 15964 1960 "GET /api/vehicles/vehicle-brands/?vehicle_type=1 HTTP/1.1" 200 1078
+INFO 2025-11-09 22:19:42,461 basehttp 15964 1960 "GET /api/vehicles/vehicle-models/?vehicle_brand=1 HTTP/1.1" 200 4005
+INFO 2025-11-09 22:36:06,524 basehttp 15964 28032 "GET /api/vehicles/vehicle-brands/?vehicle_type=1 HTTP/1.1" 200 1078
+INFO 2025-11-09 22:36:58,820 basehttp 15964 16460 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+INFO 2025-11-09 22:36:59,354 basehttp 15964 1108 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+ERROR 2025-11-09 22:36:59,680 authentication 15964 24864 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-09 22:36:59,800 basehttp 15964 8876 "GET /api/spare-parts/parts/ HTTP/1.1" 200 72
+INFO 2025-11-09 22:37:00,311 basehttp 15964 26540 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-09 22:37:00,982 basehttp 15964 24864 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 889
+ERROR 2025-11-09 22:38:03,798 authentication 15964 11468 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-09 22:38:05,159 basehttp 15964 11468 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 889
+ERROR 2025-11-09 22:39:07,912 authentication 15964 10204 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-09 22:39:09,214 basehttp 15964 10204 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 889
