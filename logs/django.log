@@ -182,3 +182,6 @@ WARNING 2025-11-06 23:00:20,372 basehttp 4840 6192 "POST /api/auth/staff/login/p
 INFO 2025-11-06 23:00:20,517 basehttp 4840 6192 - Broken pipe from ('127.0.0.1', 54296)
 WARNING 2025-11-06 23:02:12,878 log 4840 1400 Bad Request: /api/auth/staff/login/password/
 WARNING 2025-11-06 23:02:12,878 basehttp 4840 1400 "POST /api/auth/staff/login/password/ HTTP/1.1" 400 107
+INFO 2025-11-09 11:40:36,594 autoreload 27996 22004 Watching for file changes with StatReloader
+INFO 2025-11-09 11:40:53,925 autoreload 27996 22004 D:\developer\31oct\3nov\backend2\repairmybike_backend\services\models.py changed, reloading.
+INFO 2025-11-09 11:40:54,528 autoreload 17464 24608 Watching for file changes with StatReloader

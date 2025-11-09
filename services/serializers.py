@@ -39,10 +39,36 @@ class ServiceSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_images(self, obj):
-        # Normalize image list to absolute URLs suitable for Flutter
-        imgs = obj.images or []
-        if not isinstance(imgs, list):
-            return []
+        """Return a sanitized list of image URLs.
+        - Accepts both list and single string (in case models changed).
+        - Filters out non-image-like strings (e.g., description text).
+        - Normalizes to absolute URLs when possible (Cloudinary or MEDIA_URL).
+        """
+        raw = getattr(obj, 'images', None)
+        # Normalize raw to list
+        if raw is None:
+            imgs = []
+        elif isinstance(raw, list):
+            imgs = raw
+        else:
+            imgs = [str(raw)]
+
+        # Helper: quick heuristic to decide whether a string is image-like
+        def _is_image_like(s: str) -> bool:
+            if not s:
+                return False
+            t = s.strip().lower()
+            if t.startswith('http://') or t.startswith('https://') or t.startswith('data:image/'):
+                return True
+            if t.startswith('/') or t.startswith('media/'):
+                return True
+            # filename extension check
+            for ext in ('.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tiff'):
+                if t.endswith(ext):
+                    return True
+            return False
+
+        imgs = [str(u) for u in imgs if _is_image_like(str(u))]
 
         # Prefer Cloudinary when enabled, but preserve existing local paths
         if getattr(settings, 'USE_CLOUDINARY', False) and _cloudinary_url:
@@ -50,9 +76,9 @@ class ServiceSerializer(serializers.ModelSerializer):
                 if not u:
                     return None
                 u = u.strip()
-                if u.startswith('http://') or u.startswith('https://'):
+                if u.startswith('http://') or u.startswith('https://') or u.startswith('data:image/'):
                     return u
-                # If the value looks like a local media path, keep MEDIA_URL join
+                # Local media path
                 if u.startswith('/') or 'media/' in u or u.startswith('media/'):
                     base_local = getattr(settings, 'MEDIA_URL', '/')
                     if base_local.startswith('http://') or base_local.startswith('https://'):
@@ -72,7 +98,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             if not u:
                 return None
             u = u.strip()
-            if u.startswith('http://') or u.startswith('https://'):
+            if u.startswith('http://') or u.startswith('https://') or u.startswith('data:image/'):
                 return u
             if base.startswith('http://') or base.startswith('https://'):
                 # Ensure single slash join
