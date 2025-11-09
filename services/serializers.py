@@ -39,76 +39,51 @@ class ServiceSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_images(self, obj):
-        """Return a sanitized list of image URLs.
-        - Accepts both list and single string (in case models changed).
-        - Filters out non-image-like strings (e.g., description text).
-        - Normalizes to absolute URLs when possible (Cloudinary or MEDIA_URL).
+        """Return image URLs for the service.
+        Supports:
+        - Single ImageField on Service (obj.images)
+        - Future: related ServiceImage objects via obj.images.all()
+        - Backward compatibility: list of strings
         """
         raw = getattr(obj, 'images', None)
-        # Normalize raw to list
-        if raw is None:
-            imgs = []
-        elif isinstance(raw, list):
-            imgs = raw
-        else:
-            imgs = [str(raw)]
 
-        # Helper: quick heuristic to decide whether a string is image-like
-        def _is_image_like(s: str) -> bool:
-            if not s:
-                return False
-            t = s.strip().lower()
-            if t.startswith('http://') or t.startswith('https://') or t.startswith('data:image/'):
-                return True
-            if t.startswith('/') or t.startswith('media/'):
-                return True
-            # filename extension check
-            for ext in ('.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tiff'):
-                if t.endswith(ext):
-                    return True
-            return False
+        # Case 1: ImageField on Service
+        try:
+            if hasattr(raw, 'url'):
+                # If the file exists, return its URL
+                return [raw.url] if getattr(raw, 'name', None) else []
+        except Exception:
+            pass
 
-        imgs = [str(u) for u in imgs if _is_image_like(str(u))]
+        # Case 2: Related images manager (future-proof)
+        if hasattr(raw, 'all'):
+            urls = []
+            for item in raw.all():
+                img = getattr(item, 'image', None)
+                if img and getattr(img, 'name', None):
+                    try:
+                        urls.append(img.url)
+                    except Exception:
+                        continue
+            return urls
 
-        # Prefer Cloudinary when enabled, but preserve existing local paths
-        if getattr(settings, 'USE_CLOUDINARY', False) and _cloudinary_url:
-            def _to_abs_cloudinary_or_local(u: str):
-                if not u:
-                    return None
-                u = u.strip()
+        # Case 3: Backward compatibility with list of strings
+        if isinstance(raw, list):
+            imgs = [str(u).strip() for u in raw if u]
+            base = getattr(settings, 'MEDIA_URL', '/')
+
+            def _to_abs(u: str):
                 if u.startswith('http://') or u.startswith('https://') or u.startswith('data:image/'):
                     return u
-                # Local media path
-                if u.startswith('/') or 'media/' in u or u.startswith('media/'):
-                    base_local = getattr(settings, 'MEDIA_URL', '/')
-                    if base_local.startswith('http://') or base_local.startswith('https://'):
-                        if u.startswith('/'):
-                            return f"{base_local.rstrip('/')}{u}"
-                        return f"{base_local.rstrip('/')}/{u}"
-                    return u  # relative fallback
-                # Otherwise treat as Cloudinary public ID
-                return _cloudinary_url(u)[0]
-
-            return [x for x in (_to_abs_cloudinary_or_local(u) for u in imgs) if x]
-
-        # Fallback to joining with MEDIA_URL (R2/local)
-        base = getattr(settings, 'MEDIA_URL', '/')
-
-        def _to_abs(u: str):
-            if not u:
-                return None
-            u = u.strip()
-            if u.startswith('http://') or u.startswith('https://') or u.startswith('data:image/'):
+                if base.startswith('http://') or base.startswith('https://'):
+                    if u.startswith('/'):
+                        return f"{base.rstrip('/')}{u}"
+                    return f"{base.rstrip('/')}/{u}"
                 return u
-            if base.startswith('http://') or base.startswith('https://'):
-                # Ensure single slash join
-                if u.startswith('/'):
-                    return f"{base.rstrip('/')}{u}"
-                return f"{base.rstrip('/')}/{u}"
-            # Fallback: return as-is
-            return u
 
-        return [x for x in (_to_abs(u) for u in imgs) if x]
+            return [x for x in (_to_abs(u) for u in imgs) if x]
+
+        return []
 
 
 class ServicePricingSerializer(serializers.ModelSerializer):

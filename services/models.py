@@ -28,8 +28,8 @@ class Service(models.Model):
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     reviews_count = models.PositiveIntegerField(default=0)
     specifications = models.JSONField(default=list)
-    # Store a list of image paths/URLs; uploading handled by media storage
-    images = models.JSONField(default=list, blank=True)
+    # Single primary image uploaded via backend (optional)
+    images = models.ImageField(upload_to='services/images/', blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -23,6 +23,16 @@ class ServiceAdmin(admin.ModelAdmin):
     search_fields = ("name", "service_category__name")
     readonly_fields = ("created_at", "updated_at")
 
+    fieldsets = (
+        (None, {
+            'fields': ('service_category', 'name', 'description', 'specifications', 'images', 'is_featured')
+        }),
+        ('Timestamps', {
+            'classes': ('collapse',),
+            'fields': ('created_at', 'updated_at')
+        })
+    )
+
 
 @admin.register(ServicePricing)
 class ServicePricingAdmin(admin.ModelAdmin):
