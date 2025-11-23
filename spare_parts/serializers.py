@@ -8,6 +8,8 @@ from .models import (
     SparePartFitment,
     Cart,
     CartItem,
+    Order,
+    OrderItem,
 )
 
 
@@ -205,3 +207,43 @@ class CartAddItemSerializer(serializers.Serializer):
     session_id = serializers.CharField()
     spare_part_id = serializers.IntegerField()
     quantity = serializers.IntegerField(min_value=1, default=1)
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    part_name = serializers.CharField(source='spare_part.name', read_only=True)
+    sku = serializers.CharField(source='spare_part.sku', read_only=True)
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'total_price']
+        read_only_fields = ['id', 'unit_price', 'total_price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = [
+            'id', 'session_id', 'user', 'customer_name', 'phone', 'address',
+            'amount_total', 'currency', 'payment_method', 'payment_status',
+            'status', 'items', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'user', 'amount_total', 'currency', 'payment_method', 'payment_status', 'status', 'created_at', 'updated_at']
+
+
+class CheckoutSerializer(serializers.Serializer):
+    session_id = serializers.CharField()
+    customer_name = serializers.CharField()
+    phone = serializers.CharField()
+    address = serializers.CharField()
+
+
+class BuyNowSerializer(serializers.Serializer):
+    session_id = serializers.CharField()
+    spare_part_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1, default=1)
+    customer_name = serializers.CharField()
+    phone = serializers.CharField()
+    address = serializers.CharField()

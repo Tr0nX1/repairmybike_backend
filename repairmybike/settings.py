@@ -24,7 +24,7 @@ SECRET_KEY = config('SECRET_KEY', default=secrets.token_urlsafe(50))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.railway.app', 'repairmybikebackend-production.up.railway.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '*.railway.app', 'repairmybikebackend-production.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
@@ -302,6 +302,7 @@ from corsheaders.defaults import default_headers
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost(?::\d+)?$",
     r"^http://127\.0\.0\.1(?::\d+)?$",
+    r"^http://10\.0\.2\.2(?::\d+)?$",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -310,7 +311,8 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'https://repairmybikebackend-production.up.railway.app',
     'http://localhost:3000',
-    'http://127.0.0.1:3000'
+    'http://127.0.0.1:3000',
+    'http://10.0.2.2:8000'
 ]
 
 # Razorpay Configuration

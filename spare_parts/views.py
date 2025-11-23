@@ -10,6 +10,8 @@ from .models import (
     SparePartFitment,
     Cart,
     CartItem,
+    Order,
+    OrderItem,
 )
 from .serializers import (
     SparePartCategorySerializer,
@@ -18,6 +20,9 @@ from .serializers import (
     SparePartDetailSerializer,
     CartSerializer,
     CartAddItemSerializer,
+    OrderSerializer,
+    CheckoutSerializer,
+    BuyNowSerializer,
 )
 
 
@@ -187,3 +192,126 @@ class CartViewSet(viewsets.ViewSet):
         cart.items.all().delete()
         cart_serializer = CartSerializer(cart)
         return Response({'error': False, 'message': 'Cart cleared', 'data': cart_serializer.data})
+
+    @action(detail=False, methods=['post'])
+    def checkout(self, request):
+        serializer = CheckoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        session_id = serializer.validated_data['session_id']
+        customer_name = serializer.validated_data['customer_name']
+        phone = serializer.validated_data['phone']
+        address = serializer.validated_data['address']
+
+        cart = self._get_or_create_cart(session_id, request.user if request.user and request.user.is_authenticated else None)
+        items = list(cart.items.select_related('spare_part'))
+        if not items:
+            return Response({'error': True, 'message': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+
+        amount_total = 0
+        for item in items:
+            part = item.spare_part
+            if not part.active or not part.in_stock or part.stock_qty < item.quantity:
+                return Response({'error': True, 'message': 'Insufficient stock for one or more items'}, status=status.HTTP_400_BAD_REQUEST)
+            amount_total += item.unit_price * item.quantity
+
+        order = Order.objects.create(
+            session_id=session_id,
+            user=request.user if request.user and request.user.is_authenticated else None,
+            customer_name=customer_name,
+            phone=phone,
+            address=address,
+            amount_total=amount_total,
+            currency='INR',
+            payment_method='cash',
+            payment_status='cash_due',
+            status='created',
+        )
+
+        for item in items:
+            OrderItem.objects.create(
+                order=order,
+                spare_part=item.spare_part,
+                quantity=item.quantity,
+                unit_price=item.unit_price,
+            )
+            item.spare_part.stock_qty -= item.quantity
+            if item.spare_part.stock_qty <= 0:
+                item.spare_part.in_stock = False
+                item.spare_part.stock_qty = 0
+            item.spare_part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+
+        cart.items.all().delete()
+
+        order_serializer = OrderSerializer(order)
+        return Response({'error': False, 'message': 'Checkout successful. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
+    def buy_now(self, request):
+        serializer = BuyNowSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        session_id = serializer.validated_data['session_id']
+        spare_part_id = serializer.validated_data['spare_part_id']
+        quantity = serializer.validated_data['quantity']
+        customer_name = serializer.validated_data['customer_name']
+        phone = serializer.validated_data['phone']
+        address = serializer.validated_data['address']
+
+        try:
+            part = SparePart.objects.get(id=spare_part_id, active=True)
+        except SparePart.DoesNotExist:
+            return Response({'error': True, 'message': 'Spare part not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not part.in_stock or part.stock_qty < quantity:
+            return Response({'error': True, 'message': 'Insufficient stock'}, status=status.HTTP_400_BAD_REQUEST)
+
+        amount_total = part.sale_price * quantity
+        order = Order.objects.create(
+            session_id=session_id,
+            user=request.user if request.user and request.user.is_authenticated else None,
+            customer_name=customer_name,
+            phone=phone,
+            address=address,
+            amount_total=amount_total,
+            currency='INR',
+            payment_method='cash',
+            payment_status='cash_due',
+            status='created',
+        )
+
+        OrderItem.objects.create(
+            order=order,
+            spare_part=part,
+            quantity=quantity,
+            unit_price=part.sale_price,
+        )
+
+        part.stock_qty -= quantity
+        if part.stock_qty <= 0:
+            part.in_stock = False
+            part.stock_qty = 0
+        part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+
+        order_serializer = OrderSerializer(order)
+        return Response({'error': False, 'message': 'Order created. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)
+
+
+class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def list(self, request, *args, **kwargs):
+        session_id = request.query_params.get('session_id')
+        qs = self.get_queryset()
+        if request.user and request.user.is_authenticated:
+            qs = qs.filter(user=request.user)
+        elif session_id:
+            qs = qs.filter(session_id=session_id)
+        else:
+            return Response({'error': True, 'message': 'Provide session_id or authenticate'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(qs.order_by('-created_at'), many=True)
+        return Response({'error': False, 'message': 'Orders retrieved successfully', 'data': serializer.data})
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({'error': False, 'message': 'Order details retrieved successfully', 'data': serializer.data})

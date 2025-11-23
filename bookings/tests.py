@@ -1,28 +1,12 @@
-import requests, json
+from django.test import TestCase
+from django.urls import reverse
 
-BASE = "http://localhost:8000/api/bookings/bookings/"
 
-def pretty(r):
-    print(r.status_code, json.dumps(r.json(), indent=2))
-
-# 1. Create booking
-payload = {
-    "customer_name": "Rahul Sharma",
-    "customer_phone": "9876543210",
-    "customer_email": "rahul@example.com",
-    "vehicle_model_id": 1,
-    "service_ids": [3, 7],
-    "service_location": "home",
-    "address": "123, MG Road, Bangalore",
-    "appointment_date": "2025-11-01",
-    "appointment_time": "10:00:00"
-}
-r = requests.post(BASE, json=payload)
-pretty(r)
-booking_id = r.json()["data"]["id"]
-
-# 2. List bookings
-pretty(requests.get(BASE, params={"phone": "9876543210"}))
-
-# 3. Retrieve created booking
-pretty(requests.get(f"{BASE}{booking_id}/"))
+class BookingAPITests(TestCase):
+    def test_list_requires_phone_query_param(self):
+        url = reverse('booking-list')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 400)
+        data = resp.json()
+        self.assertTrue(data.get('error'))
+        self.assertIn('phone', data.get('message', '').lower())

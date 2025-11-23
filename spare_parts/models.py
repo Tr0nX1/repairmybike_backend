@@ -137,3 +137,50 @@ class CartItem(models.Model):
     @property
     def total_price(self):
         return self.unit_price * self.quantity
+
+
+class Order(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('cash_due', 'Cash Due'),
+        ('cash_paid', 'Cash Paid'),
+    ]
+    STATUS_CHOICES = [
+        ('created', 'Created'),
+        ('confirmed', 'Confirmed'),
+        ('fulfilled', 'Fulfilled'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    session_id = models.CharField(max_length=64, db_index=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
+    customer_name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=20)
+    address = models.TextField()
+    amount_total = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3, default='INR')
+    payment_method = models.CharField(max_length=20, default='cash')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='cash_due')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='created')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'spare_part_orders'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Order {self.id} ({self.session_id})"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    spare_part = models.ForeignKey(SparePart, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField()
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        db_table = 'spare_part_order_items'
+
+    @property
+    def total_price(self):
+        return self.unit_price * self.quantity

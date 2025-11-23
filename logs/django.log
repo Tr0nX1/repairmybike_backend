@@ -201,3 +201,817 @@ ERROR 2025-11-09 22:38:03,798 authentication 15964 11468 Authentication failed: 
 INFO 2025-11-09 22:38:05,159 basehttp 15964 11468 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 889
 ERROR 2025-11-09 22:39:07,912 authentication 15964 10204 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
 INFO 2025-11-09 22:39:09,214 basehttp 15964 10204 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 889
+INFO 2025-11-23 12:40:46,429 autoreload 22776 21864 Watching for file changes with StatReloader
+INFO 2025-11-23 12:47:25,795 autoreload 12500 13992 Watching for file changes with StatReloader
+WARNING 2025-11-23 12:47:33,700 log 12500 20792 Not Found: /
+WARNING 2025-11-23 12:47:33,701 basehttp 12500 20792 "GET /?ide_webview_request_time=1763882253661 HTTP/1.1" 404 4116
+WARNING 2025-11-23 12:47:33,901 log 12500 20792 Not Found: /@vite/client
+WARNING 2025-11-23 12:47:33,902 basehttp 12500 20792 "GET /@vite/client HTTP/1.1" 404 4131
+ERROR 2025-11-23 12:48:07,219 log 22460 20188 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+INFO 2025-11-23 15:08:54,071 autoreload 12968 17744 Watching for file changes with StatReloader
+INFO 2025-11-23 15:09:00,460 basehttp 12968 12608 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+INFO 2025-11-23 15:09:00,976 basehttp 12968 28140 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 15:09:01,780 basehttp 12968 17636 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 15:09:02,979 basehttp 12968 30268 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+WARNING 2025-11-23 15:09:03,090 log 12968 21460 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:09:03,090 log 12968 19664 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:09:03,090 log 12968 10116 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:09:03,090 log 12968 28364 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:09:03,090 log 12968 22964 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:09:03,090 log 12968 27460 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:09:03,091 log 12968 25980 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:09:03,091 basehttp 12968 19664 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:09:03,091 basehttp 12968 21460 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:09:03,092 basehttp 12968 10116 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:09:03,092 basehttp 12968 28364 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:09:03,092 basehttp 12968 22964 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:09:03,093 basehttp 12968 27460 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:09:03,093 basehttp 12968 25980 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 15:09:07,265 log 12968 28364 Not Found: /media/spare_parts/images/ngk_cr7_NoMnd1Z.png
+WARNING 2025-11-23 15:09:07,266 basehttp 12968 28364 "GET /media/spare_parts/images/ngk_cr7_NoMnd1Z.png HTTP/1.1" 404 4474
+WARNING 2025-11-23 15:09:07,314 log 12968 28364 Not Found: /media/spare_parts/images/rk_chain_kit_pJztT5h.png
+WARNING 2025-11-23 15:09:07,314 basehttp 12968 28364 "GET /media/spare_parts/images/rk_chain_kit_pJztT5h.png HTTP/1.1" 404 4494
+WARNING 2025-11-23 15:09:07,589 log 12968 28364 Not Found: /media/spare_parts/images/tvs_air_filter_xzd3DrI.png
+WARNING 2025-11-23 15:09:07,589 basehttp 12968 28364 "GET /media/spare_parts/images/tvs_air_filter_xzd3DrI.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:09:07,892 log 12968 28364 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:09:07,892 basehttp 12968 28364 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:09:08,056 log 12968 21460 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:09:08,058 log 12968 28364 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:09:08,059 basehttp 12968 21460 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:09:08,059 basehttp 12968 28364 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:09:09,642 log 12968 28364 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:09:09,642 basehttp 12968 28364 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:09:09,903 log 12968 10116 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:09:09,908 log 12968 19664 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:09:09,911 log 12968 21460 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:09:09,916 log 12968 25980 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:09:09,918 log 12968 27460 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:09:09,922 log 12968 28364 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:09:09,926 log 12968 22964 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:09:09,926 basehttp 12968 10116 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:09:09,927 basehttp 12968 19664 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 15:09:09,927 basehttp 12968 21460 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:09:09,927 basehttp 12968 25980 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:09:09,928 basehttp 12968 27460 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:09:09,928 basehttp 12968 28364 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:09:09,928 basehttp 12968 22964 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:09:18,914 log 12968 28364 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:09:18,919 log 12968 10116 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:09:18,921 log 12968 27460 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:09:18,923 log 12968 21460 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:09:18,926 log 12968 22964 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:09:18,929 log 12968 25980 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:09:18,932 log 12968 19664 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:09:18,933 basehttp 12968 28364 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:09:18,933 basehttp 12968 10116 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:09:18,933 basehttp 12968 27460 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:09:18,934 basehttp 12968 21460 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:09:18,934 basehttp 12968 22964 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:09:18,934 basehttp 12968 19664 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:09:18,935 basehttp 12968 25980 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+INFO 2025-11-23 15:09:21,290 basehttp 12968 26056 "POST /api/spare-parts/cart/add/ HTTP/1.1" 201 519
+INFO 2025-11-23 15:09:29,774 basehttp 12968 20832 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 201 730
+WARNING 2025-11-23 15:09:30,575 log 12968 29352 Bad Request: /api/spare-parts/cart/checkout/
+WARNING 2025-11-23 15:09:30,576 basehttp 12968 29352 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 400 40
+WARNING 2025-11-23 15:09:30,961 log 12968 20388 Bad Request: /api/spare-parts/cart/checkout/
+WARNING 2025-11-23 15:09:30,961 basehttp 12968 20388 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 400 40
+WARNING 2025-11-23 15:09:31,276 log 12968 4152 Bad Request: /api/spare-parts/cart/checkout/
+WARNING 2025-11-23 15:09:31,277 basehttp 12968 4152 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 400 40
+WARNING 2025-11-23 15:09:31,584 log 12968 10788 Bad Request: /api/spare-parts/cart/checkout/
+WARNING 2025-11-23 15:09:31,585 basehttp 12968 10788 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 400 40
+WARNING 2025-11-23 15:09:32,014 log 12968 27184 Bad Request: /api/spare-parts/cart/checkout/
+WARNING 2025-11-23 15:09:32,015 basehttp 12968 27184 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 400 40
+WARNING 2025-11-23 15:09:32,058 log 12968 29004 Bad Request: /api/spare-parts/cart/checkout/
+WARNING 2025-11-23 15:09:32,059 basehttp 12968 29004 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 400 40
+ERROR 2025-11-23 15:09:35,907 authentication 12968 13612 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:09:37,506 basehttp 12968 13612 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 15:09:48,296 authentication 12968 30156 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:09:49,613 basehttp 12968 30156 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+WARNING 2025-11-23 15:09:56,244 log 12968 10856 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:09:56,244 basehttp 12968 10856 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:09:56,528 log 12968 10856 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:09:56,531 basehttp 12968 10856 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:09:56,544 log 12968 26096 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:09:56,547 log 12968 2220 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:09:56,551 log 12968 17024 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:09:56,553 basehttp 12968 26096 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:09:56,553 basehttp 12968 2220 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:09:56,556 log 12968 28432 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:09:56,557 basehttp 12968 17024 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:09:56,560 log 12968 16820 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:09:56,564 log 12968 26568 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:09:56,564 basehttp 12968 28432 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 15:09:56,565 basehttp 12968 16820 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:09:56,565 basehttp 12968 26568 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:10:20,224 log 12968 11996 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:10:20,227 log 12968 10452 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:10:20,229 log 12968 28104 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:10:20,233 log 12968 8944 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:10:20,235 log 12968 11056 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:10:20,240 log 12968 23560 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:10:20,244 log 12968 16656 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:10:20,244 basehttp 12968 10452 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 15:10:20,244 basehttp 12968 11996 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:10:20,245 basehttp 12968 28104 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:10:20,245 basehttp 12968 8944 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:10:20,245 basehttp 12968 11056 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:10:20,246 basehttp 12968 16656 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:10:20,246 basehttp 12968 23560 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:10:23,453 log 12968 10452 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:10:23,453 basehttp 12968 10452 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:10:23,858 log 12968 16656 Not Found: /media/spare_parts/images/tvs_air_filter_xzd3DrI.png
+WARNING 2025-11-23 15:10:23,861 log 12968 11996 Not Found: /media/spare_parts/images/rk_chain_kit_pJztT5h.png
+WARNING 2025-11-23 15:10:23,864 log 12968 10452 Not Found: /media/spare_parts/images/ngk_cr7_NoMnd1Z.png
+WARNING 2025-11-23 15:10:23,865 basehttp 12968 16656 "GET /media/spare_parts/images/tvs_air_filter_xzd3DrI.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:10:23,865 basehttp 12968 11996 "GET /media/spare_parts/images/rk_chain_kit_pJztT5h.png HTTP/1.1" 404 4494
+WARNING 2025-11-23 15:10:23,865 basehttp 12968 10452 "GET /media/spare_parts/images/ngk_cr7_NoMnd1Z.png HTTP/1.1" 404 4474
+WARNING 2025-11-23 15:10:24,027 log 12968 10452 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:10:24,028 basehttp 12968 10452 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:10:24,446 log 12968 10452 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:10:24,449 log 12968 16656 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:10:24,453 log 12968 11996 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:10:24,460 basehttp 12968 10452 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:10:24,460 basehttp 12968 16656 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:10:24,460 basehttp 12968 11996 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+ERROR 2025-11-23 15:10:52,808 authentication 12968 26296 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:10:54,139 basehttp 12968 26296 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+WARNING 2025-11-23 15:11:53,120 log 12968 23760 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:11:53,121 basehttp 12968 23760 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:11:54,201 log 12968 23760 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:11:54,203 basehttp 12968 23760 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:11:54,207 log 12968 24584 Not Found: /media/spare_parts/images/tvs_air_filter_xzd3DrI.png
+WARNING 2025-11-23 15:11:54,210 log 12968 28536 Not Found: /media/spare_parts/images/ngk_cr7_NoMnd1Z.png
+WARNING 2025-11-23 15:11:54,213 log 12968 25812 Not Found: /media/spare_parts/images/rk_chain_kit_pJztT5h.png
+WARNING 2025-11-23 15:11:54,214 basehttp 12968 28536 "GET /media/spare_parts/images/ngk_cr7_NoMnd1Z.png HTTP/1.1" 404 4474
+WARNING 2025-11-23 15:11:54,214 basehttp 12968 24584 "GET /media/spare_parts/images/tvs_air_filter_xzd3DrI.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:11:54,214 basehttp 12968 25812 "GET /media/spare_parts/images/rk_chain_kit_pJztT5h.png HTTP/1.1" 404 4494
+WARNING 2025-11-23 15:11:54,252 log 12968 25812 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:11:54,253 basehttp 12968 25812 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:11:54,629 log 12968 24584 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:11:54,631 log 12968 25812 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:11:54,634 log 12968 28536 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:11:54,635 basehttp 12968 24584 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:11:54,635 basehttp 12968 25812 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:11:54,635 basehttp 12968 28536 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+ERROR 2025-11-23 15:11:57,208 authentication 12968 15096 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:11:58,453 basehttp 12968 15096 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+WARNING 2025-11-23 15:12:32,094 log 12968 10944 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:12:32,094 basehttp 12968 10944 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:12:33,039 log 12968 10944 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:12:33,045 log 12968 29604 Not Found: /media/spare_parts/images/ngk_cr7_NoMnd1Z.png
+WARNING 2025-11-23 15:12:33,049 log 12968 28720 Not Found: /media/spare_parts/images/rk_chain_kit_pJztT5h.png
+WARNING 2025-11-23 15:12:33,050 basehttp 12968 10944 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:12:33,053 log 12968 28152 Not Found: /media/spare_parts/images/tvs_air_filter_xzd3DrI.png
+WARNING 2025-11-23 15:12:33,054 basehttp 12968 29604 "GET /media/spare_parts/images/ngk_cr7_NoMnd1Z.png HTTP/1.1" 404 4474
+WARNING 2025-11-23 15:12:33,054 basehttp 12968 28720 "GET /media/spare_parts/images/rk_chain_kit_pJztT5h.png HTTP/1.1" 404 4494
+WARNING 2025-11-23 15:12:33,054 basehttp 12968 28152 "GET /media/spare_parts/images/tvs_air_filter_xzd3DrI.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:12:33,062 log 12968 10944 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:12:33,062 basehttp 12968 10944 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:12:33,319 log 12968 28152 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:12:33,322 log 12968 28720 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:12:33,324 log 12968 29604 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:12:33,325 basehttp 12968 28152 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:12:33,325 basehttp 12968 28720 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:12:33,326 basehttp 12968 29604 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:12:34,866 log 12968 29604 Not Found: /media/spare_parts/images/rk_chain_kit_pJztT5h.png
+WARNING 2025-11-23 15:12:34,869 log 12968 28152 Not Found: /media/spare_parts/images/ngk_cr7_NoMnd1Z.png
+WARNING 2025-11-23 15:12:34,871 log 12968 28720 Not Found: /media/spare_parts/images/tvs_air_filter_xzd3DrI.png
+WARNING 2025-11-23 15:12:34,871 basehttp 12968 29604 "GET /media/spare_parts/images/rk_chain_kit_pJztT5h.png HTTP/1.1" 404 4494
+WARNING 2025-11-23 15:12:34,872 basehttp 12968 28152 "GET /media/spare_parts/images/ngk_cr7_NoMnd1Z.png HTTP/1.1" 404 4474
+WARNING 2025-11-23 15:12:34,872 basehttp 12968 28720 "GET /media/spare_parts/images/tvs_air_filter_xzd3DrI.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:12:34,920 log 12968 28152 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:12:34,920 basehttp 12968 28152 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:12:34,934 log 12968 28152 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:12:34,934 basehttp 12968 28152 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:12:35,179 log 12968 28152 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:12:35,183 log 12968 28720 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:12:35,186 log 12968 29604 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:12:35,186 basehttp 12968 28152 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:12:35,186 basehttp 12968 28720 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:12:35,187 basehttp 12968 29604 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+INFO 2025-11-23 15:12:57,362 basehttp 12968 11976 "GET /api/services/services/?service_category=1 HTTP/1.1" 200 639
+WARNING 2025-11-23 15:12:57,415 log 12968 22632 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:12:57,416 basehttp 12968 22632 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 15:12:57,653 log 12968 22632 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:12:57,654 basehttp 12968 22632 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:12:57,658 log 12968 16960 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:12:57,661 log 12968 29668 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:12:57,661 basehttp 12968 16960 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:12:57,662 basehttp 12968 29668 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:12:59,263 log 12968 29668 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:12:59,264 basehttp 12968 29668 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 15:12:59,536 log 12968 29668 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:12:59,537 basehttp 12968 29668 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+ERROR 2025-11-23 15:13:01,145 authentication 12968 17196 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:13:02,421 basehttp 12968 17196 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 15:13:53,140 basehttp 12968 3124 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 15:13:53,150 basehttp 12968 11992 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 15:13:55,640 basehttp 12968 28448 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+ERROR 2025-11-23 15:13:55,884 authentication 12968 26688 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:13:56,510 basehttp 12968 24840 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+INFO 2025-11-23 15:13:57,149 basehttp 12968 26688 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 15:13:58,246 basehttp 12968 28572 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+WARNING 2025-11-23 15:13:58,322 log 12968 12612 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:13:58,325 log 12968 24892 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:13:58,328 log 12968 13388 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:13:58,330 log 12968 4620 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:13:58,335 log 12968 29328 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:13:58,338 log 12968 24156 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:13:58,338 basehttp 12968 12612 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:13:58,339 basehttp 12968 24892 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:13:58,339 basehttp 12968 13388 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:13:58,340 basehttp 12968 4620 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 15:13:58,340 basehttp 12968 29328 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:13:58,340 basehttp 12968 24156 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:13:58,345 log 12968 7296 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:13:58,345 basehttp 12968 7296 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+INFO 2025-11-23 15:14:01,206 basehttp 12968 11752 "GET /api/services/services/?service_category=1 HTTP/1.1" 200 639
+WARNING 2025-11-23 15:14:01,260 log 12968 4620 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:14:01,261 basehttp 12968 4620 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 15:14:01,502 log 12968 4620 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:14:01,505 log 12968 24892 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:14:01,509 log 12968 7296 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:14:01,513 log 12968 12612 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:14:01,515 log 12968 24156 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:14:01,518 log 12968 13388 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:14:01,521 log 12968 29328 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:14:01,522 basehttp 12968 4620 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 15:14:01,522 basehttp 12968 24892 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:14:01,522 basehttp 12968 7296 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:14:01,523 basehttp 12968 12612 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 15:14:01,523 basehttp 12968 24156 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:14:01,523 basehttp 12968 13388 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:14:01,524 basehttp 12968 29328 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:14:08,636 log 12968 24156 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:14:08,636 basehttp 12968 24156 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 15:14:08,912 log 12968 24156 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:14:08,913 basehttp 12968 24156 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+ERROR 2025-11-23 15:15:00,382 authentication 12968 25684 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:15:01,725 basehttp 12968 25684 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+WARNING 2025-11-23 15:15:18,803 log 12968 22700 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:15:18,804 basehttp 12968 22700 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+INFO 2025-11-23 15:15:20,789 basehttp 12968 17012 "GET /api/vehicles/vehicle-types/ HTTP/1.1" 200 623
+INFO 2025-11-23 15:15:21,323 basehttp 12968 17012 "GET /api/vehicles/vehicle-brands/?vehicle_type=1 HTTP/1.1" 200 1078
+INFO 2025-11-23 15:15:21,842 basehttp 12968 17012 "GET /api/vehicles/vehicle-models/?vehicle_brand=3 HTTP/1.1" 200 5853
+ERROR 2025-11-23 15:16:04,835 authentication 12968 25268 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:16:06,430 basehttp 12968 25268 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 15:17:09,148 authentication 12968 14748 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:17:10,399 basehttp 12968 14748 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 15:18:13,405 authentication 12968 28748 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:18:14,802 basehttp 12968 28748 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 15:19:17,673 authentication 12968 10392 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:19:19,010 basehttp 12968 10392 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 15:20:22,201 authentication 12968 29984 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:20:23,523 basehttp 12968 29984 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 15:20:55,798 basehttp 12968 25616 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 15:20:55,802 basehttp 12968 10856 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 15:20:58,196 basehttp 12968 11060 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+INFO 2025-11-23 15:20:58,310 basehttp 12968 10856 "GET /api/services/services/?service_category=1 HTTP/1.1" 200 639
+WARNING 2025-11-23 15:20:58,389 log 12968 30336 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:20:58,390 basehttp 12968 30336 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+INFO 2025-11-23 15:20:58,739 basehttp 12968 30468 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+ERROR 2025-11-23 15:20:58,784 authentication 12968 6324 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+WARNING 2025-11-23 15:20:59,641 log 12968 30336 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:20:59,642 basehttp 12968 30336 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 15:20:59,910 log 12968 30336 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:20:59,911 basehttp 12968 30336 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+INFO 2025-11-23 15:21:00,205 basehttp 12968 6324 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 15:21:00,870 basehttp 12968 11028 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+WARNING 2025-11-23 15:21:05,833 log 12968 30336 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:21:05,834 basehttp 12968 30336 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 15:21:14,542 log 12968 30336 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:21:14,543 basehttp 12968 30336 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 15:21:14,859 log 12968 30336 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 15:21:14,860 basehttp 12968 30336 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+ERROR 2025-11-23 15:22:03,386 authentication 12968 13320 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:22:04,793 basehttp 12968 13320 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 15:34:27,516 autoreload 27360 19956 Watching for file changes with StatReloader
+ERROR 2025-11-23 15:34:32,708 log 27360 28288 Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+WARNING 2025-11-23 15:34:32,711 basehttp 27360 28288 "GET /api/spare-parts/parts/ HTTP/1.1" 400 78337
+ERROR 2025-11-23 15:34:33,348 log 27360 26572 Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+WARNING 2025-11-23 15:34:33,350 basehttp 27360 26572 "GET /api/spare-parts/parts/ HTTP/1.1" 400 78337
+ERROR 2025-11-23 15:34:34,362 log 27360 15992 Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+WARNING 2025-11-23 15:34:34,364 basehttp 27360 15992 "GET /api/spare-parts/parts/ HTTP/1.1" 400 78337
+ERROR 2025-11-23 15:34:36,129 log 27360 11456 Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+WARNING 2025-11-23 15:34:36,132 basehttp 27360 11456 "GET /api/spare-parts/parts/ HTTP/1.1" 400 78337
+ERROR 2025-11-23 15:34:39,446 log 27360 5208 Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+WARNING 2025-11-23 15:34:39,448 basehttp 27360 5208 "GET /api/spare-parts/parts/ HTTP/1.1" 400 78337
+ERROR 2025-11-23 15:34:45,992 log 27360 1844 Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "C:\Users\wolf\11sat\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '10.0.2.2:8000'. You may need to add '10.0.2.2' to ALLOWED_HOSTS.
+WARNING 2025-11-23 15:34:45,994 basehttp 27360 1844 "GET /api/spare-parts/parts/ HTTP/1.1" 400 78337
+INFO 2025-11-23 15:34:52,239 autoreload 27360 19956 C:\Users\wolf\11sat\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2025-11-23 15:34:53,114 autoreload 8512 26700 Watching for file changes with StatReloader
+INFO 2025-11-23 15:35:26,503 autoreload 25676 27940 Watching for file changes with StatReloader
+INFO 2025-11-23 15:36:37,367 basehttp 25676 15132 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+INFO 2025-11-23 15:36:37,726 basehttp 25676 28296 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 15:36:37,820 basehttp 25676 12752 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+INFO 2025-11-23 15:36:37,987 basehttp 25676 16800 "GET /api/services/services/ HTTP/1.1" 200 639
+ERROR 2025-11-23 15:36:38,647 authentication 25676 12628 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 15:36:39,795 basehttp 25676 30428 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+INFO 2025-11-23 15:36:39,916 basehttp 25676 12628 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+WARNING 2025-11-23 15:36:39,984 log 25676 24156 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 15:36:39,984 log 25676 25552 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 15:36:39,984 log 25676 24804 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 15:36:39,985 log 25676 904 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 15:36:39,985 log 25676 27904 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 15:36:39,985 log 25676 28304 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 15:36:39,985 log 25676 27784 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 15:36:39,986 basehttp 25676 24156 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 15:36:39,986 basehttp 25676 25552 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 15:36:39,986 basehttp 25676 24804 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 15:36:39,987 basehttp 25676 904 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 15:36:39,987 basehttp 25676 27904 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:36:39,987 basehttp 25676 28304 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 15:36:39,988 basehttp 25676 27784 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+INFO 2025-11-23 16:04:47,764 autoreload 30392 16296 Watching for file changes with StatReloader
+INFO 2025-11-23 16:05:49,601 basehttp 30392 14748 "GET /api/spare-parts/cart/?session_id=sess_1763911936437_2022255949 HTTP/1.1" 200 245
+INFO 2025-11-23 16:05:50,853 basehttp 30392 28316 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6238
+WARNING 2025-11-23 16:05:50,991 log 30392 25780 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:05:50,991 log 30392 11868 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:05:50,991 log 30392 3232 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:05:50,992 basehttp 30392 25780 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4525
+WARNING 2025-11-23 16:05:50,992 basehttp 30392 11868 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4501
+WARNING 2025-11-23 16:05:50,992 basehttp 30392 3232 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4513
+INFO 2025-11-23 16:12:10,150 basehttp 30392 25368 "GET /api/spare-parts/cart/?session_id=sess_1763911936437_2022255949 HTTP/1.1" 200 245
+INFO 2025-11-23 16:12:11,997 basehttp 30392 28284 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6238
+WARNING 2025-11-23 16:12:12,119 log 30392 29888 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:12:12,122 log 30392 22588 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:12:12,123 basehttp 30392 29888 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4525
+WARNING 2025-11-23 16:12:12,127 log 30392 7972 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:12:12,127 basehttp 30392 22588 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4513
+WARNING 2025-11-23 16:12:12,128 basehttp 30392 7972 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4501
+INFO 2025-11-23 16:12:29,449 basehttp 30392 11228 "GET /api/spare-parts/cart/?session_id=sess_1763911936437_2022255949 HTTP/1.1" 200 245
+INFO 2025-11-23 16:12:31,594 basehttp 30392 25948 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6238
+WARNING 2025-11-23 16:12:31,713 log 30392 21644 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:12:31,715 basehttp 30392 21644 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4525
+WARNING 2025-11-23 16:12:31,719 log 30392 27024 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:12:31,722 log 30392 15080 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:12:31,722 basehttp 30392 27024 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4501
+WARNING 2025-11-23 16:12:31,722 basehttp 30392 15080 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4513
+INFO 2025-11-23 16:18:13,391 basehttp 30392 28824 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+INFO 2025-11-23 16:18:13,940 basehttp 30392 19172 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+INFO 2025-11-23 16:18:14,050 basehttp 30392 11968 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+ERROR 2025-11-23 16:18:14,418 authentication 30392 9104 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:18:15,067 basehttp 30392 26752 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 16:18:15,661 basehttp 30392 9104 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 16:18:15,770 basehttp 30392 6244 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+WARNING 2025-11-23 16:18:15,862 log 30392 20600 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:18:15,865 log 30392 18060 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:18:15,867 log 30392 12912 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:18:15,871 log 30392 8740 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 16:18:15,874 log 30392 20572 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 16:18:15,877 log 30392 22376 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:18:15,881 log 30392 19176 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 16:18:15,881 basehttp 30392 20600 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:18:15,881 basehttp 30392 18060 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:18:15,881 basehttp 30392 12912 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:18:15,881 basehttp 30392 8740 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:15,882 basehttp 30392 20572 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:15,882 basehttp 30392 19176 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 16:18:15,882 basehttp 30392 22376 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 16:18:26,488 log 30392 19176 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:18:26,489 basehttp 30392 19176 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:18:26,740 log 30392 18060 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 16:18:26,743 log 30392 12912 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:18:26,748 log 30392 8740 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:18:26,751 log 30392 20572 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 16:18:26,754 log 30392 19176 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:18:26,757 log 30392 20600 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:18:26,760 log 30392 22376 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 16:18:26,761 basehttp 30392 18060 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:26,761 basehttp 30392 12912 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:18:26,762 basehttp 30392 8740 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 16:18:26,762 basehttp 30392 20572 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:26,762 basehttp 30392 20600 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:18:26,762 basehttp 30392 19176 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:18:26,763 basehttp 30392 22376 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 16:18:41,561 log 30392 20600 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:18:41,564 log 30392 19176 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:18:41,568 log 30392 18060 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 16:18:41,572 log 30392 12912 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:18:41,574 log 30392 8740 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 16:18:41,577 log 30392 20572 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 16:18:41,580 log 30392 22376 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:18:41,581 basehttp 30392 20600 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:18:41,581 basehttp 30392 19176 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:18:41,582 basehttp 30392 18060 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:41,582 basehttp 30392 12912 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:18:41,582 basehttp 30392 8740 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 16:18:41,582 basehttp 30392 20572 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:41,583 basehttp 30392 22376 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+INFO 2025-11-23 16:18:49,853 basehttp 30392 28380 "POST /api/spare-parts/cart/add/ HTTP/1.1" 201 373
+WARNING 2025-11-23 16:18:50,164 log 30392 19176 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:18:50,165 basehttp 30392 19176 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:18:50,434 log 30392 12912 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:18:50,438 log 30392 20600 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:18:50,441 log 30392 22376 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:18:50,443 log 30392 20572 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 16:18:50,446 log 30392 18060 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 16:18:50,449 log 30392 8740 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 16:18:50,452 log 30392 19176 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:18:50,452 basehttp 30392 12912 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:18:50,452 basehttp 30392 22376 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 16:18:50,453 basehttp 30392 20600 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:18:50,453 basehttp 30392 20572 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:50,453 basehttp 30392 18060 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:50,454 basehttp 30392 8740 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 16:18:50,454 basehttp 30392 19176 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:18:59,506 log 30392 20572 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 16:18:59,509 log 30392 19176 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:18:59,513 log 30392 8740 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:18:59,515 log 30392 22376 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 16:18:59,517 log 30392 20600 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:18:59,521 log 30392 12912 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:18:59,524 log 30392 18060 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 16:18:59,525 basehttp 30392 19176 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:18:59,526 basehttp 30392 20572 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:18:59,526 basehttp 30392 8740 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 16:18:59,526 basehttp 30392 20600 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:18:59,526 basehttp 30392 22376 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 16:18:59,526 basehttp 30392 12912 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:18:59,527 basehttp 30392 18060 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+INFO 2025-11-23 16:19:00,683 basehttp 30392 28208 "POST /api/spare-parts/cart/add/ HTTP/1.1" 201 373
+ERROR 2025-11-23 16:19:18,406 authentication 30392 26632 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:19:19,712 basehttp 30392 26632 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 16:20:22,829 authentication 30392 22768 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:20:24,895 basehttp 30392 22768 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 16:20:35,020 basehttp 30392 19176 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 201 581
+WARNING 2025-11-23 16:20:49,667 log 30392 28312 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:20:49,667 basehttp 30392 28312 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+INFO 2025-11-23 16:20:53,897 basehttp 30392 7888 "GET /api/services/services/?service_category=1 HTTP/1.1" 200 639
+WARNING 2025-11-23 16:20:53,960 log 30392 28312 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 16:20:53,960 basehttp 30392 28312 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 16:20:54,184 log 30392 28312 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:20:54,188 log 30392 17568 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:20:54,189 basehttp 30392 28312 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:20:54,192 log 30392 28628 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:20:54,192 basehttp 30392 17568 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:20:54,193 basehttp 30392 28628 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:20:55,267 log 30392 17568 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 16:20:55,267 basehttp 30392 17568 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 16:20:55,560 log 30392 17568 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 16:20:55,561 basehttp 30392 17568 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 16:21:08,152 log 30392 17568 Not Found: /media/services/images/croppedlogo.jpeg
+WARNING 2025-11-23 16:21:08,152 basehttp 30392 17568 "GET /media/services/images/croppedlogo.jpeg HTTP/1.1" 404 4450
+WARNING 2025-11-23 16:21:09,479 log 30392 17568 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:21:09,480 basehttp 30392 17568 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:21:09,484 log 30392 25072 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:21:09,489 log 30392 21936 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:21:09,490 basehttp 30392 25072 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:21:09,490 basehttp 30392 21936 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+ERROR 2025-11-23 16:21:27,815 authentication 30392 25924 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:21:29,137 basehttp 30392 25924 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 16:22:42,987 basehttp 30392 29128 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 16:22:43,153 basehttp 30392 26636 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 16:22:45,300 basehttp 30392 25928 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+ERROR 2025-11-23 16:22:45,859 authentication 30392 23780 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:22:46,013 basehttp 30392 8132 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+INFO 2025-11-23 16:22:47,140 basehttp 30392 23780 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 16:22:47,929 basehttp 30392 29168 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+WARNING 2025-11-23 16:22:48,047 log 30392 20468 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:22:48,056 log 30392 20120 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:22:48,061 log 30392 9420 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:22:48,067 log 30392 5524 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 16:22:48,072 log 30392 27352 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:22:48,077 log 30392 2644 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 16:22:48,079 basehttp 30392 20120 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:22:48,079 basehttp 30392 9420 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 16:22:48,079 basehttp 30392 20468 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:22:48,080 basehttp 30392 5524 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 16:22:48,080 basehttp 30392 2644 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:22:48,087 basehttp 30392 27352 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:22:48,087 log 30392 30192 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 16:22:48,089 basehttp 30392 30192 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+ERROR 2025-11-23 16:23:49,986 authentication 30392 27184 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:23:51,281 basehttp 30392 27184 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 16:24:53,905 authentication 30392 19184 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:24:55,146 basehttp 30392 19184 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 16:25:58,200 authentication 30392 15524 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:25:59,539 basehttp 30392 15524 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+ERROR 2025-11-23 16:27:02,264 authentication 30392 29552 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:27:03,540 basehttp 30392 29552 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 16:29:37,892 basehttp 30392 17764 "GET /api/spare-parts/cart/?session_id=sess_1763911936437_2022255949 HTTP/1.1" 200 245
+INFO 2025-11-23 16:29:40,203 basehttp 30392 25624 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6238
+WARNING 2025-11-23 16:29:40,406 log 30392 20836 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:29:40,410 basehttp 30392 20836 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4525
+WARNING 2025-11-23 16:29:40,415 log 30392 29340 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:29:40,418 log 30392 24736 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:29:40,419 basehttp 30392 29340 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4513
+WARNING 2025-11-23 16:29:40,419 basehttp 30392 24736 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4501
+INFO 2025-11-23 16:34:30,480 basehttp 30392 8340 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 16:34:30,552 basehttp 30392 25728 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 16:34:32,720 basehttp 30392 26148 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+ERROR 2025-11-23 16:34:33,905 authentication 30392 25172 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:34:34,279 basehttp 30392 23548 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+INFO 2025-11-23 16:34:35,216 basehttp 30392 25172 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 16:34:36,589 basehttp 30392 2936 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+WARNING 2025-11-23 16:34:36,849 log 30392 21468 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:34:36,873 log 30392 14836 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:34:36,924 log 30392 28664 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 16:34:36,941 log 30392 29892 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:34:36,945 log 30392 28252 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 16:34:36,946 basehttp 30392 21468 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 16:34:36,946 basehttp 30392 14836 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 16:34:36,947 basehttp 30392 28664 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 16:34:36,953 log 30392 23276 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 16:34:36,954 basehttp 30392 29892 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 16:34:36,971 log 30392 27556 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 16:34:36,972 basehttp 30392 28252 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 16:34:36,974 basehttp 30392 23276 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 16:34:36,974 basehttp 30392 27556 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+INFO 2025-11-23 16:34:52,592 basehttp 30392 24840 "POST /api/spare-parts/cart/add/ HTTP/1.1" 201 373
+ERROR 2025-11-23 16:35:37,928 authentication 30392 26612 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 16:35:39,193 basehttp 30392 26612 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 16:37:32,405 basehttp 30392 18776 "GET /api/spare-parts/cart/?session_id=sess_1763911936437_2022255949 HTTP/1.1" 200 245
+INFO 2025-11-23 16:37:34,361 basehttp 30392 25304 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6238
+WARNING 2025-11-23 16:37:34,520 log 30392 24952 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 16:37:34,525 log 30392 27668 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 16:37:34,526 basehttp 30392 24952 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4525
+WARNING 2025-11-23 16:37:34,530 log 30392 10784 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 16:37:34,530 basehttp 30392 27668 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4501
+WARNING 2025-11-23 16:37:34,530 basehttp 30392 10784 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4513
+WARNING 2025-11-23 23:01:50,433 log 16984 17744 Bad Request: /api/bookings/bookings/
+INFO 2025-11-23 23:14:44,596 autoreload 7828 13320 Watching for file changes with StatReloader
+INFO 2025-11-23 23:16:29,734 basehttp 7828 26980 - Broken pipe from ('127.0.0.1', 55276)
+INFO 2025-11-23 23:16:30,359 basehttp 7828 26644 - Broken pipe from ('127.0.0.1', 55278)
+WARNING 2025-11-23 23:33:13,043 log 7828 19208 Bad Request: /api/spare-parts/cart/checkout/
+WARNING 2025-11-23 23:33:13,044 basehttp 7828 19208 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 400 40
+INFO 2025-11-23 23:35:29,491 basehttp 7828 26876 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+INFO 2025-11-23 23:35:49,067 basehttp 7828 26876 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+INFO 2025-11-23 23:36:10,620 basehttp 7828 26876 "POST /api/spare-parts/cart/add/ HTTP/1.1" 201 355
+INFO 2025-11-23 23:36:13,528 basehttp 7828 26876 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 201 544
+INFO 2025-11-23 23:40:58,367 basehttp 7828 25468 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+INFO 2025-11-23 23:40:58,765 basehttp 7828 10784 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 23:40:58,861 basehttp 7828 29324 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 23:40:59,089 basehttp 7828 3192 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 382
+ERROR 2025-11-23 23:40:59,652 authentication 7828 28304 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:41:00,630 basehttp 7828 28224 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6248
+WARNING 2025-11-23 23:41:00,782 log 7828 29376 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:41:00,785 log 7828 28328 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:41:00,789 log 7828 19320 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:41:00,792 log 7828 6992 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:41:00,795 log 7828 25532 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:41:00,797 log 7828 18536 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:41:00,800 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:00,801 basehttp 7828 29376 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:41:00,801 basehttp 7828 28328 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:41:00,802 basehttp 7828 19320 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:41:00,802 basehttp 7828 6992 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:00,802 basehttp 7828 25532 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:00,802 basehttp 7828 18536 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:41:00,803 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+INFO 2025-11-23 23:41:01,073 basehttp 7828 28304 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:41:04,607 basehttp 7828 29248 "GET /api/spare-parts/orders/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 1223
+WARNING 2025-11-23 23:41:14,839 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:14,840 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:41:15,105 log 7828 28328 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:41:15,107 log 7828 6992 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:41:15,109 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:15,114 log 7828 18536 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:41:15,116 log 7828 29376 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:41:15,119 log 7828 19320 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:41:15,123 log 7828 25532 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:41:15,123 basehttp 7828 28328 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:41:15,123 basehttp 7828 6992 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:41:15,124 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:41:15,124 basehttp 7828 29376 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:15,124 basehttp 7828 18536 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:41:15,125 basehttp 7828 19320 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:15,125 basehttp 7828 25532 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:41:19,015 log 7828 28328 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:41:19,019 log 7828 25532 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:41:19,023 log 7828 18536 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:41:19,026 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:19,028 log 7828 19320 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:41:19,032 log 7828 29376 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:41:19,035 log 7828 6992 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:41:19,036 basehttp 7828 28328 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:41:19,036 basehttp 7828 25532 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:41:19,036 basehttp 7828 18536 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:41:19,037 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:41:19,037 basehttp 7828 19320 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:19,037 basehttp 7828 29376 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:19,038 basehttp 7828 6992 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:41:20,502 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:20,503 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:41:20,790 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:20,796 log 7828 6992 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:41:20,799 log 7828 19320 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:41:20,803 log 7828 29376 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:41:20,808 log 7828 28328 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:41:20,812 log 7828 18536 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:41:20,817 log 7828 25532 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:41:20,817 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:41:20,817 basehttp 7828 6992 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:41:20,818 basehttp 7828 19320 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:20,818 basehttp 7828 29376 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:20,818 basehttp 7828 28328 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:41:20,819 basehttp 7828 18536 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:41:20,819 basehttp 7828 25532 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:41:30,149 log 7828 18536 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:41:30,153 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:30,156 log 7828 19320 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:41:30,159 log 7828 6992 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:41:30,162 log 7828 29376 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:41:30,165 log 7828 28328 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:41:30,170 log 7828 25532 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:41:30,170 basehttp 7828 18536 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:41:30,171 basehttp 7828 19320 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:30,171 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:41:30,171 basehttp 7828 6992 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:41:30,172 basehttp 7828 29376 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:41:30,172 basehttp 7828 28328 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:41:30,172 basehttp 7828 25532 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+INFO 2025-11-23 23:41:31,691 basehttp 7828 28688 "POST /api/spare-parts/cart/add/ HTTP/1.1" 201 373
+WARNING 2025-11-23 23:41:33,444 log 7828 12192 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:41:33,448 log 7828 25532 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:41:33,452 log 7828 18536 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:41:33,453 basehttp 7828 12192 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:41:33,453 basehttp 7828 25532 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:41:33,454 basehttp 7828 18536 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+INFO 2025-11-23 23:41:46,513 basehttp 7828 29212 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 201 581
+ERROR 2025-11-23 23:41:49,450 authentication 7828 2744 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:41:50,791 basehttp 7828 2744 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:41:54,814 basehttp 7828 24896 "GET /api/spare-parts/orders/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 1727
+ERROR 2025-11-23 23:42:07,430 authentication 7828 6280 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:42:08,759 basehttp 7828 6280 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:42:12,799 basehttp 7828 396 - Broken pipe from ('127.0.0.1', 55637)
+ERROR 2025-11-23 23:48:29,712 authentication 7828 26564 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:48:29,946 basehttp 7828 30196 "GET /api/spare-parts/cart/?session_id=sess_1763916490568_1155112145 HTTP/1.1" 200 385
+INFO 2025-11-23 23:48:30,992 basehttp 7828 26564 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:48:31,872 basehttp 7828 25768 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6237
+WARNING 2025-11-23 23:48:32,040 log 7828 22440 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:48:32,043 log 7828 27180 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:48:32,044 basehttp 7828 22440 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4525
+WARNING 2025-11-23 23:48:32,044 basehttp 7828 27180 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4513
+WARNING 2025-11-23 23:48:32,048 log 7828 26632 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:48:32,049 basehttp 7828 26632 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4501
+INFO 2025-11-23 23:48:33,513 basehttp 7828 22664 "GET /api/spare-parts/orders/?session_id=sess_1763916490568_1155112145 HTTP/1.1" 200 67
+INFO 2025-11-23 23:49:35,610 basehttp 7828 3264 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-23 23:49:35,667 basehttp 7828 27468 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-23 23:49:37,927 basehttp 7828 8620 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+ERROR 2025-11-23 23:49:38,318 authentication 7828 12700 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:49:38,377 basehttp 7828 23000 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+INFO 2025-11-23 23:49:39,564 basehttp 7828 12700 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:49:40,443 basehttp 7828 12992 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6247
+WARNING 2025-11-23 23:49:40,550 log 7828 30324 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:49:40,556 log 7828 13724 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:49:40,559 log 7828 16436 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:49:40,563 log 7828 10116 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:49:40,566 log 7828 28124 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:49:40,571 log 7828 12948 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:49:40,577 log 7828 9464 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:49:40,577 basehttp 7828 30324 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:49:40,578 basehttp 7828 13724 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:49:40,578 basehttp 7828 16436 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:49:40,579 basehttp 7828 28124 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:49:40,579 basehttp 7828 10116 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:49:40,579 basehttp 7828 12948 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:49:40,579 basehttp 7828 9464 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:49:43,209 log 7828 28124 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:49:43,210 basehttp 7828 28124 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:49:43,458 log 7828 30324 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:49:43,462 log 7828 28124 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:49:43,465 log 7828 16436 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:49:43,467 log 7828 12948 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:49:43,471 log 7828 10116 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:49:43,474 log 7828 13724 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:49:43,476 log 7828 9464 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:49:43,477 basehttp 7828 30324 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:49:43,477 basehttp 7828 28124 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:49:43,478 basehttp 7828 12948 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:49:43,478 basehttp 7828 16436 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:49:43,478 basehttp 7828 10116 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:49:43,478 basehttp 7828 13724 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:49:43,479 basehttp 7828 9464 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+INFO 2025-11-23 23:49:43,836 basehttp 7828 7588 "GET /api/spare-parts/orders/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 1727
+WARNING 2025-11-23 23:49:53,389 log 7828 9464 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:49:53,393 log 7828 30324 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:49:53,396 log 7828 13724 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:49:53,399 log 7828 28124 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:49:53,404 log 7828 12948 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:49:53,407 log 7828 10116 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:49:53,409 basehttp 7828 9464 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:49:53,412 log 7828 16436 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:49:53,412 basehttp 7828 30324 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:49:53,412 basehttp 7828 13724 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:49:53,413 basehttp 7828 10116 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+WARNING 2025-11-23 23:49:53,413 basehttp 7828 28124 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:49:53,413 basehttp 7828 12948 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:49:53,414 basehttp 7828 16436 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+INFO 2025-11-23 23:49:55,535 basehttp 7828 29152 "POST /api/spare-parts/cart/add/ HTTP/1.1" 201 374
+WARNING 2025-11-23 23:50:04,107 log 7828 13724 Not Found: /media/spare_parts/images/kn_air_filter_42aVR9V.png
+WARNING 2025-11-23 23:50:04,111 log 7828 9464 Not Found: /media/spare_parts/images/motul_7100_h8rs1gX.png
+WARNING 2025-11-23 23:50:04,113 log 7828 12948 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-23 23:50:04,117 log 7828 16436 Not Found: /media/spare_parts/images/mrf_zapper_w12SRKN.png
+WARNING 2025-11-23 23:50:04,120 log 7828 30324 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-23 23:50:04,124 log 7828 28124 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-23 23:50:04,127 log 7828 10116 Not Found: /media/spare_parts/images/exide_battery_primary_OulVXYE.png
+WARNING 2025-11-23 23:50:04,127 basehttp 7828 13724 "GET /media/spare_parts/images/kn_air_filter_42aVR9V.png HTTP/1.1" 404 4498
+WARNING 2025-11-23 23:50:04,127 basehttp 7828 9464 "GET /media/spare_parts/images/motul_7100_h8rs1gX.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:50:04,128 basehttp 7828 12948 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4502
+WARNING 2025-11-23 23:50:04,128 basehttp 7828 28124 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4526
+WARNING 2025-11-23 23:50:04,128 basehttp 7828 16436 "GET /media/spare_parts/images/mrf_zapper_w12SRKN.png HTTP/1.1" 404 4486
+WARNING 2025-11-23 23:50:04,128 basehttp 7828 30324 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4514
+WARNING 2025-11-23 23:50:04,129 basehttp 7828 10116 "GET /media/spare_parts/images/exide_battery_primary_OulVXYE.png HTTP/1.1" 404 4530
+INFO 2025-11-23 23:50:26,825 basehttp 7828 27808 "POST /api/spare-parts/cart/checkout/ HTTP/1.1" 201 581
+ERROR 2025-11-23 23:50:29,576 authentication 7828 25332 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:50:30,874 basehttp 7828 25332 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:50:35,382 basehttp 7828 27420 "GET /api/spare-parts/orders/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 2231
+ERROR 2025-11-23 23:50:46,490 authentication 7828 28348 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:50:47,741 basehttp 7828 28348 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:50:52,237 basehttp 7828 4612 "GET /api/spare-parts/orders/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 2231
+ERROR 2025-11-23 23:51:38,055 authentication 7828 25128 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-23 23:51:39,327 basehttp 7828 25128 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-23 23:51:44,136 basehttp 7828 23548 "GET /api/spare-parts/orders/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 2231
+INFO 2025-11-24 00:00:43,479 basehttp 7828 22224 "GET /api/services/service-categories/ HTTP/1.1" 200 375
+INFO 2025-11-24 00:00:43,485 basehttp 7828 20644 "GET /api/services/services/ HTTP/1.1" 200 639
+INFO 2025-11-24 00:00:45,988 basehttp 7828 25048 "GET /api/subscriptions/plans/ HTTP/1.1" 200 52
+INFO 2025-11-24 00:00:46,502 basehttp 7828 26900 "GET /api/spare-parts/cart/?session_id=sess_1763888324426_1781576751 HTTP/1.1" 200 245
+ERROR 2025-11-24 00:00:47,190 authentication 7828 27388 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-24 00:00:48,492 basehttp 7828 26176 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6247
+INFO 2025-11-24 00:00:48,513 basehttp 7828 27388 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-24 00:00:49,993 basehttp 7828 26176 - Broken pipe from ('127.0.0.1', 58733)
+INFO 2025-11-24 00:00:49,994 basehttp 7828 27388 - Broken pipe from ('127.0.0.1', 58730)
+INFO 2025-11-24 00:00:53,184 basehttp 7828 12264 - Broken pipe from ('127.0.0.1', 58755)
+INFO 2025-11-24 00:02:28,505 basehttp 7828 28492 "GET /api/services/services/ HTTP/1.1" 200 639
+ERROR 2025-11-24 00:02:31,242 authentication 7828 14748 Authentication failed: {'status_code': 401, 'error_type': 'invalid token', 'error_message': 'Received expired token (exp in past) during jwt validation. (sometimes can be due to time glitch (between machines), try to set the jwt_validation_leeway parameter (in DescopeClient) to higher value than 5sec which is the default)'}
+INFO 2025-11-24 00:02:31,728 basehttp 7828 25316 "GET /api/spare-parts/cart/?session_id=sess_1763916490568_1155112145 HTTP/1.1" 200 385
+INFO 2025-11-24 00:02:32,496 basehttp 7828 14748 "GET /api/bookings/bookings/?phone=8901232357 HTTP/1.1" 200 898
+INFO 2025-11-24 00:02:33,842 basehttp 7828 6356 "GET /api/spare-parts/parts/ HTTP/1.1" 200 6237
+WARNING 2025-11-24 00:02:34,040 log 7828 14028 Not Found: /media/spare_parts/images/castrol_power1_vu5Geaw.png
+WARNING 2025-11-24 00:02:34,044 log 7828 3812 Not Found: /media/spare_parts/images/Screenshot_2025-07-30_035610.png
+WARNING 2025-11-24 00:02:34,048 log 7828 21936 Not Found: /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png
+WARNING 2025-11-24 00:02:34,048 basehttp 7828 14028 "GET /media/spare_parts/images/castrol_power1_vu5Geaw.png HTTP/1.1" 404 4501
+WARNING 2025-11-24 00:02:34,049 basehttp 7828 3812 "GET /media/spare_parts/images/Screenshot_2025-07-30_035610.png HTTP/1.1" 404 4525
+WARNING 2025-11-24 00:02:34,049 basehttp 7828 21936 "GET /media/spare_parts/images/bosch_brake_front_6Z2ac6I.png HTTP/1.1" 404 4513
+INFO 2025-11-24 00:02:34,930 basehttp 7828 24612 "GET /api/spare-parts/orders/?session_id=sess_1763916490568_1155112145 HTTP/1.1" 200 67
