@@ -31,7 +31,7 @@ RUN echo '#!/bin/bash\n\
 RUN_PORT="${PORT:-8000}"\n\
 python manage.py migrate --no-input\n\
 python manage.py collectstatic --no-input\n\
-gunicorn repairmybike.wsgi:application --bind "[::]:$RUN_PORT" --workers 2 --timeout 120' > start.sh && \
+gunicorn repairmybike.wsgi:application --bind 0.0.0.0:$RUN_PORT --workers 2 --timeout 120' > start.sh && \
     chmod +x start.sh
 
 # Run the application
