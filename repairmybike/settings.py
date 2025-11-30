@@ -105,26 +105,13 @@ if DATABASE_URL:
     }
     print("✓ Configured PostgreSQL database from DATABASE_URL")
 else:
-    # Local development databases
     DATABASES = {
-        'default': dj_database_url.config(
-            default='postgresql://postgres:aGoQRdoZCSvNWmzJxNoQSCoNMjChYTaZ@mainline.proxy.rlwy.net:12825/railway',
-            conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=True,
-        ),
-        'sqlite': {
+        'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    # Add PostgreSQL-specific options for default
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'require',
-        'connect_timeout': 10,
-    }
-    print("✓ Configured PostgreSQL database for default")
-    print("✓ Configured SQLite database for backup")
+    print("✓ Configured SQLite database (no DATABASE_URL provided)")
 
 
 
