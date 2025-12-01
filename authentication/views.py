@@ -295,7 +295,7 @@ class PhoneOTPRequestView(APIView):
                     identifier=phone_number,
                     attempt_type='phone',
                     created_at__gte=timezone.now() - timezone.timedelta(hours=1)
-                ).count() >= 5
+                ).count() >= 10
                 
                 if rate_limited:
                     return Response(
@@ -343,13 +343,17 @@ class PhoneOTPRequestView(APIView):
                     attempt_type='phone'
                 )
                 
-                # Update attempt tracker for rate limiting
+                # Update attempt tracker for rate limiting (reset window if older than 1 hour)
+                if attempt_rec.last_attempt < timezone.now() - timezone.timedelta(hours=1):
+                    attempt_rec.attempts_count = 0
+                    attempt_rec.is_blocked = False
+                    attempt_rec.blocked_until = None
                 attempt_rec.attempts_count += 1
                 attempt_rec.last_attempt = timezone.now()
-                # Block for an hour if more than 5 attempts in the last hour
-                if attempt_rec.attempts_count >= 5:
+                # Block for 30 minutes if more than 10 attempts within the last hour window
+                if attempt_rec.attempts_count >= 10:
                     attempt_rec.is_blocked = True
-                    attempt_rec.blocked_until = timezone.now() + timezone.timedelta(hours=1)
+                    attempt_rec.blocked_until = timezone.now() + timezone.timedelta(minutes=30)
                 attempt_rec.save()
                 
                 return Response({
@@ -952,13 +956,19 @@ class EmailOTPRequestView(APIView):
             defaults={'attempts_count': 0}
         )
         
+        # Reset counts if the last attempt is older than 1 hour
+        now = timezone.now()
+        if attempt.last_attempt < now - timezone.timedelta(hours=1):
+            attempt.attempts_count = 0
+            attempt.is_blocked = False
+            attempt.blocked_until = None
         attempt.attempts_count += 1
-        attempt.last_attempt = timezone.now()
+        attempt.last_attempt = now
         
-        # Block if too many attempts
-        if attempt.attempts_count >= 5:  # Max 5 attempts per hour
+        # Block if too many attempts (allow up to 10 per hour, then 30 min block)
+        if attempt.attempts_count >= 10:
             attempt.is_blocked = True
-            attempt.blocked_until = timezone.now() + timezone.timedelta(hours=1)
+            attempt.blocked_until = now + timezone.timedelta(minutes=30)
         
         attempt.save()
 
@@ -1239,13 +1249,17 @@ class UnifiedOTPRequestView(APIView):
             defaults={'attempts_count': 0}
         )
         
+        now = timezone.now()
+        if attempt.last_attempt < now - timezone.timedelta(hours=1):
+            attempt.attempts_count = 0
+            attempt.is_blocked = False
+            attempt.blocked_until = None
         attempt.attempts_count += 1
-        attempt.last_attempt = timezone.now()
+        attempt.last_attempt = now
         
-        # Block if too many attempts
-        if attempt.attempts_count >= 5:  # Max 5 attempts per hour
+        if attempt.attempts_count >= 10:
             attempt.is_blocked = True
-            attempt.blocked_until = timezone.now() + timezone.timedelta(hours=1)
+            attempt.blocked_until = now + timezone.timedelta(minutes=30)
         
         attempt.save()
 

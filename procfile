@@ -1,2 +1,2 @@
 release: python manage.py wait_for_db --timeout 60 && python manage.py migrate && python manage.py load_service_categories && python manage.py load_motorcycle_data && python manage.py load_scooter_data && python manage.py load_major_services && python manage.py load_default_service_pricing
-web: gunicorn repairmybike.wsgi:application --bind 0.0.0.0:${PORT_HTTP:-8080} --workers 2 --timeout 120
+web: gunicorn repairmybike.wsgi:application --bind 0.0.0.0:$PORT
