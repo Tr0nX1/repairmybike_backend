@@ -1,8 +1,13 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from django.core.cache import cache
-from .models import VehicleType, VehicleBrand, VehicleModel
-from .serializers import VehicleTypeSerializer, VehicleBrandSerializer, VehicleModelSerializer
+from .models import VehicleType, VehicleBrand, VehicleModel, UserVehicle
+from .serializers import (
+    VehicleTypeSerializer, 
+    VehicleBrandSerializer, 
+    VehicleModelSerializer,
+    UserVehicleSerializer
+)
 
 
 class VehicleTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -105,3 +110,17 @@ class VehicleModelViewSet(viewsets.ReadOnlyModelViewSet):
             'message': 'Vehicle models retrieved successfully',
             'data': serializer.data
         })
+
+
+class UserVehicleViewSet(viewsets.ModelViewSet):
+    serializer_class = UserVehicleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return UserVehicle.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Handle setting is_default logic if needed
+        if serializer.validated_data.get('is_default', False):
+            UserVehicle.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+        serializer.save(user=self.request.user)

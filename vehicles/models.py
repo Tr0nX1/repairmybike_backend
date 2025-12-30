@@ -44,3 +44,20 @@ class VehicleModel(models.Model):
     
     def __str__(self):
         return f"{self.name} - {self.vehicle_brand.name}"
+
+
+class UserVehicle(models.Model):
+    user = models.ForeignKey('authentication.User', on_delete=models.CASCADE, related_name='vehicles')
+    vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.CASCADE, related_name='user_vehicles')
+    registration_number = models.CharField(max_length=20, blank=True, null=True)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'user_vehicles'
+        ordering = ['-is_default', '-created_at']
+        unique_together = ['user', 'vehicle_model']  # Prevent duplicate models for same user, or remove if user can own multiple of same model
+    
+    def __str__(self):
+        return f"{self.user} - {self.vehicle_model}"

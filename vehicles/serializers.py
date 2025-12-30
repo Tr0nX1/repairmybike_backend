@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
-from .models import VehicleType, VehicleBrand, VehicleModel
+from .models import VehicleType, VehicleBrand, VehicleModel, UserVehicle
 
 
 class VehicleTypeSerializer(serializers.ModelSerializer):
@@ -102,3 +102,15 @@ class VehicleModelSerializer(serializers.ModelSerializer):
             return self._abs_url(obj.image.url) if obj.image else None
         except Exception:
             return None
+
+
+class UserVehicleSerializer(serializers.ModelSerializer):
+    vehicle_model_details = VehicleModelSerializer(source='vehicle_model', read_only=True)
+    vehicle_model_id = serializers.PrimaryKeyRelatedField(
+        queryset=VehicleModel.objects.all(), source='vehicle_model', write_only=True
+    )
+    
+    class Meta:
+        model = UserVehicle
+        fields = ['id', 'vehicle_model_id', 'vehicle_model_details', 'registration_number', 'is_default', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
