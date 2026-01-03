@@ -163,6 +163,11 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='created')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    tracking_number = models.CharField(max_length=100, null=True, blank=True)
+    courier_name = models.CharField(max_length=100, null=True, blank=True)
+    estimated_delivery = models.DateTimeField(null=True, blank=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+
 
     class Meta:
         db_table = 'spare_part_orders'
