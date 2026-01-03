@@ -301,13 +301,19 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
 
     def list(self, request, *args, **kwargs):
         session_id = request.query_params.get('session_id')
+        phone = request.query_params.get('phone')
         qs = self.get_queryset()
+        
+        # Priority: authenticated user > phone > session_id
         if request.user and request.user.is_authenticated:
             qs = qs.filter(user=request.user)
+        elif phone:
+            qs = qs.filter(phone=phone)
         elif session_id:
             qs = qs.filter(session_id=session_id)
         else:
-            return Response({'error': True, 'message': 'Provide session_id or authenticate'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': True, 'message': 'Provide phone, session_id, or authenticate'}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = self.get_serializer(qs.order_by('-created_at'), many=True)
         return Response({'error': False, 'message': 'Orders retrieved successfully', 'data': serializer.data})
 
@@ -315,3 +321,34 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response({'error': False, 'message': 'Order details retrieved successfully', 'data': serializer.data})
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        instance = self.get_object()
+        
+        # Check current status
+        if instance.status not in ['created', 'pending', 'confirmed']:
+            return Response(
+                {
+                    'error': True,
+                    'message': f'Cannot cancel order in {instance.status} status'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        if instance.status == 'cancelled':
+             return Response(
+                {'error': True, 'message': 'Order is already cancelled'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Restore stock for each item
+        for item in instance.items.all():
+            part = item.spare_part
+            part.stock_qty += item.quantity
+            part.save()
+
+        instance.status = 'cancelled'
+        instance.save()
+        
+        return Response({'success': True, 'message': 'Order cancelled successfully'})

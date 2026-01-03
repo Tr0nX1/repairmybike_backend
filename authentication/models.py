@@ -10,6 +10,7 @@ class User(AbstractUser):
     profile_picture = models.URLField(blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     is_phone_verified = models.BooleanField(default=False)
+    default_vehicle = models.ForeignKey('vehicles.VehicleModel', on_delete=models.SET_NULL, null=True, blank=True, related_name='users_default')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     
