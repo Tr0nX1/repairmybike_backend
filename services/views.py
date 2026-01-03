@@ -36,8 +36,8 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         print(f"📝 Serialized data: {serializer.data}")
         
-        # Cache for 1 hour
-        cache.set(cache_key, serializer.data, 3600)
+        # Cache for 5 minutes for faster database sync
+        cache.set(cache_key, serializer.data, 300)
         
         print(f"✅ Returning fresh data: {len(serializer.data)} categories")
         return Response({
@@ -101,8 +101,8 @@ class ServiceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         print(f"📝 Serialized data: {serializer.data}")
         
-        # Cache for 1 hour
-        cache.set(cache_key, serializer.data, 3600)
+        # Cache for 5 minutes for faster database sync
+        cache.set(cache_key, serializer.data, 300)
         
         print(f"✅ Returning fresh data: {len(serializer.data)} services")
         return Response({
@@ -142,8 +142,8 @@ class ServicePricingViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = self.get_queryset().filter(vehicle_model_id=vehicle_model_id)
         serializer = self.get_serializer(queryset, many=True)
         
-        # Cache for 30 minutes
-        cache.set(cache_key, serializer.data, 1800)
+        # Cache for 5 minutes instead of 30 minutes
+        cache.set(cache_key, serializer.data, 300)
         
         return Response({
             'error': False,
