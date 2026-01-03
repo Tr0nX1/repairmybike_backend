@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from descope import DescopeClient, DeliveryMethod, SESSION_TOKEN_NAME, REFRESH_SESSION_TOKEN_NAME
+from .models import UserSession
 from .serializers import (
     UserSerializer, UserRegistrationSerializer, UserLoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
@@ -1392,3 +1393,59 @@ class UnifiedOTPVerifyView(APIView):
         )
         
         return user, True
+
+
+class RefreshTokenView(APIView):
+    """Handle token refresh using Descope refresh token"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            descope_client = create_descope_client()
+            
+            # Refresh session with Descope
+            auth_response = descope_client.refresh_session(refresh_token)
+            
+            if not auth_response:
+                return Response({'error': 'Token refresh failed'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+            new_refresh_jwt = auth_response.get(REFRESH_SESSION_TOKEN_NAME, {}).get("jwt")
+            
+            # Update local session if refresh token changed
+            if new_refresh_jwt:
+                try:
+                    UserSession.objects.filter(refresh_token=refresh_token).update(
+                        session_token=session_jwt,
+                        refresh_token=new_refresh_jwt,
+                        expires_at=timezone.now() + timedelta(hours=8),
+                        last_activity=timezone.now()
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to update session during refresh: {e}")
+            else:
+                # If refresh token not rotated, just update session token
+                 try:
+                    UserSession.objects.filter(refresh_token=refresh_token).update(
+                        session_token=session_jwt,
+                        last_activity=timezone.now()
+                    )
+                 except Exception:
+                     pass
+
+            resp = {
+                'session_token': session_jwt,
+            }
+            if new_refresh_jwt:
+                resp['refresh_token'] = new_refresh_jwt
+                
+            return Response(resp, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Token refresh failed: {str(e)}")
+            return Response({'error': 'Token refresh failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
