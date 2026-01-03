@@ -154,7 +154,7 @@ class Order(models.Model):
     session_id = models.CharField(max_length=64, db_index=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
     customer_name = models.CharField(max_length=200)
-    phone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20, db_index=True)
     address = models.TextField()
     amount_total = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3, default='INR')
