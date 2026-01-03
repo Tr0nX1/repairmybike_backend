@@ -1,11 +1,11 @@
 from django.db import models
 from vehicles.models import VehicleModel
-
+from django.conf import settings
 
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
-    icon = models.CharField(max_length=10, default='🔧')  # Default wrench emoji
+    icon = models.CharField(max_length=10, default='🔧')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -28,7 +28,6 @@ class Service(models.Model):
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     reviews_count = models.PositiveIntegerField(default=0)
     specifications = models.JSONField(default=list)
-    # Single primary image uploaded via backend (optional)
     images = models.ImageField(upload_to='services/images/', blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -57,3 +56,17 @@ class ServicePricing(models.Model):
     
     def __str__(self):
         return f"{self.service.name} - {self.vehicle_model.name} - ₹{self.price}"
+
+
+class UserSavedService(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='saved_services')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='saved_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'user_saved_services'
+        unique_together = ['user', 'service']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user} - {self.service}"

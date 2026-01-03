@@ -2,8 +2,11 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.core.cache import cache
-from .models import ServiceCategory, Service, ServicePricing
-from .serializers import ServiceCategorySerializer, ServiceSerializer, ServicePricingSerializer
+from .models import ServiceCategory, Service, ServicePricing, UserSavedService
+from .serializers import (
+    ServiceCategorySerializer, ServiceSerializer, ServicePricingSerializer,
+    UserSavedServiceSerializer
+)
 
 
 class ServiceCategoryViewSet(viewsets.ModelViewSet):
@@ -146,4 +149,68 @@ class ServicePricingViewSet(viewsets.ReadOnlyModelViewSet):
             'error': False,
             'message': 'Service pricing retrieved successfully',
             'data': serializer.data
+        })
+
+
+class SavedServiceViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSavedServiceSerializer
+    
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return UserSavedService.objects.none()
+        return UserSavedService.objects.filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+             return Response({
+                'error': False,
+                'data': []
+            })
+            
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'error': False,
+            'message': 'Saved services retrieved',
+            'data': serializer.data
+        })
+
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response(
+                {'error': True, 'message': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        updated_data = request.data.copy()
+        # 'service_id' is expected in request body
+        
+        serializer = self.get_serializer(data=updated_data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response({
+                'error': False,
+                'message': 'Service saved successfully',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        return Response({
+            'error': True,
+            'message': 'Failed to save service',
+            'details': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], url_path='remove')
+    def remove_service(self, request):
+        if not request.user.is_authenticated:
+            return Response({'error': True}, status=401)
+            
+        service_id = request.data.get('service_id')
+        deleted, _ = UserSavedService.objects.filter(
+            user=request.user, service_id=service_id
+        ).delete()
+        
+        return Response({
+            'error': False,
+            'message': 'Service removed' if deleted else 'Service not found in saved',
         })

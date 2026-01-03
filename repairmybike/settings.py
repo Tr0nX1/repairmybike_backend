@@ -193,9 +193,14 @@ if USE_CLOUDINARY:
     # Use Cloudinary storage backend for media
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-    # Either provide consolidated CLOUDINARY_URL or discrete keys
     CLOUDINARY_URL = config('CLOUDINARY_URL', default='')
-    if not CLOUDINARY_URL:
+    if CLOUDINARY_URL:
+        # Standard cloudinary library checks os.environ
+        os.environ['CLOUDINARY_URL'] = CLOUDINARY_URL
+        CLOUDINARY_STORAGE = {
+             'CLOUDINARY_URL': CLOUDINARY_URL
+        }
+    else:
         CLOUDINARY_STORAGE = {
             'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
             'API_KEY': config('CLOUDINARY_API_KEY', default=''),
