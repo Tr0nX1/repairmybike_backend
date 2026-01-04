@@ -300,19 +300,22 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderSerializer
 
     def list(self, request, *args, **kwargs):
+        user = request.user
         session_id = request.query_params.get('session_id')
-        phone = request.query_params.get('phone')
         qs = self.get_queryset()
         
-        # Priority: authenticated user > phone > session_id
-        if request.user and request.user.is_authenticated:
-            qs = qs.filter(user=request.user)
-        elif phone:
-            qs = qs.filter(phone=phone)
+        if user.is_authenticated:
+            # Strictly filter by the authenticated user
+            qs = qs.filter(user=user)
         elif session_id:
-            qs = qs.filter(session_id=session_id)
+            # Fallback only for anonymous/guest users with a session_id
+            # Note: We should ideally sign guest sessions too, but this isolates from phone scraping
+            qs = qs.filter(session_id=session_id, user__isnull=True)
         else:
-            return Response({'error': True, 'message': 'Provide phone, session_id, or authenticate'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': True, 
+                'message': 'Authentication required or session_id must be provided'
+            }, status=status.HTTP_401_UNAUTHORIZED)
         
         serializer = self.get_serializer(qs.order_by('-created_at'), many=True)
         return Response({'error': False, 'message': 'Orders retrieved successfully', 'data': serializer.data})
