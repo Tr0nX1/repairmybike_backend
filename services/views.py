@@ -12,7 +12,7 @@ from .serializers import (
 class ServiceCategoryViewSet(viewsets.ModelViewSet):
     queryset = ServiceCategory.objects.all()
     serializer_class = ServiceCategorySerializer
-    permission_classes = []  # Temporarily removed for testing
+    permission_classes = [permissions.AllowAny]
     
     def list(self, request, *args, **kwargs):
         print("🔍 ServiceCategoryViewSet.list() called")
@@ -50,7 +50,7 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    permission_classes = []  # Temporarily removed for testing
+    permission_classes = [permissions.AllowAny]
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -118,6 +118,7 @@ class ServicePricingViewSet(viewsets.ReadOnlyModelViewSet):
         'vehicle_model'
     ).all()
     serializer_class = ServicePricingSerializer
+    permission_classes = [permissions.AllowAny]
     
     @action(detail=False, methods=['get'], url_path='by-vehicle')
     def by_vehicle(self, request):

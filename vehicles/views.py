@@ -13,6 +13,7 @@ from .serializers import (
 class VehicleTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = VehicleType.objects.all()
     serializer_class = VehicleTypeSerializer
+    permission_classes = [permissions.AllowAny]
     
     def list(self, request, *args, **kwargs):
         cache_key = 'vehicle_types_list'
@@ -41,6 +42,7 @@ class VehicleTypeViewSet(viewsets.ReadOnlyModelViewSet):
 class VehicleBrandViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = VehicleBrand.objects.select_related('vehicle_type').all()
     serializer_class = VehicleBrandSerializer
+    permission_classes = [permissions.AllowAny]
     filterset_fields = ['vehicle_type']
     
     def list(self, request, *args, **kwargs):
@@ -78,6 +80,7 @@ class VehicleBrandViewSet(viewsets.ReadOnlyModelViewSet):
 class VehicleModelViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = VehicleModel.objects.select_related('vehicle_brand__vehicle_type').all()
     serializer_class = VehicleModelSerializer
+    permission_classes = [permissions.AllowAny]
     filterset_fields = ['vehicle_brand']
     
     def list(self, request, *args, **kwargs):

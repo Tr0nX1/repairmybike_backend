@@ -29,11 +29,13 @@ from .serializers import (
 class SparePartCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SparePartCategory.objects.all()
     serializer_class = SparePartCategorySerializer
+    permission_classes = [permissions.AllowAny]
 
 
 class SparePartBrandViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SparePartBrand.objects.all()
     serializer_class = SparePartBrandSerializer
+    permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
         category_id = request.query_params.get('category')
@@ -51,6 +53,7 @@ class SparePartBrandViewSet(viewsets.ReadOnlyModelViewSet):
 class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SparePart.objects.select_related('brand', 'category').all()
     serializer_class = SparePartDetailSerializer
+    permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
         q = request.query_params.get('q')
