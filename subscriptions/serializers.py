@@ -4,6 +4,8 @@ from .models import Plan, Subscription
 
 
 class PlanSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Plan
         fields = (
@@ -12,6 +14,7 @@ class PlanSerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
+            "image",
             "benefits",
             "services",
             "price",
@@ -24,6 +27,31 @@ class PlanSerializer(serializers.ModelSerializer):
             "updated_at",
         )
         read_only_fields = ("id", "created_at", "updated_at")
+
+    def _abs_url(self, url: str):
+        from django.conf import settings
+        if not url:
+            return None
+        if url.startswith('http://') or url.startswith('https://'):
+            return url
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            try:
+                return request.build_absolute_uri(url)
+            except Exception:
+                pass
+        base = getattr(settings, 'MEDIA_URL', '/')
+        if base.startswith('http://') or base.startswith('https://'):
+            if url.startswith('/'):
+                return f"{base.rstrip('/')}{url}"
+            return f"{base.rstrip('/')}/{url}"
+        return url
+
+    def get_image(self, obj):
+        try:
+            return self._abs_url(obj.image.url) if obj.image else None
+        except Exception:
+            return None
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):

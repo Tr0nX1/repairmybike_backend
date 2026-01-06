@@ -10,6 +10,7 @@ from .models import (
     CartItem,
     Order,
     OrderItem,
+    UserSavedPart,
 )
 
 
@@ -248,3 +249,11 @@ class BuyNowSerializer(serializers.Serializer):
     customer_name = serializers.CharField()
     phone = serializers.CharField()
     address = serializers.CharField()
+
+class UserSavedPartSerializer(serializers.ModelSerializer):
+    spare_part = SparePartListSerializer(read_only=True)
+
+    class Meta:
+        model = UserSavedPart
+        fields = ['id', 'spare_part', 'created_at']
+        read_only_fields = ['id', 'created_at']

@@ -4,14 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import (
-    SparePartCategory,
-    SparePartBrand,
-    SparePart,
-    SparePartFitment,
-    Cart,
-    CartItem,
-    Order,
     OrderItem,
+    UserSavedPart,
 )
 from .serializers import (
     SparePartCategorySerializer,
@@ -23,6 +17,7 @@ from .serializers import (
     OrderSerializer,
     CheckoutSerializer,
     BuyNowSerializer,
+    UserSavedPartSerializer,
 )
 
 
@@ -358,3 +353,48 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
         instance.save()
         
         return Response({'success': True, 'message': 'Order cancelled successfully'})
+
+class UserSavedPartViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSavedPartSerializer
+
+    def get_queryset(self):
+        return UserSavedPart.objects.filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        serializer = self.get_serializer(qs, many=True)
+        return Response({
+            'error': False,
+            'message': 'Saved parts retrieved successfully',
+            'data': serializer.data
+        })
+
+    def create(self, request, *args, **kwargs):
+        spare_part_id = request.data.get('spare_part_id')
+        if not spare_part_id:
+            return Response({'error': True, 'message': 'spare_part_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            part = SparePart.objects.get(id=spare_part_id)
+        except SparePart.DoesNotExist:
+            return Response({'error': True, 'message': 'Spare part not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        obj, created = UserSavedPart.objects.get_or_create(user=request.user, spare_part=part)
+        return Response({
+            'error': False,
+            'message': 'Part saved successfully' if created else 'Part already saved',
+            'data': self.get_serializer(obj).data
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def remove(self, request):
+        spare_part_id = request.data.get('spare_part_id')
+        if not spare_part_id:
+            return Response({'error': True, 'message': 'spare_part_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        deleted, _ = UserSavedPart.objects.filter(user=request.user, spare_part_id=spare_part_id).delete()
+        return Response({
+            'error': False,
+            'message': 'Part removed from saved list' if deleted else 'Part not found in saved list'
+        }, status=status.HTTP_200_OK if deleted else status.HTTP_404_NOT_FOUND)

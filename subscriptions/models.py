@@ -21,6 +21,7 @@ class Plan(models.Model):
     name = models.CharField(max_length=128, unique=True)
     slug = models.SlugField(max_length=128, unique=True)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='plans/images/', blank=True, null=True)
     # High-level tier to group related durations (Basic/Premium)
     tier = models.CharField(max_length=16, choices=TIER_CHOICES, default="basic", db_index=True)
     benefits = models.JSONField(default=dict, blank=True)

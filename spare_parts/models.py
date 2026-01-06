@@ -189,3 +189,16 @@ class OrderItem(models.Model):
     @property
     def total_price(self):
         return self.unit_price * self.quantity
+
+class UserSavedPart(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='saved_parts')
+    spare_part = models.ForeignKey(SparePart, on_delete=models.CASCADE, related_name='saved_by_users')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'user_saved_parts'
+        unique_together = ['user', 'spare_part']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user} - {self.spare_part}"
