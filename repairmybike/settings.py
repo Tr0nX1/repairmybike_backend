@@ -298,6 +298,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost(?::\d+)?$",
     r"^http://127\.0\.0\.1(?::\d+)?$",
     r"^http://10\.0\.2\.2(?::\d+)?$",
+    'https://repairmybike.in',
+    'https://www.repairmybike.in'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
