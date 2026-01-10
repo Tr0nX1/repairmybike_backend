@@ -288,7 +288,7 @@ REST_FRAMEWORK = {
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000,http://127.0.0.1:3000,https://repairmybikebackend-production.up.railway.app,https://repairmybike-frontend.vercel.app,https://www.repairmybike.in,repairmybike.in',
+    default='http://localhost:3000,http://127.0.0.1:3000,https://repairmybikebackend-production.up.railway.app,https://repairmybike-frontend.vercel.app,https://www.repairmybike.in,https://repairmybike.in',
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
