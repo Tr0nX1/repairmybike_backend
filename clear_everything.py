@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from authentication.models import PhoneOTP, EmailOTP, OTPAttempt, UserSession, UserAddress
 from vehicles.models import UserVehicle
 from bookings.models import Booking
-from shop.models import Order # Assuming shop has orders
+from spare_parts.models import Order
 
 User = get_user_model()
 

@@ -291,7 +291,7 @@ CORS_ALLOWED_ORIGINS = config(
 
 # Allow any localhost/127.0.0.1 port for Flutter web/dev servers
 from corsheaders.defaults import default_headers
-CORS_ALLOWED_ORIGIN_REGEXES = [
+CORS_ALLOWED_ORIGIN_PATTERNS = [
     r"^http://localhost(?::\d+)?$",
     r"^http://127\.0\.0\.1(?::\d+)?$",
     r"^http://10\.0\.2\.2(?::\d+)?$",
@@ -302,10 +302,14 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
     'https://repairmybikebackend-production.up.railway.app',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://10.0.2.2:8000'
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://10.0.2.2',
 ]
+# Add common ports to be safe
+for port in [3000, 8000, 8080]:
+    CSRF_TRUSTED_ORIGINS.append(f'http://localhost:{port}')
+    CSRF_TRUSTED_ORIGINS.append(f'http://127.0.0.1:{port}')
 
 # Razorpay Configuration
 RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='')
