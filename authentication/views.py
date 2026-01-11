@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from descope import DescopeClient, DeliveryMethod, SESSION_TOKEN_NAME, REFRESH_SESSION_TOKEN_NAME
-from .models import UserSession
+from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, StaffDirectory, UserAddress
 from .serializers import (
     UserSerializer, UserRegistrationSerializer, UserLoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
@@ -23,9 +23,9 @@ from .serializers import (
     EmailOTPRequestSerializer, EmailOTPVerifySerializer, EmailLoginSerializer,
     UnifiedOTPRequestSerializer, UnifiedOTPVerifySerializer,
     StaffOtpLoginSerializer,
-    StaffPasswordLoginSerializer
+    StaffPasswordLoginSerializer,
+    UserAddressSerializer
 )
-from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, StaffDirectory
 from .authentication import DescopeAuthentication
 
 logger = logging.getLogger(__name__)
@@ -1449,3 +1449,23 @@ class RefreshTokenView(APIView):
             logger.error(f"Token refresh failed: {str(e)}")
             return Response({'error': 'Token refresh failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
+from rest_framework import viewsets
+
+class UserAddressViewSet(viewsets.ModelViewSet):
+    """ViewSet for UserAddress model"""
+    serializer_class = UserAddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return UserAddress.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # If this is set as default, unset other defaults
+        if serializer.validated_data.get('is_default', False):
+            UserAddress.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('is_default', False):
+            UserAddress.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+        serializer.save()

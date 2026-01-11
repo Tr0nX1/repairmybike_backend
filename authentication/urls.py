@@ -1,7 +1,13 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
+router = DefaultRouter()
+router.register(r'addresses', views.UserAddressViewSet, basename='useraddress')
+
 urlpatterns = [
+    path('', include(router.urls)),
+    
     # Authentication endpoints
     path('register/', views.UserRegistrationView.as_view(), name='user-register'),
     path('login/', views.UserLoginView.as_view(), name='user-login'),
