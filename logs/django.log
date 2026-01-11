@@ -1029,3 +1029,4 @@ INFO 2025-11-29 21:32:40,307 basehttp 12732 12748 "GET /static/admin/js/theme.js
 INFO 2025-11-29 21:32:40,312 basehttp 12732 17608 "GET /static/admin/css/base.css HTTP/1.1" 200 22120
 INFO 2025-11-29 21:32:40,312 basehttp 12732 14648 "GET /static/admin/css/login.css HTTP/1.1" 200 951
 INFO 2025-11-29 21:32:40,315 basehttp 12732 17608 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2026-01-11 14:12:09,174 autoreload 25232 28808 Watching for file changes with StatReloader
