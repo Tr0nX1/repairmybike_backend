@@ -1030,3 +1030,447 @@ INFO 2025-11-29 21:32:40,312 basehttp 12732 17608 "GET /static/admin/css/base.cs
 INFO 2025-11-29 21:32:40,312 basehttp 12732 14648 "GET /static/admin/css/login.css HTTP/1.1" 200 951
 INFO 2025-11-29 21:32:40,315 basehttp 12732 17608 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
 INFO 2026-01-11 14:12:09,174 autoreload 25232 28808 Watching for file changes with StatReloader
+INFO 2026-01-11 14:16:47,980 autoreload 27948 33460 Watching for file changes with StatReloader
+INFO 2026-01-11 14:19:10,934 basehttp 27948 30184 "GET / HTTP/1.1" 301 0
+INFO 2026-01-11 14:19:10,940 basehttp 27948 33604 code 400, message Bad request syntax ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03¯æqI+YÜçm\x17m<')
+ERROR 2026-01-11 14:19:10,941 basehttp 27948 33604 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:10,943 basehttp 27948 32772 code 400, message Bad request version ('ýNwù(VZ£xC/')
+ERROR 2026-01-11 14:19:10,943 basehttp 27948 32772 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:20,026 basehttp 27948 29904 code 400, message Bad request version ("¦&\x80evGJ¸{\x08Æcv1\x91\x8a\x07'É")
+ERROR 2026-01-11 14:19:20,027 basehttp 27948 29904 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:20,027 basehttp 27948 25196 code 400, message Bad request version ('Ó\x84\x9eÁ5¿Ú\x95\x9b²Ð+\x14j×}D1FGNÆé\x9f\x8bf¢\x7f&x/\x91\x9fMtÉ\x07Ê4\x12ÝÙ1\x04\x92¿JýZ®¤[\x12-¸lÛ\\\x13õ\x13d')
+ERROR 2026-01-11 14:19:20,028 basehttp 27948 25196 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:20,029 basehttp 27948 32944 code 400, message Bad request version ('ªz\x86')
+ERROR 2026-01-11 14:19:20,029 basehttp 27948 32944 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:20,029 basehttp 27948 29804 code 400, message Bad request version ('xöøl4eþ.£0U\x18ãKIM')
+ERROR 2026-01-11 14:19:20,030 basehttp 27948 29804 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:23,585 basehttp 27948 29724 code 400, message Bad request version ('\x02h2\x08http/1.1\x00')
+ERROR 2026-01-11 14:19:23,585 basehttp 27948 29724 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:23,587 basehttp 27948 27096 code 400, message Bad request version ('\\')
+ERROR 2026-01-11 14:19:23,587 basehttp 27948 27096 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:23,591 basehttp 27948 33272 code 400, message Bad request version ('\x02h2\x08http/1.1\x00')
+INFO 2026-01-11 14:19:23,592 basehttp 27948 5456 code 400, message Bad request version ('ã@}Ì\\³\x01¼¯U;èÙ\x8a7t\x00\x95à«\xadJ\x11\x9aæ6\x06Cf63\x93`fZe\x9a\x8firO2ú\x12=¢/Ô´£\x04¦Ïss\x04')
+ERROR 2026-01-11 14:19:23,592 basehttp 27948 33272 You're accessing the development server over HTTPS, but it only supports HTTP.
+ERROR 2026-01-11 14:19:23,592 basehttp 27948 5456 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:19:23,594 basehttp 27948 7716 code 400, message Bad request version ('\x00\x12\x00\x10\x04\x03\x08\x04\x04\x01\x05\x03\x08\x05\x05\x01\x08\x06\x06\x01\x00\x1b\x00\x03\x02\x00\x02\x00\x12\x00\x00\x00')
+INFO 2026-01-11 14:19:23,594 basehttp 27948 23828 code 400, message Bad request version ('Ó\x83ÛCäe)ÀýþòÆÖG\x17³\x81')
+ERROR 2026-01-11 14:19:23,594 basehttp 27948 7716 You're accessing the development server over HTTPS, but it only supports HTTP.
+ERROR 2026-01-11 14:19:23,594 basehttp 27948 23828 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:03,639 autoreload 30660 32496 Watching for file changes with StatReloader
+INFO 2026-01-11 14:29:09,217 basehttp 30660 360 code 400, message Bad request syntax ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03Qü\x8b;×i²òÍ\x8djP')
+ERROR 2026-01-11 14:29:09,226 basehttp 30660 360 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:09,229 basehttp 30660 23616 code 400, message Bad request version ('®B#')
+ERROR 2026-01-11 14:29:09,229 basehttp 30660 23616 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:19,521 basehttp 30660 4976 code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03X~gadn\x9f^')
+ERROR 2026-01-11 14:29:19,522 basehttp 30660 4976 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:19,523 basehttp 30660 3080 code 400, message Bad request version ('ämºúV\x7f\x1b\x93A·Ý\x00')
+ERROR 2026-01-11 14:29:19,523 basehttp 30660 3080 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:19,529 basehttp 30660 31120 code 400, message Bad request version ('\x10\x17\x90gËF\x12·2\x11\x81J\x1b)AZ')
+ERROR 2026-01-11 14:29:19,529 basehttp 30660 31120 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:19,529 basehttp 30660 16132 code 400, message Bad request version ('e\x0fAd\x95£}\x8byz"\x946')
+ERROR 2026-01-11 14:29:19,530 basehttp 30660 16132 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:19,531 basehttp 30660 26080 code 400, message Bad request version ('VßÉ¨Òæ8$Ä¡V\x87\x00\x11õnãåµ5EË\x93rº\x06i\x9fçBLó\x97\x08n¦\x8b:D\x07\x07\x82\x8f\x83¹%\x93Xq¡P¢ÝHV=«\x96Iq¿@rEÐ¤»\x8bÑ')
+ERROR 2026-01-11 14:29:19,531 basehttp 30660 26080 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:29:19,532 basehttp 30660 20448 code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x06')
+ERROR 2026-01-11 14:29:19,532 basehttp 30660 20448 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:32:35,604 autoreload 25076 19108 Watching for file changes with StatReloader
+INFO 2026-01-11 14:32:40,759 basehttp 25076 18228 code 400, message Bad request version ('\x00\x02\x01\x00\x00\x17\x00\x00\x003\x04ï\x04í')
+ERROR 2026-01-11 14:32:40,760 basehttp 25076 18228 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-11 14:32:40,762 basehttp 25076 28856 code 400, message Bad request syntax ('\x16\x03\x01\x06À\x01\x00\x06¼\x03\x03!\x14ð')
+ERROR 2026-01-11 14:32:40,763 basehttp 25076 28856 You're accessing the development server over HTTPS, but it only supports HTTP.
+WARNING 2026-01-11 14:33:20,893 log 25076 4232 Not Found: /
+WARNING 2026-01-11 14:33:20,894 basehttp 25076 4232 "GET / HTTP/1.1" 404 3463
+INFO 2026-01-11 14:33:27,831 basehttp 25076 4232 "GET /admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 14:33:28,380 basehttp 25076 4232 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4162
+INFO 2026-01-11 14:33:28,652 basehttp 25076 14652 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2026-01-11 14:33:28,653 basehttp 25076 27180 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2026-01-11 14:33:28,653 basehttp 25076 20396 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2026-01-11 14:33:28,657 basehttp 25076 4232 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2026-01-11 14:33:28,660 basehttp 25076 31728 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2026-01-11 14:33:28,669 basehttp 25076 19124 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2026-01-11 14:33:28,674 basehttp 25076 14652 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2026-01-11 14:33:28,678 basehttp 25076 25096 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2026-01-11 14:33:28,707 basehttp 25076 19124 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2026-01-11 14:33:41,433 basehttp 25076 4232 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 14:33:42,969 basehttp 25076 4232 "GET /admin/ HTTP/1.1" 200 19073
+INFO 2026-01-11 14:33:43,024 basehttp 25076 14652 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2026-01-11 14:33:43,051 basehttp 25076 14652 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2026-01-11 14:33:43,053 basehttp 25076 25096 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2026-01-11 14:33:43,055 basehttp 25076 20396 "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 200 392
+INFO 2026-01-11 14:35:03,008 basehttp 25076 4232 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 24210
+INFO 2026-01-11 14:35:03,080 basehttp 25076 14652 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6811
+INFO 2026-01-11 14:35:03,098 basehttp 25076 31728 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2026-01-11 14:35:03,100 basehttp 25076 27180 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2026-01-11 14:35:03,117 basehttp 25076 4232 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2026-01-11 14:35:03,139 basehttp 25076 14652 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+INFO 2026-01-11 14:35:03,151 basehttp 25076 19124 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2026-01-11 14:35:03,155 basehttp 25076 19124 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2026-01-11 14:35:03,164 basehttp 25076 27180 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2026-01-11 14:35:03,165 basehttp 25076 31728 "GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+INFO 2026-01-11 14:35:03,167 basehttp 25076 4232 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2026-01-11 14:35:03,167 basehttp 25076 19124 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+INFO 2026-01-11 14:35:03,167 basehttp 25076 32116 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2026-01-11 14:35:03,191 basehttp 25076 19124 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2026-01-11 14:35:03,198 basehttp 25076 20396 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2026-01-11 14:35:03,245 basehttp 25076 19124 "GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+INFO 2026-01-11 14:35:03,246 basehttp 25076 32116 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2026-01-11 14:35:03,257 basehttp 25076 19124 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2026-01-11 14:35:03,319 basehttp 25076 14652 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2026-01-11 14:35:03,460 basehttp 25076 19124 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2026-01-11 14:35:06,215 basehttp 25076 25096 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:35:06,238 basehttp 25076 14652 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2026-01-11 14:35:06,251 basehttp 25076 20396 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2026-01-11 14:35:06,251 basehttp 25076 27180 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2026-01-11 14:35:06,252 basehttp 25076 31728 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2026-01-11 14:35:09,189 basehttp 25076 19124 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:37:27,250 basehttp 25076 33092 "GET /admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 14:37:27,587 basehttp 25076 33092 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4162
+INFO 2026-01-11 14:37:27,611 basehttp 25076 33092 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2026-01-11 14:37:27,617 basehttp 25076 26432 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2026-01-11 14:37:27,617 basehttp 25076 33092 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2026-01-11 14:37:27,618 basehttp 25076 18576 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2026-01-11 14:37:27,618 basehttp 25076 31444 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2026-01-11 14:37:27,760 basehttp 25076 31444 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2026-01-11 14:37:27,761 basehttp 25076 33092 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+WARNING 2026-01-11 14:37:27,875 log 25076 33092 Not Found: /favicon.ico
+WARNING 2026-01-11 14:37:27,875 basehttp 25076 33092 "GET /favicon.ico HTTP/1.1" 404 3514
+INFO 2026-01-11 14:40:17,725 autoreload 25076 19108 D:\developer\repairmybike\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2026-01-11 14:40:18,738 autoreload 30704 27772 Watching for file changes with StatReloader
+INFO 2026-01-11 14:41:33,223 autoreload 30704 27772 D:\developer\repairmybike\repairmybike_backend\spare_parts\admin.py changed, reloading.
+INFO 2026-01-11 14:41:34,166 autoreload 24620 9180 Watching for file changes with StatReloader
+INFO 2026-01-11 14:41:35,713 autoreload 24620 9180 D:\developer\repairmybike\repairmybike_backend\spare_parts\admin.py changed, reloading.
+INFO 2026-01-11 14:41:36,490 autoreload 33452 30196 Watching for file changes with StatReloader
+INFO 2026-01-11 14:41:58,850 autoreload 33008 24864 Watching for file changes with StatReloader
+INFO 2026-01-11 14:43:36,979 autoreload 29076 16332 Watching for file changes with StatReloader
+INFO 2026-01-11 14:43:46,095 basehttp 29076 33640 "GET /admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 14:43:46,366 basehttp 29076 33640 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4162
+INFO 2026-01-11 14:43:46,544 basehttp 29076 33640 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2026-01-11 14:43:46,558 basehttp 29076 33640 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2026-01-11 14:43:46,559 basehttp 29076 27824 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2026-01-11 14:43:46,583 basehttp 29076 6684 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2026-01-11 14:43:46,585 basehttp 29076 32052 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2026-01-11 14:43:46,586 basehttp 29076 26776 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2026-01-11 14:43:46,587 basehttp 29076 33128 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+WARNING 2026-01-11 14:43:46,710 log 29076 33128 Not Found: /favicon.ico
+WARNING 2026-01-11 14:43:46,711 basehttp 29076 33128 "GET /favicon.ico HTTP/1.1" 404 3517
+INFO 2026-01-11 14:44:12,099 basehttp 29076 26048 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4162
+INFO 2026-01-11 14:44:12,182 basehttp 29076 26048 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2026-01-11 14:44:12,195 basehttp 29076 13344 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2026-01-11 14:44:12,201 basehttp 29076 22676 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2026-01-11 14:44:12,202 basehttp 29076 26960 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2026-01-11 14:44:12,204 basehttp 29076 30808 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2026-01-11 14:44:12,204 basehttp 29076 28772 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2026-01-11 14:44:12,204 basehttp 29076 26048 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+WARNING 2026-01-11 14:44:12,344 log 29076 22676 Not Found: /favicon.ico
+WARNING 2026-01-11 14:44:12,345 basehttp 29076 22676 "GET /favicon.ico HTTP/1.1" 404 3517
+INFO 2026-01-11 14:44:28,285 basehttp 29076 22676 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4323
+INFO 2026-01-11 14:44:30,090 basehttp 29076 28772 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4323
+INFO 2026-01-11 14:44:43,698 basehttp 29076 28772 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 14:44:45,302 basehttp 29076 28772 "GET /admin/ HTTP/1.1" 200 19954
+INFO 2026-01-11 14:44:45,370 basehttp 29076 28772 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2026-01-11 14:44:45,484 basehttp 29076 28772 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2026-01-11 14:44:45,486 basehttp 29076 26048 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2026-01-11 14:44:45,490 basehttp 29076 30808 "GET /static/admin/img/icon-deletelink.svg HTTP/1.1" 200 392
+INFO 2026-01-11 14:45:15,952 basehttp 29076 30808 "GET /admin/subscriptions/plan/ HTTP/1.1" 200 18273
+INFO 2026-01-11 14:45:16,545 basehttp 29076 26048 "GET /admin/subscriptions/plan/ HTTP/1.1" 200 18273
+INFO 2026-01-11 14:45:16,790 basehttp 29076 28772 "GET /admin/subscriptions/plan/ HTTP/1.1" 200 18273
+INFO 2026-01-11 14:45:16,856 basehttp 29076 28772 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6811
+INFO 2026-01-11 14:45:16,867 basehttp 29076 33568 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2026-01-11 14:45:16,867 basehttp 29076 23904 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2026-01-11 14:45:16,868 basehttp 29076 32388 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+INFO 2026-01-11 14:45:16,872 basehttp 29076 28772 "GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+INFO 2026-01-11 14:45:16,896 basehttp 29076 23904 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2026-01-11 14:45:16,896 basehttp 29076 28772 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2026-01-11 14:45:16,920 basehttp 29076 23904 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2026-01-11 14:45:16,921 basehttp 29076 13344 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2026-01-11 14:45:17,075 basehttp 29076 32388 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2026-01-11 14:45:17,103 basehttp 29076 32388 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2026-01-11 14:45:20,699 basehttp 29076 26960 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:45:20,788 basehttp 29076 26960 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2026-01-11 14:45:20,788 basehttp 29076 32388 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2026-01-11 14:45:27,899 basehttp 29076 32388 "GET /admin/subscriptions/plan/add/ HTTP/1.1" 200 25867
+INFO 2026-01-11 14:45:27,993 basehttp 29076 32388 "GET /static/admin/css/forms.css HTTP/1.1" 200 9090
+INFO 2026-01-11 14:45:28,000 basehttp 29076 26960 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2026-01-11 14:45:28,067 basehttp 29076 32388 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11800
+INFO 2026-01-11 14:45:28,104 basehttp 29076 32388 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2026-01-11 14:45:31,034 basehttp 29076 23904 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:49:08,246 basehttp 33452 26008 "GET /admin/subscriptions/plan/ HTTP/1.1" 200 18273
+INFO 2026-01-11 14:49:09,528 basehttp 33452 26008 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:49:14,018 basehttp 33452 26008 "GET /admin/subscriptions/plan/add/ HTTP/1.1" 200 25867
+INFO 2026-01-11 14:49:14,147 basehttp 33452 29856 "GET /static/admin/css/forms.css HTTP/1.1" 200 9090
+INFO 2026-01-11 14:49:14,148 basehttp 33452 32820 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2026-01-11 14:49:14,152 basehttp 33452 32032 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2026-01-11 14:49:14,154 basehttp 33452 29856 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11800
+INFO 2026-01-11 14:49:15,276 basehttp 33452 26008 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:49:57,009 basehttp 33452 26008 "GET /admin/bookings/bookingservice/ HTTP/1.1" 200 18260
+INFO 2026-01-11 14:50:00,009 basehttp 33452 29856 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:50:05,077 basehttp 33452 26008 "GET /admin/subscriptions/subscription/ HTTP/1.1" 200 18215
+INFO 2026-01-11 14:50:06,296 basehttp 33452 29856 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:50:11,843 basehttp 33452 26008 "GET /admin/subscriptions/subscription/add/ HTTP/1.1" 200 29433
+INFO 2026-01-11 14:50:11,920 basehttp 33452 32820 "GET /static/admin/js/calendar.js HTTP/1.1" 200 9141
+INFO 2026-01-11 14:50:11,920 basehttp 33452 32032 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19319
+INFO 2026-01-11 14:50:13,111 basehttp 33452 29856 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:50:13,184 basehttp 33452 32032 "GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
+INFO 2026-01-11 14:50:13,184 basehttp 33452 29856 "GET /static/admin/img/icon-clock.svg HTTP/1.1" 200 677
+INFO 2026-01-11 14:50:26,164 basehttp 33452 26008 "GET /admin/subscriptions/plan/ HTTP/1.1" 200 18273
+INFO 2026-01-11 14:50:29,046 basehttp 33452 32032 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:52:07,291 autoreload 33452 30196 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 14:52:07,294 autoreload 29076 16332 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 14:52:08,387 autoreload 21752 28620 Watching for file changes with StatReloader
+INFO 2026-01-11 14:52:08,387 autoreload 18564 12588 Watching for file changes with StatReloader
+INFO 2026-01-11 14:52:23,820 autoreload 21752 28620 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 14:52:23,823 autoreload 18564 12588 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 14:52:24,669 autoreload 9440 27084 Watching for file changes with StatReloader
+INFO 2026-01-11 14:52:24,670 autoreload 10180 29032 Watching for file changes with StatReloader
+INFO 2026-01-11 14:52:32,181 autoreload 10180 29032 D:\developer\repairmybike\repairmybike_backend\subscriptions\admin.py changed, reloading.
+INFO 2026-01-11 14:52:32,185 autoreload 9440 27084 D:\developer\repairmybike\repairmybike_backend\subscriptions\admin.py changed, reloading.
+INFO 2026-01-11 14:52:33,332 autoreload 33192 3412 Watching for file changes with StatReloader
+INFO 2026-01-11 14:52:33,335 autoreload 29852 32616 Watching for file changes with StatReloader
+INFO 2026-01-11 14:53:44,517 basehttp 33192 28880 "GET /admin/subscriptions/plan/ HTTP/1.1" 200 18598
+INFO 2026-01-11 14:53:45,789 basehttp 33192 28880 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:54:04,928 basehttp 33192 28880 "GET /admin/subscriptions/plan/add/ HTTP/1.1" 200 31280
+INFO 2026-01-11 14:54:05,112 basehttp 33192 22904 "GET /static/admin/js/collapse.js HTTP/1.1" 200 1803
+INFO 2026-01-11 14:54:05,116 basehttp 33192 18552 "GET /static/admin/js/SelectBox.js HTTP/1.1" 200 4530
+INFO 2026-01-11 14:54:05,117 basehttp 33192 25944 "GET /static/admin/js/SelectFilter2.js HTTP/1.1" 200 15492
+INFO 2026-01-11 14:54:05,133 basehttp 33192 30932 "GET /static/admin/js/inlines.js HTTP/1.1" 200 15526
+INFO 2026-01-11 14:54:06,250 basehttp 33192 28880 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:54:06,314 basehttp 33192 18552 "GET /static/admin/img/icon-unknown-alt.svg HTTP/1.1" 200 655
+INFO 2026-01-11 14:54:06,314 basehttp 33192 30932 "GET /static/admin/img/icon-unknown.svg HTTP/1.1" 200 655
+INFO 2026-01-11 14:54:06,315 basehttp 33192 25944 "GET /static/admin/img/selector-icons.svg HTTP/1.1" 200 3291
+INFO 2026-01-11 14:54:06,338 basehttp 33192 30932 "GET /static/admin/img/inline-delete.svg HTTP/1.1" 200 560
+INFO 2026-01-11 14:54:19,763 basehttp 29852 24056 "GET /admin/subscriptions/plan/add/ HTTP/1.1" 200 31280
+INFO 2026-01-11 14:54:19,901 basehttp 29852 30460 "GET /static/admin/js/collapse.js HTTP/1.1" 200 1803
+INFO 2026-01-11 14:54:19,966 basehttp 29852 4896 "GET /static/admin/js/inlines.js HTTP/1.1" 200 15526
+INFO 2026-01-11 14:54:19,967 basehttp 29852 9936 "GET /static/admin/js/SelectBox.js HTTP/1.1" 200 4530
+INFO 2026-01-11 14:54:19,970 basehttp 29852 33328 "GET /static/admin/js/SelectFilter2.js HTTP/1.1" 200 15492
+INFO 2026-01-11 14:54:21,071 basehttp 29852 24056 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:54:21,196 basehttp 29852 24056 "GET /static/admin/img/icon-unknown.svg HTTP/1.1" 200 655
+INFO 2026-01-11 14:54:21,196 basehttp 29852 33328 "GET /static/admin/img/icon-unknown-alt.svg HTTP/1.1" 200 655
+INFO 2026-01-11 14:54:21,196 basehttp 29852 9936 "GET /static/admin/img/selector-icons.svg HTTP/1.1" 200 3291
+INFO 2026-01-11 14:54:21,241 basehttp 29852 9936 "GET /static/admin/img/inline-delete.svg HTTP/1.1" 200 560
+INFO 2026-01-11 14:54:23,891 basehttp 33192 28880 "GET /admin/subscriptions/planbenefit/ HTTP/1.1" 200 18099
+INFO 2026-01-11 14:54:26,824 basehttp 33192 30932 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:54:31,783 basehttp 33192 28880 "GET /admin/subscriptions/planbenefit/add/ HTTP/1.1" 200 20071
+INFO 2026-01-11 14:54:33,073 basehttp 33192 30932 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:54:48,785 basehttp 33192 28880 "GET /admin/subscriptions/plan/ HTTP/1.1" 200 18598
+INFO 2026-01-11 14:54:50,020 basehttp 33192 30932 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:55:27,856 basehttp 33192 28880 "GET /admin/subscriptions/plan/add/ HTTP/1.1" 200 31280
+INFO 2026-01-11 14:55:29,088 basehttp 33192 30932 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:56:27,247 autoreload 29852 32616 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 14:56:27,277 autoreload 33192 3412 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 14:56:28,376 autoreload 32780 25772 Watching for file changes with StatReloader
+INFO 2026-01-11 14:56:28,379 autoreload 24308 30644 Watching for file changes with StatReloader
+INFO 2026-01-11 14:57:05,300 basehttp 24308 23056 "GET /admin/services/service/add/?_to_field=id&_popup=1 HTTP/1.1" 200 9963
+INFO 2026-01-11 14:57:06,641 basehttp 24308 23056 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:58:05,280 autoreload 32780 25772 D:\developer\repairmybike\repairmybike_backend\subscriptions\admin.py changed, reloading.
+INFO 2026-01-11 14:58:05,583 autoreload 24308 30644 D:\developer\repairmybike\repairmybike_backend\subscriptions\admin.py changed, reloading.
+INFO 2026-01-11 14:58:06,246 autoreload 26856 30976 Watching for file changes with StatReloader
+INFO 2026-01-11 14:58:06,585 autoreload 30112 15624 Watching for file changes with StatReloader
+INFO 2026-01-11 14:58:16,597 basehttp 30112 25412 "GET /admin/services/service/add/?_to_field=id&_popup=1 HTTP/1.1" 200 9963
+INFO 2026-01-11 14:58:17,893 basehttp 30112 25412 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:59:07,091 basehttp 30112 25412 "GET /admin/services/servicecategory/ HTTP/1.1" 200 20739
+INFO 2026-01-11 14:59:08,362 basehttp 30112 25412 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:59:08,457 basehttp 30112 25412 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2026-01-11 14:59:27,829 basehttp 30112 25412 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25144
+INFO 2026-01-11 14:59:29,055 basehttp 30112 25412 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 14:59:41,835 basehttp 30112 25412 "GET /admin/vehicles/vehiclebrand/7/change/ HTTP/1.1" 200 22106
+INFO 2026-01-11 14:59:43,118 basehttp 30112 25412 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:00:17,930 basehttp 30112 25412 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:00:19,467 basehttp 30112 25412 "GET /admin/ HTTP/1.1" 200 20421
+INFO 2026-01-11 15:00:25,708 basehttp 30112 25412 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25144
+INFO 2026-01-11 15:00:26,954 basehttp 30112 25412 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:00:44,864 basehttp 30112 25412 "GET /admin/vehicles/vehiclebrand/7/change/ HTTP/1.1" 200 22106
+INFO 2026-01-11 15:00:46,106 basehttp 30112 25412 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:01:03,839 autoreload 26856 30976 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 15:01:03,847 autoreload 30112 15624 D:\developer\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-01-11 15:01:04,876 autoreload 4348 19272 Watching for file changes with StatReloader
+INFO 2026-01-11 15:01:04,902 autoreload 9632 25256 Watching for file changes with StatReloader
+INFO 2026-01-11 15:01:06,854 autoreload 4348 19272 D:\developer\repairmybike\repairmybike_backend\subscriptions\admin.py changed, reloading.
+INFO 2026-01-11 15:01:06,902 autoreload 9632 25256 D:\developer\repairmybike\repairmybike_backend\subscriptions\admin.py changed, reloading.
+INFO 2026-01-11 15:01:07,823 autoreload 25604 29932 Watching for file changes with StatReloader
+INFO 2026-01-11 15:01:07,848 autoreload 32048 33556 Watching for file changes with StatReloader
+INFO 2026-01-11 15:01:39,186 basehttp 32048 29560 "POST /admin/vehicles/vehiclebrand/7/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:01:41,538 basehttp 32048 29560 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25368
+INFO 2026-01-11 15:01:49,914 basehttp 32048 8164 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:01:51,438 basehttp 32048 8164 "GET /admin/ HTTP/1.1" 200 21018
+INFO 2026-01-11 15:01:51,559 basehttp 32048 8164 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+INFO 2026-01-11 15:02:08,663 basehttp 32048 8164 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25144
+INFO 2026-01-11 15:02:09,899 basehttp 32048 8164 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:02:16,195 basehttp 32048 8164 "GET /admin/vehicles/vehiclebrand/7/change/ HTTP/1.1" 200 22085
+INFO 2026-01-11 15:02:17,480 basehttp 32048 8164 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:02:42,343 basehttp 32048 27544 "GET /admin/login/?next=/admin/\ HTTP/1.1" 302 0
+INFO 2026-01-11 15:02:43,850 basehttp 32048 27544 "GET /admin/ HTTP/1.1" 200 20794
+WARNING 2026-01-11 15:02:44,096 log 32048 24476 Not Found: /favicon.ico
+WARNING 2026-01-11 15:02:44,096 basehttp 32048 24476 "GET /favicon.ico HTTP/1.1" 404 3517
+INFO 2026-01-11 15:02:45,290 basehttp 32048 27544 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:02:46,792 basehttp 32048 27544 "GET /admin/ HTTP/1.1" 200 20794
+INFO 2026-01-11 15:02:55,657 basehttp 32048 32540 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25144
+INFO 2026-01-11 15:02:57,088 basehttp 32048 32540 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:03:04,069 basehttp 32048 32540 "GET /admin/vehicles/vehiclebrand/7/change/ HTTP/1.1" 200 22085
+INFO 2026-01-11 15:03:05,430 basehttp 32048 32540 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:03:26,522 basehttp 32048 27760 "GET /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:03:28,088 basehttp 32048 27760 "GET /admin/ HTTP/1.1" 200 20794
+WARNING 2026-01-11 15:03:28,344 log 32048 27760 Not Found: /favicon.ico
+WARNING 2026-01-11 15:03:28,345 basehttp 32048 27760 "GET /favicon.ico HTTP/1.1" 404 3517
+INFO 2026-01-11 15:03:33,356 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25144
+INFO 2026-01-11 15:03:34,650 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:03:40,409 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/3/change/ HTTP/1.1" 200 22065
+INFO 2026-01-11 15:03:41,640 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:03:50,498 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/3/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:03:52,811 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25365
+INFO 2026-01-11 15:03:54,137 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:04:00,515 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/6/change/ HTTP/1.1" 200 22108
+INFO 2026-01-11 15:04:01,868 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:04:12,639 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/6/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:04:14,896 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25367
+INFO 2026-01-11 15:04:16,318 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:04:23,945 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/1/change/ HTTP/1.1" 200 22084
+INFO 2026-01-11 15:04:25,224 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:04:35,654 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/1/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:04:37,873 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25364
+INFO 2026-01-11 15:04:39,100 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:05:01,392 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/2/change/ HTTP/1.1" 200 22057
+INFO 2026-01-11 15:05:02,626 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:05:20,272 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/2/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:05:22,582 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25368
+INFO 2026-01-11 15:05:23,804 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:05:31,043 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/11/change/ HTTP/1.1" 200 22110
+INFO 2026-01-11 15:05:32,402 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:05:42,579 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/11/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:05:44,804 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25372
+INFO 2026-01-11 15:05:46,035 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:05:52,165 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/5/change/ HTTP/1.1" 200 22131
+INFO 2026-01-11 15:05:53,387 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:06:03,729 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/5/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:06:06,005 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25373
+INFO 2026-01-11 15:06:07,410 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:06:25,318 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/9/change/ HTTP/1.1" 200 22048
+INFO 2026-01-11 15:06:26,531 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:06:38,404 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/9/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:06:40,632 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25369
+INFO 2026-01-11 15:06:41,881 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:06:52,233 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/8/change/ HTTP/1.1" 200 22034
+INFO 2026-01-11 15:06:53,478 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:07:02,803 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/8/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:07:05,100 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25366
+INFO 2026-01-11 15:07:06,334 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:07:11,943 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/4/change/ HTTP/1.1" 200 22041
+INFO 2026-01-11 15:07:13,207 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:07:22,413 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/4/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:07:24,725 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25363
+INFO 2026-01-11 15:07:26,115 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:07:31,418 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/10/change/ HTTP/1.1" 200 22072
+INFO 2026-01-11 15:07:32,655 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:07:43,121 basehttp 32048 27760 "POST /admin/vehicles/vehiclebrand/10/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:07:45,437 basehttp 32048 27760 "GET /admin/vehicles/vehiclebrand/ HTTP/1.1" 200 25370
+INFO 2026-01-11 15:07:46,657 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:08:53,078 basehttp 25604 31908 "GET /admin/subscriptions/plan/add/ HTTP/1.1" 200 31889
+INFO 2026-01-11 15:08:54,616 basehttp 25604 31908 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:10:30,275 autoreload 24660 31620 Watching for file changes with StatReloader
+INFO 2026-01-11 15:10:39,137 basehttp 32048 27760 "GET /admin/vehicles/vehicletype/ HTTP/1.1" 200 21084
+INFO 2026-01-11 15:10:40,364 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:10:46,258 basehttp 32048 27760 "GET /admin/vehicles/vehicletype/1/change/ HTTP/1.1" 200 20272
+INFO 2026-01-11 15:10:47,719 basehttp 32048 27760 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:10:54,708 basehttp 32048 27760 "GET /admin/vehicles/vehicletype/1/change/ HTTP/1.1" 200 20272
+INFO 2026-01-11 15:13:00,336 basehttp 32048 27760 "GET /admin/vehicles/vehiclemodel/ HTTP/1.1" 200 59330
+INFO 2026-01-11 15:13:03,577 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:13:45,229 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/71/change/ HTTP/1.1" 200 22553
+INFO 2026-01-11 15:13:46,495 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:13:56,433 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/71/change/ HTTP/1.1" 200 22553
+INFO 2026-01-11 15:14:40,828 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/71/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:14:46,272 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/ HTTP/1.1" 200 59559
+INFO 2026-01-11 15:14:47,604 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:14:56,442 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/71/change/ HTTP/1.1" 200 22625
+INFO 2026-01-11 15:14:57,756 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:15:08,917 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/71/change/ HTTP/1.1" 200 22625
+INFO 2026-01-11 15:15:14,897 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/71/change/ HTTP/1.1" 302 0
+INFO 2026-01-11 15:15:20,153 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/ HTTP/1.1" 200 59559
+INFO 2026-01-11 15:15:21,401 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:15:32,941 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/13/change/ HTTP/1.1" 200 22518
+INFO 2026-01-11 15:15:34,381 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:17:49,291 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/ HTTP/1.1" 200 59330
+INFO 2026-01-11 15:18:12,575 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=7 HTTP/1.1" 200 22450
+INFO 2026-01-11 15:18:14,031 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:18:22,975 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/61/change/?_changelist_filters=vehicle_brand__id__exact%3D7 HTTP/1.1" 200 22754
+INFO 2026-01-11 15:18:24,307 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:20:32,342 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/ HTTP/1.1" 200 59330
+INFO 2026-01-11 15:20:33,652 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:20:42,735 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29158
+INFO 2026-01-11 15:20:44,062 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:21:05,381 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/13/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22675
+INFO 2026-01-11 15:21:06,744 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:21:09,939 autoreload 19092 29256 Watching for file changes with StatReloader
+INFO 2026-01-11 15:21:26,609 basehttp 19092 28752 "GET /admin/subscriptions/plan/add/ HTTP/1.1" 200 31889
+INFO 2026-01-11 15:21:27,860 basehttp 19092 28752 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:22:18,042 basehttp 19092 28752 "GET /admin/services/service/add/?_to_field=id&_popup=1 HTTP/1.1" 200 9963
+INFO 2026-01-11 15:22:19,283 basehttp 19092 28752 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:25:06,525 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/13/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:25:11,922 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29387
+INFO 2026-01-11 15:25:13,230 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:25:23,820 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/10/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22625
+INFO 2026-01-11 15:25:25,118 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:25:41,440 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/10/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:25:46,604 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29378
+INFO 2026-01-11 15:25:48,078 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:25:56,465 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/8/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22713
+INFO 2026-01-11 15:25:57,861 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:26:21,568 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/8/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:26:26,730 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29380
+INFO 2026-01-11 15:26:28,083 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:26:36,379 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/14/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22667
+INFO 2026-01-11 15:26:37,689 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:26:48,069 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/14/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:26:53,288 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29385
+INFO 2026-01-11 15:26:54,588 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:27:03,415 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/5/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22707
+INFO 2026-01-11 15:27:04,784 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:27:44,631 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/5/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22928
+INFO 2026-01-11 15:27:45,932 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:28:13,784 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/5/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22928
+INFO 2026-01-11 15:28:15,131 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:28:47,172 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/5/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22928
+INFO 2026-01-11 15:28:48,465 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:29:31,377 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/5/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:29:36,404 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29391
+INFO 2026-01-11 15:29:37,700 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:29:48,049 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/13/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22676
+INFO 2026-01-11 15:29:49,666 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:29:59,303 basehttp 19092 33700 "GET /admin/services/servicecategory/ HTTP/1.1" 200 20739
+INFO 2026-01-11 15:30:00,644 basehttp 19092 33700 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:30:05,554 basehttp 19092 33700 "GET /admin/services/servicecategory/add/ HTTP/1.1" 200 20292
+INFO 2026-01-11 15:30:06,868 basehttp 19092 33700 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:30:55,003 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/13/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:31:00,110 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29387
+INFO 2026-01-11 15:31:01,435 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:31:10,918 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/6/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22743
+INFO 2026-01-11 15:31:12,222 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:31:23,334 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/6/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:31:28,614 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29396
+INFO 2026-01-11 15:31:29,928 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:31:39,139 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/4/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22659
+INFO 2026-01-11 15:31:40,477 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:31:54,113 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/4/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:31:59,230 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29383
+INFO 2026-01-11 15:32:00,662 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:32:13,815 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/11/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22665
+INFO 2026-01-11 15:32:15,113 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:32:30,461 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/11/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:32:35,522 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29385
+INFO 2026-01-11 15:32:36,866 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:32:48,229 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/9/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22671
+INFO 2026-01-11 15:32:49,556 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:33:08,036 basehttp 32048 32928 "POST /admin/vehicles/vehiclemodel/9/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:33:13,212 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29385
+INFO 2026-01-11 15:33:14,572 basehttp 32048 32928 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:33:24,034 basehttp 32048 32928 "GET /admin/vehicles/vehiclemodel/12/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22659
+INFO 2026-01-11 15:33:27,575 basehttp 32048 26092 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:33:50,667 basehttp 32048 26092 "POST /admin/vehicles/vehiclemodel/12/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:33:55,554 basehttp 32048 26092 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29382
+INFO 2026-01-11 15:33:56,771 basehttp 32048 26092 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:34:25,701 basehttp 32048 26092 "GET /admin/vehicles/vehiclemodel/1/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22654
+INFO 2026-01-11 15:34:27,069 basehttp 32048 26092 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:34:43,014 basehttp 32048 26092 "POST /admin/vehicles/vehiclemodel/1/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 302 0
+INFO 2026-01-11 15:34:48,029 basehttp 32048 26092 "GET /admin/vehicles/vehiclemodel/?vehicle_brand__id__exact=1 HTTP/1.1" 200 29382
+INFO 2026-01-11 15:34:49,340 basehttp 32048 26092 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-11 15:34:58,664 basehttp 32048 26092 "GET /admin/vehicles/vehiclemodel/3/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22713
+INFO 2026-01-11 15:35:00,629 basehttp 32048 26092 "GET /admin/jsi18n/ HTTP/1.1" 200 3342

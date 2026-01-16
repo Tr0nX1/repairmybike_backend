@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
+from django.utils.text import slugify
 
 
 class Plan(models.Model):
@@ -19,13 +20,18 @@ class Plan(models.Model):
     ]
 
     name = models.CharField(max_length=128, unique=True)
-    slug = models.SlugField(max_length=128, unique=True)
+    slug = models.SlugField(max_length=128, unique=True, blank=True)
+    image = models.ImageField(upload_to='subscriptions/plans/', blank=True, null=True)
     description = models.TextField(blank=True)
     # High-level tier to group related durations (Basic/Premium)
     tier = models.CharField(max_length=16, choices=TIER_CHOICES, default="basic", db_index=True)
-    benefits = models.JSONField(default=dict, blank=True)
+    benefits = models.JSONField(default=dict, blank=True, help_text="Legacy JSON field")
     # List of included service names for membership display
-    services = models.JSONField(default=list, blank=True)
+    services = models.JSONField(default=list, blank=True, help_text="Legacy JSON field")
+    
+    # New structured fields
+    included_services = models.ManyToManyField('services.Service', blank=True, related_name='subscription_plans')
+    
     price = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=8, default="INR")
     billing_period = models.CharField(max_length=16, choices=BILLING_PERIOD_CHOICES, default="monthly")
@@ -45,6 +51,26 @@ class Plan(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class PlanBenefit(models.Model):
+    """Structured benefits for a subscription plan"""
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name='benefits_list')
+    text = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'subscription_plan_benefits'
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.plan.name} - {self.text[:30]}"
 
 
 class Subscription(models.Model):

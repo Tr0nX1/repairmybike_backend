@@ -8,6 +8,8 @@ from .models import (
     SparePartFitment,
     Cart,
     CartItem,
+    Order,
+    OrderItem,
 )
 
 
@@ -66,3 +68,35 @@ class CartAdmin(admin.ModelAdmin):
     list_display = ("id", "session_id", "user", "updated_at")
     search_fields = ("session_id", "user__username")
     inlines = [CartItemInline]
+
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ("unit_price", "total_price")
+
+    def total_price(self, obj):
+        return obj.total_price
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "customer_name",
+        "phone",
+        "amount_total",
+        "payment_status",
+        "status",
+        "created_at",
+    )
+    list_filter = ("payment_status", "status", "created_at")
+    search_fields = ("customer_name", "phone", "session_id")
+    readonly_fields = ("created_at", "updated_at")
+    inlines = [OrderItemInline]
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ("id", "order", "spare_part", "quantity", "unit_price")
+    list_filter = ("spare_part",)

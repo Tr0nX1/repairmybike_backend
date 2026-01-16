@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -116,6 +116,8 @@ class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CartViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+    
     def _get_or_create_cart(self, session_id, user=None):
         cart, _ = Cart.objects.get_or_create(session_id=session_id, defaults={'user': user})
         return cart
@@ -296,6 +298,7 @@ class CartViewSet(viewsets.ViewSet):
 
 
 class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.AllowAny]
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
