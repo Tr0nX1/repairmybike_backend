@@ -286,7 +286,7 @@ REST_FRAMEWORK = {
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000,http://127.0.0.1:3000,https://repairmybikebackend-production.up.railway.app,https://repairmybike-frontend.vercel.app',
+    default='http://localhost:3000,http://127.0.0.1:3000,https://repairmybikebackend-production.up.railway.app,https://repairmybike-frontend.vercel.app,https://www.repairmybike.in,https://repairmybike.in',
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
@@ -296,6 +296,10 @@ CORS_ALLOWED_ORIGIN_PATTERNS = [
     r"^http://localhost(?::\d+)?$",
     r"^http://127\.0\.0\.1(?::\d+)?$",
     r"^http://10\.0\.2\.2(?::\d+)?$",
+]
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-guest-id',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
