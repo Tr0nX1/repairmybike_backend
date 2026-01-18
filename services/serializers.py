@@ -73,12 +73,22 @@ class ServiceSerializer(serializers.ModelSerializer):
             base = getattr(settings, 'MEDIA_URL', '/')
 
             def _to_abs(u: str):
-                if u.startswith('http://') or u.startswith('https://') or u.startswith('data:image/'):
+                if not u:
+                    return None
+                u = str(u).strip()
+                # 1. Already absolute
+                if u.startswith('http://') or u.startswith('https://') or u.startswith('data:'):
                     return u
-                if base.startswith('http://') or base.startswith('https://'):
-                    if u.startswith('/'):
-                        return f"{base.rstrip('/')}{u}"
-                    return f"{base.rstrip('/')}/{u}"
+                
+                # 2. Check if we should use Cloudinary base
+                use_cloudinary = getattr(settings, 'USE_CLOUDINARY', False)
+                if use_cloudinary and base.startswith('http'):
+                    # Prepend Cloudinary base
+                    return f"{base.rstrip('/')}/{u.lstrip('/')}"
+                
+                # 3. Fallback to MEDIA_URL logic (local)
+                if base.startswith('http'):
+                    return f"{base.rstrip('/')}/{u.lstrip('/')}"
                 return u
 
             return [x for x in (_to_abs(u) for u in imgs) if x]

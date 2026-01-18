@@ -26,19 +26,40 @@ class SparePartCategorySerializer(serializers.ModelSerializer):
     def _abs_url(self, url: str):
         if not url:
             return None
-        if url.startswith('http://') or url.startswith('https://'):
+            
+        # 1. Already absolute
+        if url.startswith('http://') or url.startswith('https://') or url.startswith('data:'):
             return url
+            
+        # 2. Check if we should use Cloudinary base
+        use_cloudinary = getattr(settings, 'USE_CLOUDINARY', False)
+        cloudinary_url = getattr(settings, 'CLOUDINARY_URL', '')
+        
+        # If Cloudinary is on, and the URL looks like a relative media path, 
+        # try to build a Cloudinary URL or at least avoid backend prepending if it's broken.
+        if use_cloudinary and cloudinary_url:
+            # Most cloudinary storage setups return absolute URLs, but if it returned a relative one:
+            # We want it to be res.cloudinary.com/...
+            base = getattr(settings, 'MEDIA_URL', '')
+            if base.startswith('http'):
+                 # Prepend Cloudinary base
+                 return f"{base.rstrip('/')}/{url.lstrip('/')}"
+
+        # 3. Fallback to Request-based absolute URI
         request = self.context.get('request') if hasattr(self, 'context') else None
         if request:
             try:
+                # build_absolute_uri prepends the current backend domain. 
+                # This is only correct if the file is actually hosted on the backend.
                 return request.build_absolute_uri(url)
             except Exception:
                 pass
+        
+        # 4. Final fallback to MEDIA_URL
         base = getattr(settings, 'MEDIA_URL', '/')
-        if base.startswith('http://') or base.startswith('https://'):
-            if url.startswith('/'):
-                return f"{base.rstrip('/')}{url}"
-            return f"{base.rstrip('/')}/{url}"
+        if base.startswith('http'):
+            return f"{base.rstrip('/')}/{url.lstrip('/')}"
+            
         return url
 
     def get_image(self, obj):
