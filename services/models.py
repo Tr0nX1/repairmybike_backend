@@ -1,6 +1,7 @@
 from django.db import models
 from vehicles.models import VehicleModel
 from django.conf import settings
+from authentication.models import GuestSession
 
 class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -70,3 +71,18 @@ class UserSavedService(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.service}"
+
+
+class GuestSavedService(models.Model):
+    """Temporary storage for services saved by a guest"""
+    guest_session = models.ForeignKey(GuestSession, on_delete=models.CASCADE, related_name='saved_services')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'guest_saved_services'
+        unique_together = ['guest_session', 'service']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Guest[{self.guest_session.guest_id}] - {self.service}"

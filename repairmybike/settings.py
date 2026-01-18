@@ -24,7 +24,7 @@ SECRET_KEY = config('SECRET_KEY', default=secrets.token_urlsafe(50))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '*.railway.app', 'repairmybikebackend-production.up.railway.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '*', 'repairmybikebackend-production.up.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
@@ -266,9 +266,7 @@ REST_FRAMEWORK = {
         'authentication.authentication.PasswordSessionAuthentication',
         'authentication.authentication.DescopeAuthentication',
         'authentication.authentication.DescopeSessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'authentication.authentication.GuestAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
@@ -294,12 +292,14 @@ CORS_ALLOWED_ORIGINS = config(
 
 # Allow any localhost/127.0.0.1 port for Flutter web/dev servers
 from corsheaders.defaults import default_headers
-CORS_ALLOWED_ORIGIN_REGEXES = [
+CORS_ALLOWED_ORIGIN_PATTERNS = [
     r"^http://localhost(?::\d+)?$",
     r"^http://127\.0\.0\.1(?::\d+)?$",
     r"^http://10\.0\.2\.2(?::\d+)?$",
-    'https://repairmybike.in',
-    'https://www.repairmybike.in'
+]
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-guest-id',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -307,13 +307,14 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
     'https://repairmybikebackend-production.up.railway.app',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://10.0.2.2:8000',
-    # 'https://repairmybike-frontend.vercel.app',
-    'https://repairmybike.in',
-    'https://www.repairmybike.in'
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://10.0.2.2',
 ]
+# Add common ports to be safe
+for port in [3000, 8000, 8080]:
+    CSRF_TRUSTED_ORIGINS.append(f'http://localhost:{port}')
+    CSRF_TRUSTED_ORIGINS.append(f'http://127.0.0.1:{port}')
 
 # Razorpay Configuration
 RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='')

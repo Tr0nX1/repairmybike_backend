@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from descope import DescopeClient, DeliveryMethod, SESSION_TOKEN_NAME, REFRESH_SESSION_TOKEN_NAME
-from .models import UserSession
+from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, StaffDirectory, UserAddress
 from .serializers import (
     UserSerializer, UserRegistrationSerializer, UserLoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
@@ -23,9 +23,9 @@ from .serializers import (
     EmailOTPRequestSerializer, EmailOTPVerifySerializer, EmailLoginSerializer,
     UnifiedOTPRequestSerializer, UnifiedOTPVerifySerializer,
     StaffOtpLoginSerializer,
-    StaffPasswordLoginSerializer
+    StaffPasswordLoginSerializer,
+    UserAddressSerializer
 )
-from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, StaffDirectory
 from .authentication import DescopeAuthentication
 
 logger = logging.getLogger(__name__)
@@ -42,6 +42,49 @@ def create_descope_client():
     )
 
 User = get_user_model()
+
+
+def _merge_guest_data(user, guest_id):
+    """
+    Merge data from a guest session into the authenticated user's account.
+    """
+    if not guest_id:
+        return
+    
+    from .models import GuestSession
+    from services.models import UserSavedService, GuestSavedService
+    
+    try:
+        import uuid
+        guest_uuid = uuid.UUID(guest_id)
+        guest_session = GuestSession.objects.filter(guest_id=guest_uuid).first()
+        
+        if not guest_session:
+            return
+
+        # 1. Merge Saved Services
+        guest_saved = GuestSavedService.objects.filter(guest_session=guest_session)
+        for gs in guest_saved:
+            # Create UserSavedService if not exists
+            UserSavedService.objects.get_or_create(
+                user=user,
+                service=gs.service
+            )
+            #gs.delete() # We'll delete them after migration? Or just leave them.
+            # Let's delete to clean up.
+        
+        guest_saved.delete()
+        
+        # 2. Merge Context Data (e.g. cart from JSON)
+        # In a real app, you'd translate JSON cart to DB Cart objects here.
+        # For now, we'll just log or store in user context.
+        
+        # Finally, delete or deactivate guest session?
+        # Typically we leave it but mark as merged or just delete.
+        # guest_session.delete()
+
+    except Exception as e:
+        logger.error(f"Error merging guest data: {e}")
 
 
 class UserRegistrationView(APIView):
@@ -436,6 +479,7 @@ class PhoneOTPVerifyView(APIView):
     def _get_or_create_user_from_phone(self, phone_number, auth_response):
         """Get or create user based on phone number and Descope response"""
         user_id = auth_response.get('user', {}).get('userId')
+        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
         
         try:
             # Try to get user by descope_user_id
@@ -443,6 +487,10 @@ class PhoneOTPVerifyView(APIView):
             user.phone_number = phone_number
             user.is_phone_verified = True
             user.save()
+            
+            # Merge Guest Data
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -453,6 +501,10 @@ class PhoneOTPVerifyView(APIView):
             user.descope_user_id = user_id
             user.is_phone_verified = True
             user.save()
+            
+            # Merge Guest Data
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -466,6 +518,9 @@ class PhoneOTPVerifyView(APIView):
             is_phone_verified=True,
             is_verified=True
         )
+        
+        # Merge Guest Data
+        _merge_guest_data(user, guest_id)
         
         return user, True
 
@@ -1133,13 +1188,16 @@ class EmailLoginView(APIView):
     
     def _get_or_create_user_from_email(self, email, auth_response):
         """Get or create user based on email and Descope response"""
-        user_id = auth_response.get('user', {}).get('userId')
-        
         try:
             user = User.objects.get(descope_user_id=user_id)
             user.email = email
             user.is_verified = True
             user.save()
+            
+            # Merge Guest Data
+            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -1149,6 +1207,11 @@ class EmailLoginView(APIView):
             user.descope_user_id = user_id
             user.is_verified = True
             user.save()
+            
+            # Merge Guest Data
+            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -1161,6 +1224,10 @@ class EmailLoginView(APIView):
             descope_user_id=user_id,
             is_verified=True
         )
+        
+        # Merge Guest Data
+        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+        _merge_guest_data(user, guest_id)
         
         return user, True
 
@@ -1336,6 +1403,11 @@ class UnifiedOTPVerifyView(APIView):
             user.phone_number = phone_number
             user.is_phone_verified = True
             user.save()
+            
+            # Merge Guest Data
+            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -1345,6 +1417,11 @@ class UnifiedOTPVerifyView(APIView):
             user.descope_user_id = user_id
             user.is_phone_verified = True
             user.save()
+            
+            # Merge Guest Data
+            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -1359,8 +1436,12 @@ class UnifiedOTPVerifyView(APIView):
             is_verified=True
         )
         
+        # Merge Guest Data
+        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+        _merge_guest_data(user, guest_id)
+        
         return user, True
-    
+
     def _get_or_create_user_from_email(self, email, auth_response):
         """Get or create user based on email and Descope response"""
         user_id = auth_response.get('user', {}).get('userId')
@@ -1370,6 +1451,11 @@ class UnifiedOTPVerifyView(APIView):
             user.email = email
             user.is_verified = True
             user.save()
+            
+            # Merge Guest Data
+            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -1379,6 +1465,11 @@ class UnifiedOTPVerifyView(APIView):
             user.descope_user_id = user_id
             user.is_verified = True
             user.save()
+            
+            # Merge Guest Data
+            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+            _merge_guest_data(user, guest_id)
+            
             return user, False
         except User.DoesNotExist:
             pass
@@ -1391,6 +1482,10 @@ class UnifiedOTPVerifyView(APIView):
             descope_user_id=user_id,
             is_verified=True
         )
+        
+        # Merge Guest Data
+        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+        _merge_guest_data(user, guest_id)
         
         return user, True
 
@@ -1449,3 +1544,23 @@ class RefreshTokenView(APIView):
             logger.error(f"Token refresh failed: {str(e)}")
             return Response({'error': 'Token refresh failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
+from rest_framework import viewsets
+
+class UserAddressViewSet(viewsets.ModelViewSet):
+    """ViewSet for UserAddress model"""
+    serializer_class = UserAddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return UserAddress.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # If this is set as default, unset other defaults
+        if serializer.validated_data.get('is_default', False):
+            UserAddress.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('is_default', False):
+            UserAddress.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+        serializer.save()

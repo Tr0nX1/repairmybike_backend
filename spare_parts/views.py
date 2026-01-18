@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -12,7 +12,6 @@ from .models import (
     CartItem,
     Order,
     OrderItem,
-    UserSavedPart,
 )
 from .serializers import (
     SparePartCategorySerializer,
@@ -24,20 +23,17 @@ from .serializers import (
     OrderSerializer,
     CheckoutSerializer,
     BuyNowSerializer,
-    UserSavedPartSerializer,
 )
 
 
 class SparePartCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SparePartCategory.objects.all()
     serializer_class = SparePartCategorySerializer
-    permission_classes = [permissions.AllowAny]
 
 
 class SparePartBrandViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SparePartBrand.objects.all()
     serializer_class = SparePartBrandSerializer
-    permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
         category_id = request.query_params.get('category')
@@ -55,7 +51,6 @@ class SparePartBrandViewSet(viewsets.ReadOnlyModelViewSet):
 class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SparePart.objects.select_related('brand', 'category').all()
     serializer_class = SparePartDetailSerializer
-    permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
         q = request.query_params.get('q')
@@ -121,6 +116,8 @@ class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CartViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+    
     def _get_or_create_cart(self, session_id, user=None):
         cart, _ = Cart.objects.get_or_create(session_id=session_id, defaults={'user': user})
         return cart
@@ -301,26 +298,22 @@ class CartViewSet(viewsets.ViewSet):
 
 
 class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.AllowAny]
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
     def list(self, request, *args, **kwargs):
-        user = request.user
         session_id = request.query_params.get('session_id')
+        phone = request.query_params.get('phone')
         qs = self.get_queryset()
         
-        if user.is_authenticated:
-            # Strictly filter by the authenticated user
-            qs = qs.filter(user=user)
+        # Priority: authenticated user > session_id
+        if request.user and request.user.is_authenticated:
+            qs = qs.filter(user=request.user)
         elif session_id:
-            # Fallback only for anonymous/guest users with a session_id
-            # Note: We should ideally sign guest sessions too, but this isolates from phone scraping
-            qs = qs.filter(session_id=session_id, user__isnull=True)
+            qs = qs.filter(session_id=session_id)
         else:
-            return Response({
-                'error': True, 
-                'message': 'Authentication required or session_id must be provided'
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': True, 'message': 'Authentication or session_id required'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = self.get_serializer(qs.order_by('-created_at'), many=True)
         return Response({'error': False, 'message': 'Orders retrieved successfully', 'data': serializer.data})
@@ -360,48 +353,3 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
         instance.save()
         
         return Response({'success': True, 'message': 'Order cancelled successfully'})
-
-class UserSavedPartViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserSavedPartSerializer
-
-    def get_queryset(self):
-        return UserSavedPart.objects.filter(user=self.request.user)
-
-    def list(self, request, *args, **kwargs):
-        qs = self.get_queryset()
-        serializer = self.get_serializer(qs, many=True)
-        return Response({
-            'error': False,
-            'message': 'Saved parts retrieved successfully',
-            'data': serializer.data
-        })
-
-    def create(self, request, *args, **kwargs):
-        spare_part_id = request.data.get('spare_part_id')
-        if not spare_part_id:
-            return Response({'error': True, 'message': 'spare_part_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            part = SparePart.objects.get(id=spare_part_id)
-        except SparePart.DoesNotExist:
-            return Response({'error': True, 'message': 'Spare part not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        obj, created = UserSavedPart.objects.get_or_create(user=request.user, spare_part=part)
-        return Response({
-            'error': False,
-            'message': 'Part saved successfully' if created else 'Part already saved',
-            'data': self.get_serializer(obj).data
-        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
-
-    @action(detail=False, methods=['post'])
-    def remove(self, request):
-        spare_part_id = request.data.get('spare_part_id')
-        if not spare_part_id:
-            return Response({'error': True, 'message': 'spare_part_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        deleted, _ = UserSavedPart.objects.filter(user=request.user, spare_part_id=spare_part_id).delete()
-        return Response({
-            'error': False,
-            'message': 'Part removed from saved list' if deleted else 'Part not found in saved list'
-        }, status=status.HTTP_200_OK if deleted else status.HTTP_404_NOT_FOUND)

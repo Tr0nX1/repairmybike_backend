@@ -1,5 +1,6 @@
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 from descope import DescopeClient
 from django.conf import settings
@@ -197,4 +198,44 @@ class PasswordSessionAuthentication(BaseAuthentication):
 
         except Exception as e:
             logger.error(f"PasswordSessionAuthentication failed: {e}")
+            return None
+
+
+class GuestUser(AnonymousUser):
+    """Custom AnonymousUser that carries a Guest ID"""
+    def __init__(self, guest_id):
+        self.guest_id = guest_id
+        super().__init__()
+
+    @property
+    def is_authenticated(self):
+        return False
+
+    @property
+    def is_guest(self):
+        return True
+
+
+class GuestAuthentication(BaseAuthentication):
+    """
+    Identifies Guest users via X-Guest-ID header.
+    Does NOT provide full 'authenticated' status, but allows tracking.
+    """
+    def authenticate(self, request):
+        guest_id = request.META.get('HTTP_X_GUEST_ID')
+        if not guest_id:
+            return None
+        
+        # We don't necessarily need to hit the DB here if we just trust the UUID,
+        # but for Blinkit-style, we might want to ensure the session exists.
+        from .models import GuestSession
+        try:
+            # Validate UUID format
+            import uuid
+            uuid_obj = uuid.UUID(guest_id)
+            
+            # Use get_or_create to ensure session exists in DB
+            guest_session, _ = GuestSession.objects.get_or_create(guest_id=uuid_obj)
+            return (GuestUser(guest_id=str(guest_session.guest_id)), None)
+        except Exception:
             return None

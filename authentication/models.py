@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+import uuid
 
 
 class User(AbstractUser):
@@ -15,7 +16,32 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.phone_number or self.email or self.username
+        full_name = f"{self.first_name} {self.last_name}".strip()
+        return full_name or self.phone_number or self.email or self.username
+
+
+class UserAddress(models.Model):
+    """Store detailed user address information"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
+    full_name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    flat_house_no = models.CharField(max_length=255)
+    area_street = models.CharField(max_length=255)
+    landmark = models.CharField(max_length=255, blank=True, null=True)
+    pincode = models.CharField(max_length=10)
+    town_city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    is_default = models.BooleanField(default=True)
+    delivery_instructions = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-is_default', '-created_at']
+        verbose_name_plural = "User Addresses"
+
+    def __str__(self):
+        return f"{self.full_name} - {self.town_city} ({'Default' if self.is_default else ''})"
 
 
 class UserSession(models.Model):
@@ -138,3 +164,21 @@ class StaffDirectory(models.Model):
 
     def __str__(self):
         return f"{self.identifier} ({'active' if self.is_active else 'inactive'})"
+
+
+class GuestSession(models.Model):
+    """Track guest sessions before they potentially sign up"""
+    guest_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    device_id = models.CharField(max_length=255, blank=True, null=True)
+    user_agent = models.CharField(max_length=500, blank=True, null=True)
+    last_activity = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    # Metadata for cart merging or context
+    context_data = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Guest-{str(self.guest_id)[:8]}"

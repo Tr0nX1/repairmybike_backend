@@ -1,19 +1,29 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt
+from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, UserAddress
 
 User = get_user_model()
 
 
+class UserAddressSerializer(serializers.ModelSerializer):
+        fields = [
+            'id', 'full_name', 'phone_number', 'flat_house_no',
+            'area_street', 'landmark', 'pincode', 'town_city',
+            'state', 'is_default', 'delivery_instructions', 'created_at'
+        ]
+        read_only_fields = ['id', 'created_at']
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model"""
+    addresses = UserAddressSerializer(many=True, read_only=True)
     
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
             'phone_number', 'profile_picture', 'is_verified',
-            'default_vehicle', 'created_at', 'updated_at'
+            'default_vehicle', 'addresses', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 

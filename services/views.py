@@ -1,12 +1,14 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.core.cache import cache
-from .models import ServiceCategory, Service, ServicePricing, UserSavedService
+from .models import ServiceCategory, Service, ServicePricing, UserSavedService, GuestSavedService
 from .serializers import (
     ServiceCategorySerializer, ServiceSerializer, ServicePricingSerializer,
-    UserSavedServiceSerializer
+    UserSavedServiceSerializer, GuestSavedServiceSerializer
 )
+from authentication.permissions import IsGuestOrAuthenticated
+from authentication.models import GuestSession
 
 
 class ServiceCategoryViewSet(viewsets.ModelViewSet):
@@ -15,15 +17,10 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     
     def list(self, request, *args, **kwargs):
-        print("🔍 ServiceCategoryViewSet.list() called")
-        print(f"📊 Request method: {request.method}")
-        print(f"🌐 Request headers: {dict(request.headers)}")
-        
         cache_key = 'service_categories_list'
         cached_data = cache.get(cache_key)
         
         if cached_data:
-            print(f"✅ Returning cached data: {len(cached_data)} categories")
             return Response({
                 'error': False,
                 'message': 'Service categories retrieved successfully',
@@ -31,15 +28,11 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
             })
         
         queryset = self.get_queryset()
-        print(f"📋 Queryset count: {queryset.count()}")
-        
         serializer = self.get_serializer(queryset, many=True)
-        print(f"📝 Serialized data: {serializer.data}")
         
-        # Cache for 5 minutes for faster database sync
+        # Cache for 5 minutes
         cache.set(cache_key, serializer.data, 300)
         
-        print(f"✅ Returning fresh data: {len(serializer.data)} categories")
         return Response({
             'error': False,
             'message': 'Service categories retrieved successfully',
@@ -62,19 +55,13 @@ class ServiceViewSet(viewsets.ModelViewSet):
         return queryset
     
     def list(self, request, *args, **kwargs):
-        print("🔍 ServiceViewSet.list() called")
-        print(f"📊 Request method: {request.method}")
-        print(f"🌐 Request headers: {dict(request.headers)}")
-        
         category_id = request.query_params.get('category_id')
-        print(f"🏷️ Category ID filter: {category_id}")
         
         if category_id:
             cache_key = f'services_category_{category_id}'
             cached_data = cache.get(cache_key)
             
             if cached_data:
-                print(f"✅ Returning cached data for category {category_id}: {len(cached_data)} services")
                 return Response({
                     'error': False,
                     'message': 'Services retrieved successfully',
@@ -82,13 +69,11 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 })
             
             queryset = self.get_queryset().filter(service_category_id=category_id)
-            print(f"📋 Filtered queryset count: {queryset.count()}")
         else:
             cache_key = 'services_all'
             cached_data = cache.get(cache_key)
             
             if cached_data:
-                print(f"✅ Returning cached data for all services: {len(cached_data)} services")
                 return Response({
                     'error': False,
                     'message': 'Services retrieved successfully',
@@ -96,15 +81,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 })
             
             queryset = self.get_queryset()
-            print(f"📋 All services queryset count: {queryset.count()}")
         
         serializer = self.get_serializer(queryset, many=True)
-        print(f"📝 Serialized data: {serializer.data}")
         
-        # Cache for 5 minutes for faster database sync
+        # Cache for 5 minutes
         cache.set(cache_key, serializer.data, 300)
         
-        print(f"✅ Returning fresh data: {len(serializer.data)} services")
         return Response({
             'error': False,
             'message': 'Services retrieved successfully',
@@ -143,7 +125,7 @@ class ServicePricingViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = self.get_queryset().filter(vehicle_model_id=vehicle_model_id)
         serializer = self.get_serializer(queryset, many=True)
         
-        # Cache for 5 minutes instead of 30 minutes
+        # Cache for 5 minutes
         cache.set(cache_key, serializer.data, 300)
         
         return Response({
@@ -154,20 +136,26 @@ class ServicePricingViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SavedServiceViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSavedServiceSerializer
-    
+    permission_classes = [IsGuestOrAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.user.is_authenticated:
+            return UserSavedServiceSerializer
+        return GuestSavedServiceSerializer
+
     def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return UserSavedService.objects.none()
-        return UserSavedService.objects.filter(user=self.request.user)
+        user = self.request.user
+        if user.is_authenticated:
+            return UserSavedService.objects.filter(user=user)
+        
+        # Guest User logic
+        guest_id = getattr(user, 'guest_id', None)
+        if guest_id:
+            return GuestSavedService.objects.filter(guest_session__guest_id=guest_id)
+            
+        return GuestSavedService.objects.none()
 
     def list(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-             return Response({
-                'error': False,
-                'data': []
-            })
-            
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response({
@@ -177,39 +165,49 @@ class SavedServiceViewSet(viewsets.ModelViewSet):
         })
 
     def create(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return Response(
-                {'error': True, 'message': 'Authentication required'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-
-        updated_data = request.data.copy()
-        # 'service_id' is expected in request body
+        user = request.user
+        service_id = request.data.get('service_id')
         
-        serializer = self.get_serializer(data=updated_data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response({
-                'error': False,
-                'message': 'Service saved successfully',
-                'data': serializer.data
-            }, status=status.HTTP_201_CREATED)
+        if not service_id:
+             return Response({'error': True, 'message': 'service_id is required'}, status=400)
+
+        if user.is_authenticated:
+            saved_obj, created = UserSavedService.objects.get_or_create(
+                user=user, service_id=service_id
+            )
+            serializer = UserSavedServiceSerializer(saved_obj)
+        else:
+            # Guest Logic
+            guest_id = getattr(user, 'guest_id', None)
+            guest_session = GuestSession.objects.filter(guest_id=guest_id).first()
+            if not guest_session:
+                 return Response({'error': True, 'message': 'Invalid guest session'}, status=401)
             
+            saved_obj, created = GuestSavedService.objects.get_or_create(
+                guest_session=guest_session, service_id=service_id
+            )
+            serializer = GuestSavedServiceSerializer(saved_obj)
+
         return Response({
-            'error': True,
-            'message': 'Failed to save service',
-            'details': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            'error': False,
+            'message': 'Service saved successfully',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'], url_path='remove')
     def remove_service(self, request):
-        if not request.user.is_authenticated:
-            return Response({'error': True}, status=401)
-            
+        user = request.user
         service_id = request.data.get('service_id')
-        deleted, _ = UserSavedService.objects.filter(
-            user=request.user, service_id=service_id
-        ).delete()
+        
+        if user.is_authenticated:
+            deleted, _ = UserSavedService.objects.filter(
+                user=user, service_id=service_id
+            ).delete()
+        else:
+            guest_id = getattr(user, 'guest_id', None)
+            deleted, _ = GuestSavedService.objects.filter(
+                guest_session__guest_id=guest_id, service_id=service_id
+            ).delete()
         
         return Response({
             'error': False,

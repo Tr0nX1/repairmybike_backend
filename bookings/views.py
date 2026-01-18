@@ -27,46 +27,30 @@ class BookingViewSet(viewsets.ModelViewSet):
         return BookingListSerializer
     
     def list(self, request, *args, **kwargs):
-        user = request.user
-        
-        # If staff, they might still want to filter by phone, but regular users shouldn't
-        phone = request.query_params.get('phone')
-        
-        if user.is_staff and phone:
-            # Staff can look up any customer by phone
-            try:
-                customer = Customer.objects.get(phone=phone)
-                queryset = self.get_queryset().filter(customer=customer)
-            except Customer.DoesNotExist:
-                queryset = self.get_queryset().none()
-        elif not user.is_anonymous:
-            # Regular authenticated user: strictly their own data
-            # Link via user profile or phone number on the User model
-            user_phone = getattr(user, 'phone_number', None)
-            if not user_phone:
-                return Response({
-                    'error': True,
-                    'message': 'User profile does not have a phone number linked'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            try:
-                customer = Customer.objects.get(phone=user_phone)
-                queryset = self.get_queryset().filter(customer=customer)
-            except Customer.DoesNotExist:
-                queryset = self.get_queryset().none()
-        else:
-            # This should be blocked by IsAuthenticated, but for safety:
+        # Strict security: Only logged-in users can view their bookings
+        if not request.user.is_authenticated:
             return Response({
                 'error': True,
-                'message': 'Authentication required'
+                'message': 'Authentication required to view bookings'
             }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            # Filter bookings by the authenticated user's phone number
+            customer = Customer.objects.get(phone=request.user.phone_number)
+            queryset = self.get_queryset().filter(customer=customer)
+            serializer = self.get_serializer(queryset, many=True)
             
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({
-            'error': False,
-            'message': 'Booking history retrieved successfully',
-            'data': serializer.data
-        })
+            return Response({
+                'error': False,
+                'message': 'Booking history retrieved successfully',
+                'data': serializer.data
+            })
+        except Customer.DoesNotExist:
+            return Response({
+                'error': False,
+                'message': 'No bookings found',
+                'data': []
+            })
     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
