@@ -284,39 +284,25 @@ REST_FRAMEWORK = {
 }
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = config(
-    'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000,http://127.0.0.1:3000,https://repairmybikebackend-production.up.railway.app,https://repairmybike-frontend.vercel.app,https://www.repairmybike.in,https://repairmybike.in',
-    cast=lambda v: [s.strip() for s in v.split(',')]
-)
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
-# Allow any localhost/127.0.0.1 port for Flutter web/dev servers
 from corsheaders.defaults import default_headers
-CORS_ALLOWED_ORIGIN_PATTERNS = [
-    r"^http://localhost(?::\d+)?$",
-    r"^http://127\.0\.0\.1(?::\d+)?$",
-    r"^http://10\.0\.2\.2(?::\d+)?$",
-]
-
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'x-guest-id',
+    'x-session-token',
 ]
-
-CORS_ALLOW_CREDENTIALS = True
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
     'https://repairmybikebackend-production.up.railway.app',
     'https://www.repairmybike.in',
     'https://repairmybike.in',
-    'http://localhost',
-    'http://127.0.0.1',
-    'http://10.0.2.2',
 ]
-# Add common ports to be safe
-for port in [3000, 8000, 8080]:
-    CSRF_TRUSTED_ORIGINS.append(f'http://localhost:{port}')
-    CSRF_TRUSTED_ORIGINS.append(f'http://127.0.0.1:{port}')
+
+# Proxy settings (crucial for Railway)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 # Razorpay Configuration
 RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='')
@@ -328,8 +314,6 @@ STAFF_API_KEY = config('STAFF_API_KEY', default='')
 
 # Security Settings for Production
 if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    USE_X_FORWARDED_HOST = True
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
