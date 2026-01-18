@@ -27,16 +27,16 @@ class BookingViewSet(viewsets.ModelViewSet):
         return BookingListSerializer
     
     def list(self, request, *args, **kwargs):
-        phone = request.query_params.get('phone')
-        
-        if not phone:
+        # Strict security: Only logged-in users can view their bookings
+        if not request.user.is_authenticated:
             return Response({
                 'error': True,
-                'message': 'phone query parameter is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
+                'message': 'Authentication required to view bookings'
+            }, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
-            customer = Customer.objects.get(phone=phone)
+            # Filter bookings by the authenticated user's phone number
+            customer = Customer.objects.get(phone=request.user.phone_number)
             queryset = self.get_queryset().filter(customer=customer)
             serializer = self.get_serializer(queryset, many=True)
             
@@ -48,7 +48,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         except Customer.DoesNotExist:
             return Response({
                 'error': False,
-                'message': 'No bookings found for this phone number',
+                'message': 'No bookings found',
                 'data': []
             })
     

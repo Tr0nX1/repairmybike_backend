@@ -307,15 +307,13 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
         phone = request.query_params.get('phone')
         qs = self.get_queryset()
         
-        # Priority: authenticated user > phone > session_id
+        # Priority: authenticated user > session_id
         if request.user and request.user.is_authenticated:
             qs = qs.filter(user=request.user)
-        elif phone:
-            qs = qs.filter(phone=phone)
         elif session_id:
             qs = qs.filter(session_id=session_id)
         else:
-            return Response({'error': True, 'message': 'Provide phone, session_id, or authenticate'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': True, 'message': 'Authentication or session_id required'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = self.get_serializer(qs.order_by('-created_at'), many=True)
         return Response({'error': False, 'message': 'Orders retrieved successfully', 'data': serializer.data})

@@ -1,0 +1,521 @@
+{
+  "VehicleType": {
+    "count": 2,
+    "items": [
+      {
+        "id": 1,
+        "path": "vehicle_types/ChatGPT_Image_Dec_17_2025_12_02_06_AM.png"
+      },
+      {
+        "id": 2,
+        "path": "vehicle_types/Screenshot_2025-11-22_083011.png"
+      }
+    ]
+  },
+  "VehicleBrand": {
+    "count": 11,
+    "items": [
+      {
+        "id": 7,
+        "path": "media/vehicle_brands/bajaj-motorcycle3842_bn5a1v"
+      },
+      {
+        "id": 3,
+        "path": "media/vehicle_brands/bajaj-motorcycle3842_i7zj9d"
+      },
+      {
+        "id": 6,
+        "path": "media/vehicle_brands/dc0d841b7dcba9effe3e1c70adb8e6bf_c40foz"
+      },
+      {
+        "id": 1,
+        "path": "media/vehicle_brands/dc0d841b7dcba9effe3e1c70adb8e6bf_afajla"
+      },
+      {
+        "id": 2,
+        "path": "media/vehicle_brands/honda-logo-1_vrshhp"
+      },
+      {
+        "id": 11,
+        "path": "media/vehicle_brands/7021a9951213d5077a430635633f9e92_sjp5l2"
+      },
+      {
+        "id": 5,
+        "path": "media/vehicle_brands/royal-enfield-logo-png_seeklogo-335155_vdwv33"
+      },
+      {
+        "id": 9,
+        "path": "media/vehicle_brands/images_vcesbu"
+      },
+      {
+        "id": 8,
+        "path": "media/vehicle_brands/brand_iw9she"
+      },
+      {
+        "id": 4,
+        "path": "media/vehicle_brands/brand_bk1wkg"
+      },
+      {
+        "id": 10,
+        "path": "media/vehicle_brands/logo_yamaha_motor_viaxi0"
+      }
+    ]
+  },
+  "VehicleModel": {
+    "count": 84,
+    "items": [
+      {
+        "id": 71,
+        "path": "media/vehicle_models/Suzuki_Access_125_Colors__White_Red_Gray_Blue_Silver_Black_etbk6s"
+      },
+      {
+        "id": 13,
+        "path": "media/vehicle_models/download_1_q3bipd"
+      },
+      {
+        "id": 66,
+        "path": "vehicle_models/Honda_Activa_125_XUwoxng.jpg"
+      },
+      {
+        "id": 62,
+        "path": "vehicle_models/Honda_Activa_3G_Colors__Brown_White_Grey_Blue_Red_Black.jpg"
+      },
+      {
+        "id": 63,
+        "path": "vehicle_models/2017_Honda_Activa_4G_launched_in_India_at_a_price_of_INR_50730___AUTOBICS.jpg"
+      },
+      {
+        "id": 64,
+        "path": "vehicle_models/Honda_Activa_5G_Colors__Dazzle_Yellow_Spartan_Red_Silver_Grey_White.jpg"
+      },
+      {
+        "id": 65,
+        "path": "vehicle_models/Honda_Activa_6G_Colors__Blue_Red_Yellow_Black_White_Grey.jpg"
+      },
+      {
+        "id": 74,
+        "path": "vehicle_models/Yamaha_Aerox_Alpha_2025__Price__Specs_in_Indonesia_-_autoini.jpg"
+      },
+      {
+        "id": 40,
+        "path": "vehicle_models/TVS_Bike_Price_in_Sri_Lanka_-_Pricelanka_lk.jpg"
+      },
+      {
+        "id": 41,
+        "path": "vehicle_models/TVS_Bike_Price_in_Sri_Lanka_-_Pricelanka_lk_3WxPRim.jpg"
+      },
+      {
+        "id": 48,
+        "path": "vehicle_models/TVS_Apache_RTR_160_4V_Granite_Grey_Colour.jpg"
+      },
+      {
+        "id": 47,
+        "path": "vehicle_models/TVS_Apache_RTR_160_4V_Granite_Grey_Colour_7PYKrhi.jpg"
+      },
+      {
+        "id": 49,
+        "path": "vehicle_models/TVS_Apache_RTR_160_4V_Granite_Grey_Colour_uxZTkH8.jpg"
+      },
+      {
+        "id": 51,
+        "path": "vehicle_models/TVS_Apache_RR310.jpg"
+      },
+      {
+        "id": 34,
+        "path": "vehicle_models/Bajaj_Avenger_Cruise_220___220_CC.jpg"
+      },
+      {
+        "id": 33,
+        "path": "vehicle_models/2019_Bajaj_Avenger_Street_160_ABS_Launched_at_Rs_82253.jpg"
+      },
+      {
+        "id": 68,
+        "path": "vehicle_models/2017_Honda_Aviator_BS4_reaches_dealerships.jpg"
+      },
+      {
+        "id": 17,
+        "path": "vehicle_models/\u041a\u0443\u043f\u0438\u0442\u044c_\u043c\u043e\u0442\u043e\u0446\u0438\u043a\u043b_Bajaj_Boxer_Cross_150_\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u043e_\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u0430\u044f_\u0446\u0435\u043d\u0430_-_\u0410\u0440\u0442\u041c\u043e\u0442\u043e.jpg"
+      },
+      {
+        "id": 18,
+        "path": "vehicle_models/Bajaj_Caliber_115_2003_Motorcycle.jpg"
+      },
+      {
+        "id": 10,
+        "path": "media/vehicle_models/CBZ_tpqrab"
+      },
+      {
+        "id": 8,
+        "path": "media/vehicle_models/Hero_Honda_CD_100_ss_Full_Bike_Restoration_lyvfie"
+      },
+      {
+        "id": 36,
+        "path": "vehicle_models/TVS_Bikes.jpg"
+      },
+      {
+        "id": 61,
+        "path": "vehicle_models/Bajaj_to_sell_Chetak_from_75_locations.jpg"
+      },
+      {
+        "id": 69,
+        "path": "vehicle_models/Honda_CLICK125___Honda_Motorcycles.jpg"
+      },
+      {
+        "id": 29,
+        "path": "vehicle_models/Bajaj_CT_125X_tCU1Wyv.jpg"
+      },
+      {
+        "id": 57,
+        "path": "vehicle_models/2020_Hero_Destini_125_BS6_launched_at_Rs__64310.jpg"
+      },
+      {
+        "id": 67,
+        "path": "vehicle_models/2017_Honda_Dio_Colors__Yellow_Orange_Red_Grey_Blue.jpg"
+      },
+      {
+        "id": 21,
+        "path": "vehicle_models/Comparison_between_Bajaj_Discover_100_vs_125_vs_150.jpg"
+      },
+      {
+        "id": 22,
+        "path": "vehicle_models/Comparison_between_Bajaj_Discover_100_vs_125_vs_150_UU9yWFM.jpg"
+      },
+      {
+        "id": 31,
+        "path": "vehicle_models/Bajaj_Dominar_250___248_8_cc.jpg"
+      },
+      {
+        "id": 32,
+        "path": "vehicle_models/Bajaj_Dominar_400.jpg"
+      },
+      {
+        "id": 55,
+        "path": "vehicle_models/Hero_Duet_Colors__White_Red_Grey_Black_Green_Matte_Grey.jpg"
+      },
+      {
+        "id": 77,
+        "path": "vehicle_models/Mahindra_Duro_DZ__Rodeo_RZ_receive_India_Design_Mark.jpg"
+      },
+      {
+        "id": 72,
+        "path": "vehicle_models/HTTPS_1.JPG"
+      },
+      {
+        "id": 37,
+        "path": "vehicle_models/TVS_Fiero_Making_a_Comeback__Lets_take_a_lookback.jpg"
+      },
+      {
+        "id": 42,
+        "path": "vehicle_models/Tenemos_la_moto_ideal_para_ti.jpg"
+      },
+      {
+        "id": 78,
+        "path": "vehicle_models/Mahindra_Scooters_Price_in_India_2025_New_Mahindra_Scooty_Models.jpg"
+      },
+      {
+        "id": 14,
+        "path": "media/vehicle_models/download_2_i1cdtk"
+      },
+      {
+        "id": 70,
+        "path": "vehicle_models/New_Honda_Grazia.jpg"
+      },
+      {
+        "id": 76,
+        "path": "vehicle_models/Mahindra_MOJO_and_Gusto_125_now_sold_in_Canteen_Store_Department.jpg"
+      },
+      {
+        "id": 5,
+        "path": "media/vehicle_models/passion_xtec_fqbh3o"
+      },
+      {
+        "id": 6,
+        "path": "media/vehicle_models/hero_passion_plus_llli9k"
+      },
+      {
+        "id": 4,
+        "path": "media/vehicle_models/hf_deluxe_pxbefd"
+      },
+      {
+        "id": 11,
+        "path": "media/vehicle_models/Hero_hulk_etrlxa"
+      },
+      {
+        "id": 53,
+        "path": "vehicle_models/Hero_Pleasure____110_9_CC.jpg"
+      },
+      {
+        "id": 9,
+        "path": "media/vehicle_models/honda_sleek_dw76e9"
+      },
+      {
+        "id": 52,
+        "path": "vehicle_models/download_3.jpg"
+      },
+      {
+        "id": 12,
+        "path": "media/vehicle_models/Hero_Impulse_elzumk"
+      },
+      {
+        "id": 83,
+        "path": "vehicle_models/TVS_Jupiter_Review_-_Mileage_Specifications_Prices_2015_Specifications.jpg"
+      },
+      {
+        "id": 86,
+        "path": "vehicle_models/TVS_Jupiter_BS6_with_FI_Engine_Launched_at_Rs_67911.jpg"
+      },
+      {
+        "id": 19,
+        "path": "vehicle_models/Bajaj_Kawasaki_4s_champion.jpg"
+      },
+      {
+        "id": 54,
+        "path": "vehicle_models/Hero_Maestro_Features__Engine_Price_Colors_and_Specifications_Know_comple_FSl69Cf.jpg"
+      },
+      {
+        "id": 58,
+        "path": "vehicle_models/2020_Hero_Maestro_Edge_125_BS6_launched_at_Rs__67950.jpg"
+      },
+      {
+        "id": 59,
+        "path": "vehicle_models/Hero_Maestro_Edge_125___124_6_CC.jpg"
+      },
+      {
+        "id": 35,
+        "path": "vehicle_models/TVS_Motor_Introduces_TVS_HLX_125_with_5-Gears_in_Tanzania.jpg"
+      },
+      {
+        "id": 87,
+        "path": "vehicle_models/TVS_Ntorq_2020_Motorcycle.jpg"
+      },
+      {
+        "id": 43,
+        "path": "vehicle_models/download_3_zOmUc25.jpg"
+      },
+      {
+        "id": 27,
+        "path": "vehicle_models/New_Bajaj_Platina_100_KS_CBS_launched_at_Rs_40500.jpg"
+      },
+      {
+        "id": 28,
+        "path": "vehicle_models/Bajaj_Platina_110_ABS_launched_at_Rs__72224_-___Motorcycle_News_Reviews_and_more.jpg"
+      },
+      {
+        "id": 56,
+        "path": "vehicle_models/Hero_Pleasure_Plus_110_Colors_Hero_Pleasure_110.jpg"
+      },
+      {
+        "id": 24,
+        "path": "vehicle_models/VIEWBA1.JPG"
+      },
+      {
+        "id": 25,
+        "path": "vehicle_models/Ride_with_Style_with_Our_new_Bike_Collection___Bajaj_Auto_1.jpg"
+      },
+      {
+        "id": 30,
+        "path": "vehicle_models/Ride_with_Style_with_Our_new_Bike_Collection___Bajaj_Auto_1_teBP3bf.jpg"
+      },
+      {
+        "id": 23,
+        "path": "vehicle_models/Bajaj_Pulsar_N150_Launched_New_Yamaha_FZ_S_V3_Rival.jpg"
+      },
+      {
+        "id": 45,
+        "path": "vehicle_models/TVS_Radeon_Colors__White_Black_Beige_and_Purple.jpg"
+      },
+      {
+        "id": 73,
+        "path": "vehicle_models/Yamaha_Ray_ZR___125_CC.jpg"
+      },
+      {
+        "id": 75,
+        "path": "vehicle_models/Mahindra_Rodeo_RZ_Launched.jpg"
+      },
+      {
+        "id": 79,
+        "path": "vehicle_models/TVS_Scooty_Zest_110_Colors__Yellow_Red_Black_Blue_Pink_Orange_and_More.jpg"
+      },
+      {
+        "id": 80,
+        "path": "vehicle_models/Amazing_TVS_Scooty_Pep_Plus.jpg"
+      },
+      {
+        "id": 84,
+        "path": "vehicle_models/Amazing_TVS_Scooty_Pep_Plus_NZHrLg2.jpg"
+      },
+      {
+        "id": 1,
+        "path": "media/vehicle_models/splendor_ehzzfy"
+      },
+      {
+        "id": 3,
+        "path": "vehicle_models/Hero_Splendor_Plus___97_2_CC.jpg"
+      },
+      {
+        "id": 44,
+        "path": "vehicle_models/TVS_Sport.jpg"
+      },
+      {
+        "id": 38,
+        "path": "vehicle_models/TVS_Star_City_Plus.jpg"
+      },
+      {
+        "id": 46,
+        "path": "vehicle_models/TVS_StaR_City_now_available_in_Grey-Black_Dual_tone_color.jpg"
+      },
+      {
+        "id": 82,
+        "path": "vehicle_models/TVSWEG1.JPG"
+      },
+      {
+        "id": 39,
+        "path": "vehicle_models/2019_TVS_Victor_gets_SBT_Synchronized_Braking_Technology.jpg"
+      },
+      {
+        "id": 81,
+        "path": "vehicle_models/TVSWEG1_fPDBJNA.JPG"
+      },
+      {
+        "id": 20,
+        "path": "vehicle_models/\u041a\u0443\u043f\u0438\u0442\u044c_\u043c\u043e\u0442\u043e\u0446\u0438\u043a\u043b_Bajaj_Boxer_Cross_150_\u041e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u043e_\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u0430\u044f_\u0446\u0435\u043d\u0430_-_\u0410\u0440\u0442\u041c\u043e\u0442\u043e_DKQRyZX.jpg"
+      },
+      {
+        "id": 26,
+        "path": "vehicle_models/Bajaj_Xcd_125.jpg"
+      },
+      {
+        "id": 60,
+        "path": "vehicle_models/Hero_Xoom_125_2025.jpg"
+      },
+      {
+        "id": 15,
+        "path": "vehicle_models/hero_x_pulse_200_4v.jpg"
+      },
+      {
+        "id": 16,
+        "path": "vehicle_models/hero_x_pulse_200_4v_UkuvNOm.jpg"
+      },
+      {
+        "id": 85,
+        "path": "vehicle_models/TVS_Scooty_Zest_110_Colors__Yellow_Red_Black_Blue_Pink_Orange_and_More_yS9Ym8P.jpg"
+      }
+    ]
+  },
+  "Plan": {
+    "count": 0,
+    "items": []
+  },
+  "SparePartImage": {
+    "count": 12,
+    "items": [
+      {
+        "id": 1,
+        "path": "spare_parts/images/Screenshot_2025-07-30_151228.png"
+      },
+      {
+        "id": 2,
+        "path": "spare_parts/images/Screenshot_2025-07-30_151228_VufRkfl.png"
+      },
+      {
+        "id": 7,
+        "path": "spare_parts/images/bosch_brake_front_6Z2ac6I.png"
+      },
+      {
+        "id": 6,
+        "path": "spare_parts/images/castrol_power1_vu5Geaw.png"
+      },
+      {
+        "id": 3,
+        "path": "spare_parts/images/exide_battery_primary_OulVXYE.png"
+      },
+      {
+        "id": 4,
+        "path": "spare_parts/images/exide_battery_box_sfMYrru.png"
+      },
+      {
+        "id": 11,
+        "path": "spare_parts/images/kn_air_filter_42aVR9V.png"
+      },
+      {
+        "id": 5,
+        "path": "spare_parts/images/motul_7100_h8rs1gX.png"
+      },
+      {
+        "id": 12,
+        "path": "spare_parts/images/mrf_zapper_w12SRKN.png"
+      },
+      {
+        "id": 9,
+        "path": "spare_parts/images/ngk_cr7_NoMnd1Z.png"
+      },
+      {
+        "id": 10,
+        "path": "spare_parts/images/rk_chain_kit_pJztT5h.png"
+      },
+      {
+        "id": 8,
+        "path": "spare_parts/images/tvs_air_filter_xzd3DrI.png"
+      }
+    ]
+  },
+  "SparePartBrand": {
+    "count": 2,
+    "items": [
+      {
+        "id": 2,
+        "path": "spare_parts/brands/Screenshot_2025-07-30_151228.png"
+      },
+      {
+        "id": 1,
+        "path": "spare_parts/brands/Screenshot_2025-07-30_150205.png"
+      }
+    ]
+  },
+  "SparePartCategory": {
+    "count": 8,
+    "items": [
+      {
+        "id": 5,
+        "path": "spare_parts/categories/cat_air-filter_9N26j6k.png"
+      },
+      {
+        "id": 2,
+        "path": "spare_parts/categories/cat_battery_x3Uz5IY.png"
+      },
+      {
+        "id": 4,
+        "path": "spare_parts/categories/cat_brake-pads_fivQ0jG.png"
+      },
+      {
+        "id": 7,
+        "path": "spare_parts/categories/cat_chain-sprocket_nBwg8hw.png"
+      },
+      {
+        "id": 3,
+        "path": "spare_parts/categories/cat_engine-oil_WJKtofN.png"
+      },
+      {
+        "id": 1,
+        "path": "spare_parts/categories/Screenshot_2025-07-30_150808.png"
+      },
+      {
+        "id": 6,
+        "path": "spare_parts/categories/cat_spark-plug_BPV3N1m.png"
+      },
+      {
+        "id": 8,
+        "path": "spare_parts/categories/cat_tyre_GBApeCZ.png"
+      }
+    ]
+  },
+  "Service": {
+    "count": 1,
+    "items": [
+      {
+        "id": 1,
+        "path": "services/images/Screenshot_2025-07-30_151228.png"
+      }
+    ]
+  }
+}

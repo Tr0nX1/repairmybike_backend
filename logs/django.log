@@ -1474,3 +1474,8 @@ INFO 2026-01-11 15:34:48,029 basehttp 32048 26092 "GET /admin/vehicles/vehiclemo
 INFO 2026-01-11 15:34:49,340 basehttp 32048 26092 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
 INFO 2026-01-11 15:34:58,664 basehttp 32048 26092 "GET /admin/vehicles/vehiclemodel/3/change/?_changelist_filters=vehicle_brand__id__exact%3D1 HTTP/1.1" 200 22713
 INFO 2026-01-11 15:35:00,629 basehttp 32048 26092 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-01-18 11:06:40,078 autoreload 10512 9888 Watching for file changes with StatReloader
+INFO 2026-01-18 11:06:54,113 basehttp 10512 25636 code 400, message Bad request version ('\x11WJ*\x07\x93¹h\x07\x11@\x94È\x05\x0eARY\x14')
+ERROR 2026-01-18 11:06:54,114 basehttp 10512 25636 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-01-18 11:06:54,117 basehttp 10512 27244 code 400, message Bad request version ('êê\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x06S\x1a\x1a\x00\x00\x00')
+ERROR 2026-01-18 11:06:54,117 basehttp 10512 27244 You're accessing the development server over HTTPS, but it only supports HTTP.
