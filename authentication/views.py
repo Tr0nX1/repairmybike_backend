@@ -75,7 +75,17 @@ def _merge_guest_data(user, guest_id):
         
         guest_saved.delete()
         
-        # 2. Merge Context Data (e.g. cart from JSON)
+        # 2. Merge Saved Spare Parts
+        from spare_parts.models import UserSavedPart, GuestSavedPart
+        guest_parts = GuestSavedPart.objects.filter(guest_session=guest_session)
+        for gp in guest_parts:
+            UserSavedPart.objects.get_or_create(
+                user=user,
+                spare_part=gp.spare_part
+            )
+        guest_parts.delete()
+        
+        # 3. Merge Context Data (e.g. cart from JSON)
         # In a real app, you'd translate JSON cart to DB Cart objects here.
         # For now, we'll just log or store in user context.
         

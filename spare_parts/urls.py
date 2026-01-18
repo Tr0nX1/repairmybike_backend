@@ -7,6 +7,7 @@ from .views import (
     SparePartViewSet,
     CartViewSet,
     OrderViewSet,
+    SavedPartViewSet,
 )
 
 router = DefaultRouter()
@@ -15,6 +16,7 @@ router.register(r'brands', SparePartBrandViewSet, basename='spare-part-brand')
 router.register(r'parts', SparePartViewSet, basename='spare-part')
 router.register(r'cart', CartViewSet, basename='spare-part-cart')
 router.register(r'orders', OrderViewSet, basename='spare-part-order')
+router.register(r'saved-parts', SavedPartViewSet, basename='saved-parts')
 
 urlpatterns = [
     path('', include(router.urls)),

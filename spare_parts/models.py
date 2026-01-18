@@ -202,3 +202,17 @@ class UserSavedPart(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.spare_part}"
+
+
+class GuestSavedPart(models.Model):
+    guest_session = models.ForeignKey('authentication.GuestSession', on_delete=models.CASCADE, related_name='saved_parts')
+    spare_part = models.ForeignKey(SparePart, on_delete=models.CASCADE, related_name='saved_by_guests')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'guest_saved_parts'
+        unique_together = ['guest_session', 'spare_part']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Guest {self.guest_session.guest_id} - {self.spare_part}"

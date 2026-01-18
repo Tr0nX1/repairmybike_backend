@@ -11,6 +11,7 @@ from .models import (
     Order,
     OrderItem,
     UserSavedPart,
+    GuestSavedPart,
 )
 
 
@@ -255,5 +256,14 @@ class UserSavedPartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserSavedPart
+        fields = ['id', 'spare_part', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class GuestSavedPartSerializer(serializers.ModelSerializer):
+    spare_part = SparePartListSerializer(read_only=True)
+
+    class Meta:
+        model = GuestSavedPart
         fields = ['id', 'spare_part', 'created_at']
         read_only_fields = ['id', 'created_at']

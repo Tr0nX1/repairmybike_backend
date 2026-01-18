@@ -12,7 +12,11 @@ from .models import (
     CartItem,
     Order,
     OrderItem,
+    UserSavedPart,
+    GuestSavedPart,
 )
+from authentication.permissions import IsGuestOrAuthenticated
+from authentication.models import GuestSession
 from .serializers import (
     SparePartCategorySerializer,
     SparePartBrandSerializer,
@@ -23,6 +27,8 @@ from .serializers import (
     OrderSerializer,
     CheckoutSerializer,
     BuyNowSerializer,
+    UserSavedPartSerializer,
+    GuestSavedPartSerializer,
 )
 
 
@@ -353,3 +359,83 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
         instance.save()
         
         return Response({'success': True, 'message': 'Order cancelled successfully'})
+
+
+class SavedPartViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsGuestOrAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.user.is_authenticated:
+            return UserSavedPartSerializer
+        return GuestSavedPartSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return UserSavedPart.objects.filter(user=user)
+        
+        # Guest User logic
+        guest_id = getattr(user, 'guest_id', None)
+        if guest_id:
+            return GuestSavedPart.objects.filter(guest_session__guest_id=guest_id)
+            
+        return GuestSavedPart.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'error': False,
+            'message': 'Saved parts retrieved',
+            'data': serializer.data
+        })
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        spare_part_id = request.data.get('spare_part_id')
+        
+        if not spare_part_id:
+             return Response({'error': True, 'message': 'spare_part_id is required'}, status=400)
+
+        if user.is_authenticated:
+            saved_obj, created = UserSavedPart.objects.get_or_create(
+                user=user, spare_part_id=spare_part_id
+            )
+            serializer = UserSavedPartSerializer(saved_obj)
+        else:
+            # Guest Logic
+            guest_id = getattr(user, 'guest_id', None)
+            guest_session = GuestSession.objects.filter(guest_id=guest_id).first()
+            if not guest_session:
+                 return Response({'error': True, 'message': 'Invalid guest session'}, status=401)
+            
+            saved_obj, created = GuestSavedPart.objects.get_or_create(
+                guest_session=guest_session, spare_part_id=spare_part_id
+            )
+            serializer = GuestSavedPartSerializer(saved_obj)
+
+        return Response({
+            'error': False,
+            'message': 'Part saved successfully',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'], url_path='remove')
+    def remove_part(self, request):
+        user = request.user
+        spare_part_id = request.data.get('spare_part_id')
+        
+        if user.is_authenticated:
+            deleted, _ = UserSavedPart.objects.filter(
+                user=user, spare_part_id=spare_part_id
+            ).delete()
+        else:
+            guest_id = getattr(user, 'guest_id', None)
+            deleted, _ = GuestSavedPart.objects.filter(
+                guest_session__guest_id=guest_id, spare_part_id=spare_part_id
+            ).delete()
+        
+        return Response({
+            'error': False,
+            'message': 'Part removed' if deleted else 'Part not found in saved',
+        })
