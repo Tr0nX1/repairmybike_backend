@@ -266,6 +266,7 @@ REST_FRAMEWORK = {
         'authentication.authentication.PasswordSessionAuthentication',
         'authentication.authentication.DescopeAuthentication',
         'authentication.authentication.DescopeSessionAuthentication',
+        'authentication.authentication.GuestAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
-from .models import ServiceCategory, Service, ServicePricing, UserSavedService
+from .models import ServiceCategory, Service, ServicePricing, UserSavedService, GuestSavedService
 try:
     from cloudinary.utils import cloudinary_url as _cloudinary_url
 except Exception:
@@ -110,5 +110,17 @@ class UserSavedServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserSavedService
+        fields = ['id', 'service', 'service_id', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class GuestSavedServiceSerializer(serializers.ModelSerializer):
+    service = ServiceSerializer(read_only=True)
+    service_id = serializers.PrimaryKeyRelatedField(
+        queryset=Service.objects.all(), source='service', write_only=True
+    )
+
+    class Meta:
+        model = GuestSavedService
         fields = ['id', 'service', 'service_id', 'created_at']
         read_only_fields = ['id', 'created_at']
