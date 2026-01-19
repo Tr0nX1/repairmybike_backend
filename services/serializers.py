@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.conf import settings
 from .models import ServiceCategory, Service, ServicePricing, UserSavedService, GuestSavedService
+
+from repairmybike.utils import build_absolute_media_url
+
 try:
     from cloudinary.utils import cloudinary_url as _cloudinary_url
 except Exception:
@@ -69,27 +72,10 @@ class ServiceSerializer(serializers.ModelSerializer):
 
         # Case 3: Backward compatibility with list of strings
         if isinstance(raw, list):
-            imgs = [str(u).strip() for u in raw if u]
-            base = getattr(settings, 'MEDIA_URL', '/')
-
             def _to_abs(u: str):
-                if not u:
-                    return None
-                u = str(u).strip()
-                # 1. Already absolute
-                if u.startswith('http://') or u.startswith('https://') or u.startswith('data:'):
-                    return u
-                
-                # 2. Check if we should use Cloudinary base
-                use_cloudinary = getattr(settings, 'USE_CLOUDINARY', False)
-                if use_cloudinary and base.startswith('http'):
-                    # Prepend Cloudinary base
-                    return f"{base.rstrip('/')}/{u.lstrip('/')}"
-                
-                # 3. Fallback to MEDIA_URL logic (local)
-                if base.startswith('http'):
-                    return f"{base.rstrip('/')}/{u.lstrip('/')}"
-                return u
+                request = self.context.get('request') if hasattr(self, 'context') else None
+                return build_absolute_media_url(u, request)
+
 
             return [x for x in (_to_abs(u) for u in imgs) if x]
 

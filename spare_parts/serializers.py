@@ -13,6 +13,8 @@ from .models import (
     UserSavedPart,
     GuestSavedPart,
 )
+from repairmybike.utils import build_absolute_media_url
+
 
 
 class SparePartCategorySerializer(serializers.ModelSerializer):
@@ -24,43 +26,9 @@ class SparePartCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def _abs_url(self, url: str):
-        if not url:
-            return None
-            
-        # 1. Already absolute
-        if url.startswith('http://') or url.startswith('https://') or url.startswith('data:'):
-            return url
-            
-        # 2. Check if we should use Cloudinary base
-        use_cloudinary = getattr(settings, 'USE_CLOUDINARY', False)
-        cloudinary_url = getattr(settings, 'CLOUDINARY_URL', '')
-        
-        # If Cloudinary is on, and the URL looks like a relative media path, 
-        # try to build a Cloudinary URL or at least avoid backend prepending if it's broken.
-        if use_cloudinary and cloudinary_url:
-            # Most cloudinary storage setups return absolute URLs, but if it returned a relative one:
-            # We want it to be res.cloudinary.com/...
-            base = getattr(settings, 'MEDIA_URL', '')
-            if base.startswith('http'):
-                 # Prepend Cloudinary base
-                 return f"{base.rstrip('/')}/{url.lstrip('/')}"
-
-        # 3. Fallback to Request-based absolute URI
         request = self.context.get('request') if hasattr(self, 'context') else None
-        if request:
-            try:
-                # build_absolute_uri prepends the current backend domain. 
-                # This is only correct if the file is actually hosted on the backend.
-                return request.build_absolute_uri(url)
-            except Exception:
-                pass
-        
-        # 4. Final fallback to MEDIA_URL
-        base = getattr(settings, 'MEDIA_URL', '/')
-        if base.startswith('http'):
-            return f"{base.rstrip('/')}/{url.lstrip('/')}"
-            
-        return url
+        return build_absolute_media_url(url, request)
+
 
     def get_image(self, obj):
         try:
@@ -78,22 +46,9 @@ class SparePartBrandSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def _abs_url(self, url: str):
-        if not url:
-            return None
-        if url.startswith('http://') or url.startswith('https://'):
-            return url
         request = self.context.get('request') if hasattr(self, 'context') else None
-        if request:
-            try:
-                return request.build_absolute_uri(url)
-            except Exception:
-                pass
-        base = getattr(settings, 'MEDIA_URL', '/')
-        if base.startswith('http://') or base.startswith('https://'):
-            if url.startswith('/'):
-                return f"{base.rstrip('/')}{url}"
-            return f"{base.rstrip('/')}/{url}"
-        return url
+        return build_absolute_media_url(url, request)
+
 
     def get_logo(self, obj):
         try:
@@ -111,22 +66,9 @@ class SparePartImageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def _abs_url(self, url: str):
-        if not url:
-            return None
-        if url.startswith('http://') or url.startswith('https://'):
-            return url
         request = self.context.get('request') if hasattr(self, 'context') else None
-        if request:
-            try:
-                return request.build_absolute_uri(url)
-            except Exception:
-                pass
-        base = getattr(settings, 'MEDIA_URL', '/')
-        if base.startswith('http://') or base.startswith('https://'):
-            if url.startswith('/'):
-                return f"{base.rstrip('/')}{url}"
-            return f"{base.rstrip('/')}/{url}"
-        return url
+        return build_absolute_media_url(url, request)
+
 
     def get_image(self, obj):
         try:
@@ -150,22 +92,9 @@ class SparePartListSerializer(serializers.ModelSerializer):
         ]
 
     def _abs_url(self, url: str):
-        if not url:
-            return None
-        if url.startswith('http://') or url.startswith('https://'):
-            return url
         request = self.context.get('request') if hasattr(self, 'context') else None
-        if request:
-            try:
-                return request.build_absolute_uri(url)
-            except Exception:
-                pass
-        base = getattr(settings, 'MEDIA_URL', '/')
-        if base.startswith('http://') or base.startswith('https://'):
-            if url.startswith('/'):
-                return f"{base.rstrip('/')}{url}"
-            return f"{base.rstrip('/')}/{url}"
-        return url
+        return build_absolute_media_url(url, request)
+
 
     def get_thumbnail(self, obj):
         # Prefer explicitly marked primary image; otherwise fall back to first by sort_order

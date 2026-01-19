@@ -1,4 +1,6 @@
 from django.contrib import admin
+from repairmybike.admin_mixins import ImagePreviewMixin
+
 
 from .models import (
     SparePartCategory,
@@ -14,26 +16,30 @@ from .models import (
 
 
 @admin.register(SparePartCategory)
-class SparePartCategoryAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "slug", "created_at")
+class SparePartCategoryAdmin(ImagePreviewMixin, admin.ModelAdmin):
+    list_display = ("id", "name", "slug", "image_preview", "created_at")
     search_fields = ("name", "slug")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("image_preview", "created_at", "updated_at")
+
 
 
 @admin.register(SparePartBrand)
-class SparePartBrandAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "slug", "created_at")
+class SparePartBrandAdmin(ImagePreviewMixin, admin.ModelAdmin):
+    list_display = ("id", "name", "slug", "image_preview", "created_at")
     search_fields = ("name", "slug")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("image_preview", "created_at", "updated_at")
 
 
-class SparePartImageInline(admin.TabularInline):
+
+class SparePartImageInline(ImagePreviewMixin, admin.TabularInline):
     model = SparePartImage
     extra = 0
+    readonly_fields = ("image_preview",)
+
 
 
 @admin.register(SparePart)
-class SparePartAdmin(admin.ModelAdmin):
+class SparePartAdmin(ImagePreviewMixin, admin.ModelAdmin):
     list_display = (
         "id",
         "name",
@@ -41,14 +47,22 @@ class SparePartAdmin(admin.ModelAdmin):
         "brand",
         "category",
         "sale_price",
-        "currency",
+        "image_preview",
         "in_stock",
-        "stock_qty",
     )
     list_filter = ("brand", "category", "in_stock")
     search_fields = ("name", "sku")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("image_preview", "created_at", "updated_at")
     inlines = [SparePartImageInline]
+
+    def image_preview(self, obj):
+        # Show primary image if available
+        primary = obj.images.filter(is_primary=True).first() or obj.images.first()
+        if primary:
+            return super().image_preview(primary)
+        return "No Image"
+    image_preview.short_description = 'Preview'
+
 
 
 @admin.register(SparePartFitment)

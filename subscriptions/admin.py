@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Plan, Subscription, PlanBenefit
+from repairmybike.admin_mixins import ImagePreviewMixin
+
 
 
 class PlanBenefitInline(admin.TabularInline):
@@ -8,14 +10,15 @@ class PlanBenefitInline(admin.TabularInline):
 
 
 @admin.register(Plan)
-class PlanAdmin(admin.ModelAdmin):
-    list_display = ("name", "price", "currency", "billing_period", "active")
+class PlanAdmin(ImagePreviewMixin, admin.ModelAdmin):
+    list_display = ("name", "price", "currency", "billing_period", "active", "image_preview")
     list_filter = ("billing_period", "active")
     search_fields = ("name", "description")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("image_preview", "created_at", "updated_at")
     prepopulated_fields = {"slug": ("name",)}
     filter_horizontal = ("included_services",)
     inlines = [PlanBenefitInline]
+
     
     fieldsets = (
         (None, {

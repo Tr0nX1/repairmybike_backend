@@ -1,4 +1,6 @@
 from django.contrib import admin
+from repairmybike.admin_mixins import ImagePreviewMixin
+
 
 from .models import ServiceCategory, Service, ServicePricing
 
@@ -12,16 +14,18 @@ class ServiceCategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(Service)
-class ServiceAdmin(admin.ModelAdmin):
+class ServiceAdmin(ImagePreviewMixin, admin.ModelAdmin):
     list_display = (
         "id",
         "name",
         "service_category",
+        "image_preview",
         "created_at",
     )
     list_filter = ("service_category", "created_at")
     search_fields = ("name", "service_category__name")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("image_preview", "created_at", "updated_at")
+
 
     fieldsets = (
         (None, {

@@ -1,6 +1,7 @@
 from rest_framework import serializers
-
 from .models import Plan, Subscription
+from repairmybike.utils import build_absolute_media_url
+
 
 
 class PlanSerializer(serializers.ModelSerializer):
@@ -29,23 +30,9 @@ class PlanSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_at", "updated_at")
 
     def _abs_url(self, url: str):
-        from django.conf import settings
-        if not url:
-            return None
-        if url.startswith('http://') or url.startswith('https://'):
-            return url
         request = self.context.get('request') if hasattr(self, 'context') else None
-        if request:
-            try:
-                return request.build_absolute_uri(url)
-            except Exception:
-                pass
-        base = getattr(settings, 'MEDIA_URL', '/')
-        if base.startswith('http://') or base.startswith('https://'):
-            if url.startswith('/'):
-                return f"{base.rstrip('/')}{url}"
-            return f"{base.rstrip('/')}/{url}"
-        return url
+        return build_absolute_media_url(url, request)
+
 
     def get_image(self, obj):
         try:
