@@ -76,8 +76,11 @@ class ServiceSerializer(serializers.ModelSerializer):
                 request = self.context.get('request') if hasattr(self, 'context') else None
                 return build_absolute_media_url(u, request)
 
+            return [x for x in (_to_abs(u) for u in raw) if x]
 
-            return [x for x in (_to_abs(u) for u in imgs) if x]
+        if isinstance(raw, str):
+             request = self.context.get('request') if hasattr(self, 'context') else None
+             return [build_absolute_media_url(raw, request)]
 
         return []
 

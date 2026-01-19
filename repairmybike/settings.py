@@ -207,7 +207,10 @@ if USE_CLOUDINARY:
     CLOUDINARY_URL = config('CLOUDINARY_URL', default='')
     if CLOUDINARY_URL:
         os.environ['CLOUDINARY_URL'] = CLOUDINARY_URL
-        CLOUDINARY_STORAGE = {'CLOUDINARY_URL': CLOUDINARY_URL}
+        CLOUDINARY_STORAGE = {
+            'CLOUDINARY_URL': CLOUDINARY_URL,
+            'SECURE': True,
+        }
     else:
         CLOUDINARY_STORAGE = {
             'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
