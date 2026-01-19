@@ -171,78 +171,79 @@ TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# --- Storage Configuration (Static & Media) ---
+
+# Base URLs and Paths
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Media files (local default)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-"""
-Cloudinary media storage
-Enable by setting USE_CLOUDINARY=true and providing credentials.
-This routes Django ImageField/FileField media to Cloudinary.
-"""
+# Feature Flags
 USE_CLOUDINARY = config('USE_CLOUDINARY', default=False, cast=bool)
+USE_CLOUDFLARE_R2 = config('USE_CLOUDFLARE_R2', default=False, cast=bool)
+
+# Default Storage backend (can be overridden by Cloudinary or R2)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 if USE_CLOUDINARY:
-    # Register Cloudinary apps
-    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
+    # Cloudinary configuration
+    if 'cloudinary_storage' not in INSTALLED_APPS:
+        INSTALLED_APPS = ['cloudinary_storage'] + INSTALLED_APPS
+    if 'cloudinary' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('cloudinary')
 
-    # Use Cloudinary storage backend for media
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
+    STORAGES["default"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    }
+    
     CLOUDINARY_URL = config('CLOUDINARY_URL', default='')
     if CLOUDINARY_URL:
-        # Standard cloudinary library checks os.environ
         os.environ['CLOUDINARY_URL'] = CLOUDINARY_URL
-        CLOUDINARY_STORAGE = {
-             'CLOUDINARY_URL': CLOUDINARY_URL
-        }
+        CLOUDINARY_STORAGE = {'CLOUDINARY_URL': CLOUDINARY_URL}
     else:
         CLOUDINARY_STORAGE = {
             'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
             'API_KEY': config('CLOUDINARY_API_KEY', default=''),
             'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
         }
+    print(f"✓ Media storage: Cloudinary (Cloud Name: {CLOUDINARY_STORAGE.get('CLOUD_NAME', 'via URL')})")
 
-"""
-Cloudflare R2 (S3-compatible) media storage
-Enable by setting USE_CLOUDFLARE_R2=true and providing credentials.
-This will route all Django ImageField/FileField media to Cloudflare R2
-and expose absolute URLs via the storage backend.
-"""
-USE_CLOUDFLARE_R2 = config('USE_CLOUDFLARE_R2', default=False, cast=bool)
+elif USE_CLOUDFLARE_R2:
+    # Cloudflare R2 (S3) configuration
+    if 'storages' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('storages')
 
-if USE_CLOUDFLARE_R2 and not USE_CLOUDINARY:
-    # django-storages S3 backend settings for Cloudflare R2
-    INSTALLED_APPS.append('storages')
-
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    }
+    
     AWS_ACCESS_KEY_ID = config('R2_ACCESS_KEY_ID', default='')
     AWS_SECRET_ACCESS_KEY = config('R2_SECRET_ACCESS_KEY', default='')
     AWS_STORAGE_BUCKET_NAME = config('R2_BUCKET_NAME', default='')
-    AWS_S3_ENDPOINT_URL = config('R2_ENDPOINT_URL', default='')  # e.g. https://<accountid>.r2.cloudflarestorage.com
+    AWS_S3_ENDPOINT_URL = config('R2_ENDPOINT_URL', default='')
     AWS_S3_REGION_NAME = config('R2_REGION', default='auto')
     AWS_S3_SIGNATURE_VERSION = config('R2_SIGNATURE_VERSION', default='s3v4')
-
-    # If serving public assets via Cloudflare with a custom domain (recommended)
-    AWS_S3_CUSTOM_DOMAIN = config('CF_MEDIA_DOMAIN', default='')  # e.g. media.example.com
-
-    # Disable auth query string for public buckets
+    AWS_S3_CUSTOM_DOMAIN = config('CF_MEDIA_DOMAIN', default='')
     AWS_QUERYSTRING_AUTH = config('R2_QUERYSTRING_AUTH', default=False, cast=bool)
 
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-    # Construct MEDIA_URL for clients
     if AWS_S3_CUSTOM_DOMAIN:
         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
     elif AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
-        # Direct endpoint-style URL
         MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
-    else:
-        # Fallback to default; warns in logs
-        print("⚠️ Cloudflare R2 is enabled but MEDIA_URL could not be constructed; check env vars.")
+    
+    print("✓ Media storage: Cloudflare R2")
+else:
+    print("✓ Media storage: Local Filesystem")
+
+
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -370,5 +371,5 @@ LOGGING = {
     },
 }
 
-# WhiteNoise Configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# WhiteNoise Configuration removed (consolidated in STORAGES)
+
