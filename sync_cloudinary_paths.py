@@ -4,13 +4,8 @@ import django
 import argparse
 from difflib import SequenceMatcher
 
-# Setup Django with SQLite fallback for local testing
+# Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'repairmybike.settings')
-
-# Temporarily use SQLite for local testing if DATABASE_URL is not accessible
-if 'DATABASE_URL' in os.environ:
-    # Try to clear it to force SQLite usage
-    original_db_url = os.environ.pop('DATABASE_URL', None)
 
 django.setup()
 
@@ -89,13 +84,6 @@ def sync_model_images(model, field_name, cloudinary_resources, dry_run=False, ve
         
         db_path = field.name
         
-        # Skip if already looks like a Cloudinary path with hash
-        if '_' in db_path.split('/')[-1] and len(db_path.split('/')[-1].split('_')[-1].split('.')[0]) >= 6:
-            skipped_count += 1
-            if verbose:
-                print(f"  ✓ {obj}: Already synced - {db_path}")
-            continue
-        
         # Find matching Cloudinary resource
         match, score = find_best_match(db_path, cloudinary_resources)
         
@@ -105,20 +93,39 @@ def sync_model_images(model, field_name, cloudinary_resources, dry_run=False, ve
             if new_path.startswith('media/'):
                 new_path = new_path[6:]
             
+            full_url = match.get('secure_url')
+            
+            # Check if we need to update either the path or the explicit cloudinary_url field
+            needs_update = False
+            
             if new_path != db_path:
-                print(f"\n  📝 {obj} (ID: {obj.id})")
-                print(f"     Old: {db_path}")
-                print(f"     New: {new_path}")
-                print(f"     Similarity: {score:.2%}")
-                
+                needs_update = True
+                print(f"\n  📝 {obj} (ID: {obj.id}) - Path change")
+                print(f"     Old Path: {db_path}")
+                print(f"     New Path: {new_path}")
+            
+            # If the model has a cloudinary_url field, check it
+            if hasattr(obj, 'cloudinary_url') and obj.cloudinary_url != full_url:
+                needs_update = True
+                if not verbose and new_path == db_path: # Print header if it wasn't printed above
+                    print(f"\n  📝 {obj} (ID: {obj.id}) - URL sync")
+                print(f"     Old URL: {obj.cloudinary_url}")
+                print(f"     New URL: {full_url}")
+
+            if needs_update:
                 if not dry_run:
                     field.name = new_path
+                    if hasattr(obj, 'cloudinary_url'):
+                        obj.cloudinary_url = full_url
                     obj.save()
                     print(f"     ✅ Updated")
                 else:
                     print(f"     🔍 Would update (dry-run)")
-                
                 updated_count += 1
+            else:
+                skipped_count += 1
+                if verbose:
+                    print(f"  ✓ {obj}: Already synced")
         else:
             print(f"  ⚠️  No match found for: {db_path} (in {obj})")
     

@@ -22,7 +22,7 @@ class SparePartCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SparePartCategory
-        fields = ['id', 'name', 'slug', 'description', 'image', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'slug', 'description', 'image', 'cloudinary_url', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_image(self, obj):
@@ -38,7 +38,7 @@ class SparePartBrandSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SparePartBrand
-        fields = ['id', 'name', 'slug', 'logo', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'slug', 'logo', 'cloudinary_url', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_logo(self, obj):
@@ -54,7 +54,7 @@ class SparePartImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SparePartImage
-        fields = ['id', 'image', 'alt_text', 'is_primary', 'sort_order']
+        fields = ['id', 'image', 'cloudinary_url', 'alt_text', 'is_primary', 'sort_order']
         read_only_fields = ['id']
 
     def get_image(self, obj):
