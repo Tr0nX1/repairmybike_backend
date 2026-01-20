@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.conf import settings
 from .models import ServiceCategory, Service, ServicePricing, UserSavedService, GuestSavedService
 
-from repairmybike.utils import build_absolute_media_url
+# Removed build_absolute_media_url - using storage backend directly
 
 try:
     from cloudinary.utils import cloudinary_url as _cloudinary_url
@@ -42,46 +42,37 @@ class ServiceSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_images(self, obj):
-        """Return image URLs for the service.
+        """Returns absolute URLs from storage backend.
         Supports:
         - Single ImageField on Service (obj.images)
-        - Future: related ServiceImage objects via obj.images.all()
-        - Backward compatibility: list of strings
+        - Related ServiceImage objects via obj.images.all()
+        - Backward compatibility: Return empty list for old data
         """
         raw = getattr(obj, 'images', None)
+        if not raw:
+            return []
 
-        # Case 1: ImageField on Service
+        # Case 1: ImageField on Service - Use storage backend directly
         try:
             if hasattr(raw, 'url'):
-                # If the file exists, return its URL
                 return [raw.url] if getattr(raw, 'name', None) else []
         except Exception:
             pass
 
-        # Case 2: Related images manager (future-proof)
+        # Case 2: Related images manager (future-proof) - Use storage backend
         if hasattr(raw, 'all'):
             urls = []
             for item in raw.all():
                 img = getattr(item, 'image', None)
                 if img and getattr(img, 'name', None):
                     try:
-                        urls.append(img.url)
+                        urls.append(img.url)  # ✅ Storage backend generates URL
                     except Exception:
                         continue
             return urls
 
-        # Case 3: Backward compatibility with list of strings
-        if isinstance(raw, list):
-            def _to_abs(u: str):
-                request = self.context.get('request') if hasattr(self, 'context') else None
-                return build_absolute_media_url(u, request)
-
-            return [x for x in (_to_abs(u) for u in raw) if x]
-
-        if isinstance(raw, str):
-             request = self.context.get('request') if hasattr(self, 'context') else None
-             return [build_absolute_media_url(raw, request)]
-
+        # Case 3: Backward compatibility - old string data is invalid now
+        # Return empty to trigger re-upload via admin
         return []
 
 

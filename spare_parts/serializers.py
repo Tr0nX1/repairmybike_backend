@@ -13,7 +13,7 @@ from .models import (
     UserSavedPart,
     GuestSavedPart,
 )
-from repairmybike.utils import build_absolute_media_url
+# Removed build_absolute_media_url - using storage backend directly
 
 
 
@@ -25,14 +25,10 @@ class SparePartCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'description', 'image', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
-    def _abs_url(self, url: str):
-        request = self.context.get('request') if hasattr(self, 'context') else None
-        return build_absolute_media_url(url, request)
-
-
     def get_image(self, obj):
+        """Returns absolute URL from storage backend"""
         try:
-            return self._abs_url(obj.image.url) if obj.image else None
+            return obj.image.url if obj.image else None
         except Exception:
             return None
 
@@ -45,14 +41,10 @@ class SparePartBrandSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'logo', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
-    def _abs_url(self, url: str):
-        request = self.context.get('request') if hasattr(self, 'context') else None
-        return build_absolute_media_url(url, request)
-
-
     def get_logo(self, obj):
+        """Returns absolute URL from storage backend"""
         try:
-            return self._abs_url(obj.logo.url) if obj.logo else None
+            return obj.logo.url if obj.logo else None
         except Exception:
             return None
 
@@ -65,14 +57,10 @@ class SparePartImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'alt_text', 'is_primary', 'sort_order']
         read_only_fields = ['id']
 
-    def _abs_url(self, url: str):
-        request = self.context.get('request') if hasattr(self, 'context') else None
-        return build_absolute_media_url(url, request)
-
-
     def get_image(self, obj):
+        """Returns absolute URL from storage backend"""
         try:
-            return self._abs_url(obj.image.url) if obj.image else None
+            return obj.image.url if obj.image else None
         except Exception:
             return None
 
@@ -91,17 +79,13 @@ class SparePartListSerializer(serializers.ModelSerializer):
             'rating_average', 'rating_count', 'thumbnail', 'created_at', 'updated_at'
         ]
 
-    def _abs_url(self, url: str):
-        request = self.context.get('request') if hasattr(self, 'context') else None
-        return build_absolute_media_url(url, request)
-
-
     def get_thumbnail(self, obj):
+        """Returns absolute URL from storage backend"""
         # Prefer explicitly marked primary image; otherwise fall back to first by sort_order
         primary = obj.images.filter(is_primary=True).first()
         candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
         try:
-            return self._abs_url(candidate.image.url) if candidate and candidate.image else None
+            return candidate.image.url if candidate and candidate.image else None
         except Exception:
             return None
 

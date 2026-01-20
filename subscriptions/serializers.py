@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Plan, Subscription
-from repairmybike.utils import build_absolute_media_url
+# Removed build_absolute_media_url - using storage backend directly
 
 
 
@@ -29,14 +29,10 @@ class PlanSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("id", "created_at", "updated_at")
 
-    def _abs_url(self, url: str):
-        request = self.context.get('request') if hasattr(self, 'context') else None
-        return build_absolute_media_url(url, request)
-
-
     def get_image(self, obj):
+        """Returns absolute URL from storage backend"""
         try:
-            return self._abs_url(obj.image.url) if obj.image else None
+            return obj.image.url if obj.image else None
         except Exception:
             return None
 
