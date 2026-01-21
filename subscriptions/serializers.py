@@ -1,11 +1,19 @@
 from rest_framework import serializers
-from .models import Plan, Subscription
+from .models import Plan, Subscription, PlanBenefit
 # Removed build_absolute_media_url - using storage backend directly
 
 
 
+class PlanBenefitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlanBenefit
+        fields = ("id", "text", "is_active")
+
+
 class PlanSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    benefits_list = PlanBenefitSerializer(many=True, read_only=True)
+    included_services_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Plan
@@ -16,8 +24,11 @@ class PlanSerializer(serializers.ModelSerializer):
             "slug",
             "description",
             "image",
-            "benefits",
-            "services",
+            "benefits",  # Legacy JSON
+            "services",  # Legacy JSON
+            "benefits_list", # Structured
+            "included_services", # IDs
+            "included_services_details", # Detailed info
             "price",
             "currency",
             "billing_period",
@@ -36,9 +47,21 @@ class PlanSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    def get_included_services_details(self, obj):
+        """Minimal details for included services for UI consumption"""
+        return [
+            {
+                "id": s.id,
+                "name": s.name,
+                "category": s.service_category.name if s.service_category else None
+            }
+            for s in obj.included_services.all()
+        ]
+
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     plan_name = serializers.CharField(source="plan.name", read_only=True)
+    plan_details = PlanSerializer(source="plan", read_only=True)
     remaining_visits = serializers.SerializerMethodField(read_only=True)
     is_active = serializers.SerializerMethodField(read_only=True)
 
@@ -48,6 +71,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             "id",
             "plan",
             "plan_name",
+            "plan_details",
             "user",
             "contact_email",
             "contact_phone",

@@ -1,0 +1,198 @@
+{
+    "audit_title": "Membership API Audit",
+    "endpoints": [
+        {
+            "request": "GET /api/subscriptions/plans/",
+            "status_code": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Allow": "GET, POST, HEAD, OPTIONS",
+                "X-Frame-Options": "DENY",
+                "Content-Length": "2671",
+                "X-Content-Type-Options": "nosniff",
+                "Referrer-Policy": "same-origin",
+                "Cross-Origin-Opener-Policy": "same-origin",
+                "Vary": "origin"
+            },
+            "body": {
+                "count": 3,
+                "next": null,
+                "previous": null,
+                "results": [
+                    {
+                        "id": 1,
+                        "tier": "basic",
+                        "name": "Quartly",
+                        "slug": "quartly",
+                        "description": "Lots of things",
+                        "image": "https://res.cloudinary.com/dz81bjuea/image/upload/v1/media/subscriptions/plans/Screenshot_2025-08-13_114705_kqbmsn",
+                        "benefits": {},
+                        "services": [],
+                        "benefits_list": [
+                            {
+                                "id": 1,
+                                "text": "Brake adjustment and tightening",
+                                "is_active": true
+                            },
+                            {
+                                "id": 2,
+                                "text": "Lubrication",
+                                "is_active": true
+                            },
+                            {
+                                "id": 3,
+                                "text": "Screw tightening",
+                                "is_active": true
+                            },
+                            {
+                                "id": 4,
+                                "text": "Chain adjustment and lubrication",
+                                "is_active": true
+                            },
+                            {
+                                "id": 5,
+                                "text": "Air filter cleaning",
+                                "is_active": true
+                            },
+                            {
+                                "id": 6,
+                                "text": "Engine oil (on MRP)",
+                                "is_active": true
+                            }
+                        ],
+                        "included_services": [],
+                        "included_services_details": [],
+                        "price": "599.00",
+                        "currency": "INR",
+                        "billing_period": "monthly",
+                        "included_visits": 3,
+                        "active": true,
+                        "razorpay_plan_id": null,
+                        "created_at": "2026-01-22T00:48:19.649904+05:30",
+                        "updated_at": "2026-01-22T00:50:22.366893+05:30"
+                    },
+                    {
+                        "id": 2,
+                        "tier": "basic",
+                        "name": "Half yearly",
+                        "slug": "half-yearly",
+                        "description": "this is another service",
+                        "image": "https://res.cloudinary.com/dz81bjuea/image/upload/v1/media/subscriptions/plans/Screenshot_2025-08-13_110637_cqoxuo",
+                        "benefits": {},
+                        "services": [],
+                        "benefits_list": [
+                            {
+                                "id": 7,
+                                "text": "Brake adjustment and tightening",
+                                "is_active": true
+                            },
+                            {
+                                "id": 8,
+                                "text": "Lubrication",
+                                "is_active": true
+                            },
+                            {
+                                "id": 9,
+                                "text": "Screw tightening",
+                                "is_active": true
+                            },
+                            {
+                                "id": 10,
+                                "text": "Chain adjustment and lubrication",
+                                "is_active": true
+                            },
+                            {
+                                "id": 11,
+                                "text": "Air filter cleaning",
+                                "is_active": true
+                            },
+                            {
+                                "id": 12,
+                                "text": "Engine oil (on MRP)",
+                                "is_active": true
+                            }
+                        ],
+                        "included_services": [],
+                        "included_services_details": [],
+                        "price": "999.00",
+                        "currency": "INR",
+                        "billing_period": "monthly",
+                        "included_visits": 4,
+                        "active": true,
+                        "razorpay_plan_id": null,
+                        "created_at": "2026-01-22T00:50:01.893209+05:30",
+                        "updated_at": "2026-01-22T00:50:01.893234+05:30"
+                    },
+                    {
+                        "id": 3,
+                        "tier": "basic",
+                        "name": "Yearly (12 months plan )",
+                        "slug": "yearly-12-months-plan",
+                        "description": "12 months plan",
+                        "image": "https://res.cloudinary.com/dz81bjuea/image/upload/v1/media/subscriptions/plans/Screenshot_2025-08-13_100817_wgtz7f",
+                        "benefits": {},
+                        "services": [],
+                        "benefits_list": [
+                            {
+                                "id": 13,
+                                "text": "Brake adjustment and tightening",
+                                "is_active": true
+                            },
+                            {
+                                "id": 14,
+                                "text": "Lubrication",
+                                "is_active": true
+                            },
+                            {
+                                "id": 15,
+                                "text": "Screw tightening",
+                                "is_active": true
+                            },
+                            {
+                                "id": 16,
+                                "text": "Chain adjustment and lubrication",
+                                "is_active": true
+                            },
+                            {
+                                "id": 17,
+                                "text": "Air filter cleaning",
+                                "is_active": true
+                            }
+                        ],
+                        "included_services": [],
+                        "included_services_details": [],
+                        "price": "1999.00",
+                        "currency": "INR",
+                        "billing_period": "yearly",
+                        "included_visits": 6,
+                        "active": true,
+                        "razorpay_plan_id": null,
+                        "created_at": "2026-01-22T00:51:38.986664+05:30",
+                        "updated_at": "2026-01-22T00:52:01.969875+05:30"
+                    }
+                ]
+            },
+            "error": null
+        },
+        {
+            "request": "GET /api/subscriptions/subscriptions/",
+            "status_code": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Allow": "GET, POST, HEAD, OPTIONS",
+                "X-Frame-Options": "DENY",
+                "Content-Length": "74",
+                "X-Content-Type-Options": "nosniff",
+                "Referrer-Policy": "same-origin",
+                "Cross-Origin-Opener-Policy": "same-origin",
+                "Vary": "origin"
+            },
+            "body": {
+                "error": false,
+                "message": "Subscriptions retrieved successfully",
+                "data": []
+            },
+            "error": null
+        }
+    ]
+}
