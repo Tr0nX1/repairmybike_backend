@@ -14,9 +14,7 @@
             background-color: #0c0c0c;
             color: #e5e5e5;
             overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(1, 201, 245, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
+            background-image: radial-gradient(circle at 10% 20%, rgba(1, 201, 245, 0.05) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
             background-attachment: fixed;
         }
 
@@ -26,12 +24,6 @@
             -webkit-backdrop-filter: blur(12px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
-        }
-
-        .glass-dark {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .accent-gradient {
@@ -44,10 +36,6 @@
 
         .bg-accent {
             background-color: #01C9F5;
-        }
-
-        .border-accent {
-            border-color: #01C9F5;
         }
 
         .pulse {
@@ -81,10 +69,6 @@
             border-radius: 10px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #444;
-        }
-
         .metric-card {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -94,17 +78,10 @@
             background: rgba(255, 255, 255, 0.07);
             border-color: rgba(1, 201, 245, 0.3);
         }
-
-        .nav-link-active {
-            background: rgba(1, 201, 245, 0.1);
-            border: 1px solid rgba(1, 201, 245, 0.2);
-            color: #01C9F5;
-        }
     </style>
 </head>
 
 <body class="min-h-screen">
-    <!-- Navbar Container -->
     <div class="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:px-8 md:py-4 pointer-events-none">
         <nav class="glass px-6 py-3 flex items-center justify-between max-w-7xl mx-auto shadow-2xl pointer-events-auto">
             <div class="flex items-center space-x-4">
@@ -120,19 +97,16 @@
                     <span class="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">Admin Portal</span>
                 </div>
             </div>
-
             <div class="flex items-center space-x-4 md:space-x-8">
                 <div class="hidden lg:flex items-center space-x-1">
                     <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
                     <span class="text-xs font-semibold text-gray-400">System Online</span>
                 </div>
-
                 <div class="flex items-center space-x-4 border-l border-white/10 pl-6">
                     <div class="hidden md:flex flex-col text-right">
                         <span class="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Authenticated</span>
                         <span class="text-sm font-bold text-white">{{ user.get_full_name|default:user.username }}</span>
                     </div>
-
                     <div class="relative group">
                         <div id="notification-bell"
                             class="w-10 h-10 rounded-full glass flex items-center justify-center cursor-pointer hover:bg-white/10 transition-all active:scale-95">
@@ -147,9 +121,8 @@
                             </div>
                         </div>
                     </div>
-
                     <a href="/admin/logout/"
-                        class="p-2 glass flex items-center justify-center text-gray-500 hover:text-red-400 hover:border-red-400/30 transition-all rounded-lg group">
+                        class="p-2 glass flex items-center justify-center text-gray-500 hover:text-red-400 transition-all rounded-lg group">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
@@ -162,7 +135,6 @@
     </div>
 
     <main class="max-w-7xl mx-auto px-6 pt-32 pb-12">
-        <!-- KPI Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <div class="glass p-6 metric-card">
                 <div class="flex items-center justify-between mb-4">
@@ -224,7 +196,6 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left: Activity Feed -->
             <div class="lg:col-span-2">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold">Live Activity Feed</h2>
@@ -265,7 +236,6 @@
                 </div>
             </div>
 
-            <!-- Right: Operations Summary -->
             <div class="space-y-8">
                 <div>
                     <h2 class="text-xl font-bold mb-6">Today's Progress</h2>
@@ -277,9 +247,8 @@
                         </div>
                         <div class="w-full bg-white/5 rounded-full h-3 mb-6 overflow-hidden">
                             <div class="accent-gradient h-3 rounded-full transition-all duration-1000"
-                                style="width: {{ metrics.today_view.progress_percent }}%"></div>
+                                style="width:{{ metrics.today_view.progress_percent }}%"></div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-3 md:gap-4">
                             <div class="bg-white/5 p-4 rounded-xl text-center min-w-0">
                                 <span class="block text-xl font-bold text-accent truncate">{{
@@ -294,11 +263,9 @@
                         </div>
                     </div>
                 </div>
-
                 <div>
                     <h2 class="text-xl font-bold mb-6 flex items-center italic">
-                        <span class="w-1.5 h-6 bg-accent rounded-full mr-3"></span>
-                        Quick Actions
+                        <span class="w-1.5 h-6 bg-accent rounded-full mr-3"></span>Quick Actions
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <a href="/admin/spare_parts/sparepart/add/"
@@ -309,8 +276,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                            </div>
-                            <span class="text-xs font-medium">Add Part</span>
+                            </div><span class="text-xs font-medium">Add Part</span>
                         </a>
                         <a href="/admin/bookings/booking/add/"
                             class="glass p-4 text-center hover:bg-white/5 transition-colors">
@@ -320,8 +286,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                            </div>
-                            <span class="text-xs font-medium">New Booking</span>
+                            </div><span class="text-xs font-medium">New Booking</span>
                         </a>
                     </div>
                 </div>
@@ -332,7 +297,6 @@
     <audio id="notification-chime" preload="auto">
         <source src="https://assets.mixkit.co/active_storage/sfx/2861/2861-preview.mp3" type="audio/mpeg">
     </audio>
-
     <div id="toast-container" class="fixed top-28 right-6 z-[110] space-y-4 pointer-events-none"></div>
 
     <script>
@@ -347,22 +311,11 @@
             const toast = document.createElement('div');
             toast.className = 'glass p-4 border-l-4 border-accent shadow-2xl translate-x-12 opacity-0 transition-all duration-500 flex items-center space-x-3 w-80 pointer-events-auto';
             toast.style.zIndex = '120';
-            toast.innerHTML = `
-                <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-white truncate">${message}</p>
-                    <p class="text-[10px] text-gray-500 mt-0.5">Notification • Just now</p>
-                </div>
-            `;
+            toast.innerHTML = `<div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-accent flex-shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div><div class="flex-1 min-w-0"><p class="text-xs font-bold text-white truncate">${message}</p><p class="text-[10px] text-gray-500 mt-0.5">Notification • Just now</p></div>`;
             toastContainer.prepend(toast);
-            setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 100);
+            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 100);
             chime.play().catch(e => console.log('Audio autoplay blocked'));
-            setTimeout(() => {
-                toast.classList.add('translate-x-12', 'opacity-0');
-                setTimeout(() => toast.remove(), 500);
-            }, 5000);
+            setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 500); }, 5000);
         }
 
         socket.onmessage = function (e) {

@@ -54,12 +54,12 @@ class Booking(models.Model):
     vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.CASCADE, related_name='bookings')
     service_location = models.CharField(max_length=10, choices=SERVICE_LOCATION_CHOICES)
     address = models.TextField(blank=True, null=True)
-    appointment_date = models.DateField()
+    appointment_date = models.DateField(db_index=True)
     appointment_time = models.TimeField()
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='cash')
-    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='pending')
-    booking_status = models.CharField(max_length=15, choices=BOOKING_STATUS_CHOICES, default='pending')
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='pending', db_index=True)
+    booking_status = models.CharField(max_length=15, choices=BOOKING_STATUS_CHOICES, default='pending', db_index=True)
     # Optional link to a subscription; when completed, consumes a visit
     subscription = models.ForeignKey(Subscription, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     # Internal flag to avoid double-counting visit consumption
