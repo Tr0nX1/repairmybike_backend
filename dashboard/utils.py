@@ -1,7 +1,7 @@
 import logging
 import time
 from django.utils import timezone
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Count
 from bookings.models import Booking
 from spare_parts.models import Order, SparePart
 
@@ -12,33 +12,36 @@ def get_dashboard_metrics():
     today = timezone.now().date()
     
     try:
-        # 1. Revenue Metrics
-        booking_revenue = Booking.objects.filter(
-            appointment_date=today,
-            payment_status='completed'
-        ).aggregate(total=Sum('total_amount'))['total'] or 0
+        # 1. Booking Metrics (1 Query)
+        booking_metrics = Booking.objects.filter(
+            Q(appointment_date=today) | Q(booking_status='pending')
+        ).aggregate(
+            today_total=Count('id', filter=Q(appointment_date=today)),
+            today_completed=Count('id', filter=Q(appointment_date=today, booking_status='completed')),
+            revenue_today=Sum('total_amount', filter=Q(appointment_date=today, payment_status='completed')),
+            pending_count=Count('id', filter=Q(booking_status='pending'))
+        )
         
-        order_revenue = Order.objects.filter(
-            created_at__date=today,
-            payment_status='paid'
-        ).aggregate(total=Sum('amount_total'))['total'] or 0
+        # 2. Order Metrics (1 Query)
+        order_metrics = Order.objects.filter(
+            Q(created_at__date=today) | Q(status='created')
+        ).aggregate(
+            revenue_today=Sum('amount_total', filter=Q(created_at__date=today, payment_status='paid')),
+            pending_dispatch=Count('id', filter=Q(status='created'))
+        )
         
-        total_revenue = booking_revenue + order_revenue
+        # 3. Inventory Metrics (1 Query)
+        inventory_metrics = SparePart.objects.aggregate(
+            low_stock=Count('id', filter=Q(stock_qty__lt=5)),
+            out_of_stock=Count('id', filter=Q(stock_qty=0))
+        )
+
+        booking_rev = float(booking_metrics['revenue_today'] or 0)
+        order_rev = float(order_metrics['revenue_today'] or 0)
+        total_revenue = booking_rev + order_rev
         
-        # 2. Task Metrics (Pending Actions)
-        pending_bookings = Booking.objects.filter(booking_status='pending').count()
-        pending_orders = Order.objects.filter(status='created').count()
-        
-        # 3. Operations Metrics
-        today_bookings = Booking.objects.filter(appointment_date=today).count()
-        completed_today = Booking.objects.filter(
-            appointment_date=today, 
-            booking_status='completed'
-        ).count()
-        
-        # 4. Inventory Health
-        low_stock_count = SparePart.objects.filter(stock_qty__lt=5).count()
-        out_of_stock_count = SparePart.objects.filter(stock_qty=0).count()
+        today_total = booking_metrics['today_total']
+        today_completed = booking_metrics['today_completed']
         
         latency = (time.time() - start_time) * 1000
         if latency > 500:
@@ -46,30 +49,30 @@ def get_dashboard_metrics():
         
         return {
             'revenue': {
-                'today': float(total_revenue),
-                'bookings': float(booking_revenue),
-                'orders': float(order_revenue),
+                'today': total_revenue,
+                'bookings': booking_rev,
+                'orders': order_rev,
             },
             'tasks': {
-                'pending_bookings': pending_bookings,
-                'pending_orders': pending_orders,
+                'pending_bookings': booking_metrics['pending_count'],
+                'pending_orders': order_metrics['pending_dispatch'],
             },
             'today_view': {
-                'total_bookings': today_bookings,
-                'completed': completed_today,
-                'progress_percent': round((completed_today / today_bookings * 100), 1) if today_bookings > 0 else 0.0
+                'total_bookings': today_total,
+                'completed': today_completed,
+                'progress_percent': round((today_completed / today_total * 100), 1) if today_total > 0 else 0.0
             },
             'inventory': {
-                'low_stock': low_stock_count,
-                'out_of_stock': out_of_stock_count
+                'low_stock': inventory_metrics['low_stock'],
+                'out_of_stock': inventory_metrics['out_of_stock']
             }
         }
     except Exception as e:
         logger.error(f"Error calculating dashboard metrics: {e}")
         return {
-            'revenue': {'today': 0, 'bookings': 0, 'orders': 0},
+            'revenue': {'today': 0.0, 'bookings': 0.0, 'orders': 0.0},
             'tasks': {'pending_bookings': 0, 'pending_orders': 0},
-            'today_view': {'total_bookings': 0, 'completed': 0, 'progress_percent': 0},
+            'today_view': {'total_bookings': 0, 'completed': 0, 'progress_percent': 0.0},
             'inventory': {'low_stock': 0, 'out_of_stock': 0}
         }
 

@@ -1479,3 +1479,8 @@ INFO 2026-01-18 11:06:54,113 basehttp 10512 25636 code 400, message Bad request 
 ERROR 2026-01-18 11:06:54,114 basehttp 10512 25636 You're accessing the development server over HTTPS, but it only supports HTTP.
 INFO 2026-01-18 11:06:54,117 basehttp 10512 27244 code 400, message Bad request version ('êê\x13\x01\x13\x02\x13\x03À+À/À,À0Ì©Ì¨À\x13À\x14\x00\x9c\x00\x9d\x00/\x005\x01\x00\x06S\x1a\x1a\x00\x00\x00')
 ERROR 2026-01-18 11:06:54,117 basehttp 10512 27244 You're accessing the development server over HTTPS, but it only supports HTTP.
+WARNING 2026-01-22 00:33:45,125 utils 26004 27412 Dashboard metrics aggregation slow: 4536.23ms
+WARNING 2026-01-22 00:34:24,580 utils 3256 16772 Dashboard metrics aggregation slow: 4353.93ms
+WARNING 2026-01-22 00:37:02,962 utils 26700 7912 Dashboard metrics aggregation slow: 4371.17ms
+WARNING 2026-01-22 00:38:41,457 utils 28304 10632 Dashboard metrics aggregation slow: 3067.72ms
+WARNING 2026-01-22 00:39:32,431 utils 27748 17780 Dashboard metrics aggregation slow: 3196.03ms
