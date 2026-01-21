@@ -14,13 +14,24 @@
             background-color: #0c0c0c;
             color: #e5e5e5;
             overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(1, 201, 245, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
         }
 
         .glass {
             background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
         }
 
         .accent-gradient {
@@ -40,16 +51,20 @@
         }
 
         .pulse {
-            animation: pulse-animation 2s infinite;
+            animation: pulse-animation 2.5s infinite;
         }
 
         @keyframes pulse-animation {
             0% {
-                box-shadow: 0 0 0 0px rgba(1, 201, 245, 0.2);
+                box-shadow: 0 0 0 0px rgba(1, 201, 245, 0.3);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(1, 201, 245, 0);
             }
 
             100% {
-                box-shadow: 0 0 0 15px rgba(1, 201, 245, 0);
+                box-shadow: 0 0 0 0px rgba(1, 201, 245, 0);
             }
         }
 
@@ -70,51 +85,83 @@
             background: #444;
         }
 
+        .metric-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
         .metric-card:hover {
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(1, 201, 245, 0.3);
+        }
+
+        .nav-link-active {
+            background: rgba(1, 201, 245, 0.1);
+            border: 1px solid rgba(1, 201, 245, 0.2);
+            color: #01C9F5;
         }
     </style>
 </head>
 
 <body class="min-h-screen">
-    <!-- Navbar -->
-    <nav class="sticky top-0 z-50 px-6 py-4 glass mx-4 mt-4 mb-8">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
+    <!-- Navbar Container (Fixing collision by making it a proper wrapper) -->
+    <div class="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:px-8 md:py-4 pointer-events-none">
+        <nav class="glass px-6 py-3 flex items-center justify-between max-w-7xl mx-auto shadow-2xl pointer-events-auto">
+            <div class="flex items-center space-x-4">
                 <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center pulse">
                     <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                 </div>
-                <h1 class="text-xl font-bold tracking-tight">Staff <span class="text-accent">Command</span></h1>
+                <div class="hidden sm:block">
+                    <h1 class="text-xl font-bold tracking-tight leading-none">Staff <span
+                            class="text-accent">Command</span></h1>
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">Admin Portal</span>
+                </div>
             </div>
 
-            <div class="flex items-center space-x-6">
-                <div class="hidden md:flex flex-col text-right">
-                    <span class="text-xs text-gray-400">Welcome Back</span>
-                    <span class="text-sm font-semibold">{{ user.get_full_name|default:user.username }}</span>
+            <div class="flex items-center space-x-4 md:space-x-8">
+                <div class="hidden lg:flex items-center space-x-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></span>
+                    <span class="text-xs font-semibold text-gray-400">System Online</span>
                 </div>
-                <div class="relative">
-                    <div id="notification-bell"
-                        class="w-10 h-10 rounded-full glass flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors">
+
+                <div class="flex items-center space-x-4 border-l border-white/10 pl-6">
+                    <div class="hidden md:flex flex-col text-right">
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Authenticated</span>
+                        <span class="text-sm font-bold text-white">{{ user.get_full_name|default:user.username }}</span>
+                    </div>
+
+                    <div class="relative group">
+                        <div id="notification-bell"
+                            class="w-10 h-10 rounded-full glass flex items-center justify-center cursor-pointer hover:bg-white/10 transition-all active:scale-95">
+                            <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                                </path>
+                            </svg>
+                            <div id="notification-dot"
+                                class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden border-2 border-black">
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/admin/logout/"
+                        class="p-2 glass flex items-center justify-center text-gray-500 hover:text-red-400 hover:border-red-400/30 transition-all rounded-lg group">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
                             </path>
                         </svg>
-                        <div id="notification-dot"
-                            class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden"></div>
-                    </div>
+                    </a>
                 </div>
-                <a href="/admin/logout/" class="text-sm text-gray-500 hover:text-white">Sign Out</a>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </div>
 
-    <main class="px-6 pb-12">
+    <main class="max-w-7xl mx-auto px-6 pt-32 pb-12">
         <!-- KPI Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <!-- Revenue Card -->
@@ -235,20 +282,20 @@
                             <span class="text-lg font-bold">{{ metrics.today_view.completed }}/{{
                                 metrics.today_view.total_bookings }}</span>
                         </div>
-                        <div class="w-full bg-white/5 rounded-full h-3 mb-6">
+                        <div class="w-full bg-white/5 rounded-full h-3 mb-6 overflow-hidden">
                             <div class="accent-gradient h-3 rounded-full transition-all duration-1000"
                                 style="width: {{ metrics.today_view.progress_percent }}%"></div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-white/5 p-4 rounded-xl text-center">
-                                <span class="block text-xl font-bold text-accent">{{ metrics.today_view.total_bookings
-                                    }}</span>
+                        <div class="grid grid-cols-2 gap-3 md:gap-4">
+                            <div class="bg-white/5 p-4 rounded-xl text-center min-w-0">
+                                <span class="block text-xl font-bold text-accent truncate">{{
+                                    metrics.today_view.total_bookings }}</span>
                                 <span class="text-[10px] text-gray-500 uppercase tracking-widest">Target</span>
                             </div>
-                            <div class="bg-white/5 p-4 rounded-xl text-center">
-                                <span class="block text-xl font-bold text-green-500">{{ metrics.today_view.completed
-                                    }}</span>
+                            <div class="bg-white/5 p-4 rounded-xl text-center min-w-0">
+                                <span class="block text-xl font-bold text-green-500 truncate">{{
+                                    metrics.today_view.completed }}</span>
                                 <span class="text-[10px] text-gray-500 uppercase tracking-widest">Done</span>
                             </div>
                         </div>
@@ -256,8 +303,11 @@
                 </div>
 
                 <div>
-                    <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
-                    <div class="grid grid-cols-2 gap-4">
+                    <h2 class="text-xl font-bold mb-6 flex items-center italic">
+                        <span class="w-1.5 h-6 bg-accent rounded-full mr-3"></span>
+                        Quick Actions
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <a href="/admin/spare_parts/sparepart/add/"
                             class="glass p-4 text-center hover:bg-white/5 transition-colors">
                             <div
@@ -292,7 +342,7 @@
     </audio>
 
     <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-24 right-6 z-[60] space-y-4"></div>
+    <div id="toast-container" class="fixed top-28 right-6 z-[110] space-y-4 pointer-events-none"></div>
 
     <script>
         // WebSocket logic
@@ -306,29 +356,34 @@
 
         function showToast(message) {
             const toast = document.createElement('div');
-            toast.className = 'glass p-4 border-l-4 border-accent shadow-2xl translate-x-full transition-transform duration-500 flex items-center space-x-3 w-80';
+            // pointer-events-auto ensures the toast itself can be interacted with (if needed) while container is transparent
+            toast.className = 'glass p-4 border-l-4 border-accent shadow-2xl translate-x-12 opacity-0 transition-all duration-500 flex items-center space-x-3 w-80 pointer-events-auto';
+            toast.style.zIndex = '120';
             toast.innerHTML = `
-                <div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                 </div>
-                <div class="flex-1">
-                    <p class="text-xs font-bold text-white">${message}</p>
-                    <p class="text-[10px] text-gray-500 mt-0.5">Updated just now</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold text-white truncate">${message}</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">Notification • Just now</p>
                 </div>
             `;
-            toastContainer.appendChild(toast);
+            // Prepend so new ones appear at top of stack
+            toastContainer.prepend(toast);
 
             // Trigger animation
-            setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+            setTimeout(() => {
+                toast.classList.remove('translate-x-12', 'opacity-0');
+            }, 100);
 
             // Play chime
             chime.play().catch(e => console.log('Audio autoplay blocked'));
 
             // Auto remove
             setTimeout(() => {
-                toast.classList.add('translate-x-full');
+                toast.classList.add('translate-x-12', 'opacity-0');
                 setTimeout(() => toast.remove(), 500);
             }, 5000);
         }
