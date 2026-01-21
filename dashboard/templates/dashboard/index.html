@@ -104,7 +104,7 @@
 </head>
 
 <body class="min-h-screen">
-    <!-- Navbar Container (Fixing collision by making it a proper wrapper) -->
+    <!-- Navbar Container -->
     <div class="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:px-8 md:py-4 pointer-events-none">
         <nav class="glass px-6 py-3 flex items-center justify-between max-w-7xl mx-auto shadow-2xl pointer-events-auto">
             <div class="flex items-center space-x-4">
@@ -164,7 +164,6 @@
     <main class="max-w-7xl mx-auto px-6 pt-32 pb-12">
         <!-- KPI Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <!-- Revenue Card -->
             <div class="glass p-6 metric-card">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-500">
@@ -182,7 +181,6 @@
                 </div>
             </div>
 
-            <!-- Pending Bookings -->
             <div class="glass p-6 metric-card">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center text-accent">
@@ -195,10 +193,8 @@
                     <span class="text-2xl font-bold">{{ metrics.tasks.pending_bookings }}</span>
                 </div>
                 <h3 class="text-gray-400 text-sm font-medium">Pending Bookings</h3>
-                <p class="text-xs text-gray-500 mt-2">Requires staff confirmation</p>
             </div>
 
-            <!-- Product Orders -->
             <div class="glass p-6 metric-card">
                 <div class="flex items-center justify-between mb-4">
                     <div
@@ -211,10 +207,8 @@
                     <span class="text-2xl font-bold">{{ metrics.tasks.pending_orders }}</span>
                 </div>
                 <h3 class="text-gray-400 text-sm font-medium">Spares to Dispatch</h3>
-                <p class="text-xs text-gray-500 mt-2">New shipping tasks</p>
             </div>
 
-            <!-- Inventory Status -->
             <div class="glass p-6 metric-card">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500">
@@ -226,7 +220,6 @@
                     <span class="text-2xl font-bold text-red-500">{{ metrics.inventory.low_stock }}</span>
                 </div>
                 <h3 class="text-gray-400 text-sm font-medium">Low Stock Alerts</h3>
-                <p class="text-xs text-red-500/60 mt-2">{{ metrics.inventory.out_of_stock }} items out of stock</p>
             </div>
         </div>
 
@@ -336,52 +329,36 @@
         </div>
     </main>
 
-    <!-- Audio Chime for Notifications -->
     <audio id="notification-chime" preload="auto">
         <source src="https://assets.mixkit.co/active_storage/sfx/2861/2861-preview.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Toast Container -->
     <div id="toast-container" class="fixed top-28 right-6 z-[110] space-y-4 pointer-events-none"></div>
 
     <script>
-        // WebSocket logic
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const socketUrl = `${protocol}//${window.location.host}/ws/dashboard/notifications/`;
         const socket = new WebSocket(socketUrl);
-
         const bell = document.getElementById('notification-dot');
         const chime = document.getElementById('notification-chime');
         const toastContainer = document.getElementById('toast-container');
 
         function showToast(message) {
             const toast = document.createElement('div');
-            // pointer-events-auto ensures the toast itself can be interacted with (if needed) while container is transparent
             toast.className = 'glass p-4 border-l-4 border-accent shadow-2xl translate-x-12 opacity-0 transition-all duration-500 flex items-center space-x-3 w-80 pointer-events-auto';
             toast.style.zIndex = '120';
             toast.innerHTML = `
                 <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-xs font-bold text-white truncate">${message}</p>
                     <p class="text-[10px] text-gray-500 mt-0.5">Notification • Just now</p>
                 </div>
             `;
-            // Prepend so new ones appear at top of stack
             toastContainer.prepend(toast);
-
-            // Trigger animation
-            setTimeout(() => {
-                toast.classList.remove('translate-x-12', 'opacity-0');
-            }, 100);
-
-            // Play chime
+            setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 100);
             chime.play().catch(e => console.log('Audio autoplay blocked'));
-
-            // Auto remove
             setTimeout(() => {
                 toast.classList.add('translate-x-12', 'opacity-0');
                 setTimeout(() => toast.remove(), 500);
@@ -390,19 +367,13 @@
 
         socket.onmessage = function (e) {
             const data = JSON.parse(e.data);
-            console.log('Notification received:', data.message);
-
-            // Show dot and Toast
             bell.classList.remove('hidden');
             showToast(data.message);
         };
 
         socket.onclose = function (e) {
             console.error('Chat socket closed unexpectedly');
-            // Try to reconnect in 5 seconds
-            setTimeout(() => {
-                window.location.reload();
-            }, 5000);
+            setTimeout(() => window.location.reload(), 5000);
         };
     </script>
 </body>
