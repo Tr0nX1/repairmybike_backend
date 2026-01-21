@@ -9,13 +9,28 @@ from .models import ServiceCategory, Service, ServicePricing, UserSavedService, 
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
     service_count = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     
     def get_service_count(self, obj):
         return obj.get_service_count()
     
+    def get_image(self, obj):
+        """Returns standardized media object from storage backend."""
+        if not obj.image:
+            return None
+        try:
+            url = obj.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": obj.name
+            }
+        except Exception:
+            return None
+
     class Meta:
         model = ServiceCategory
-        fields = ['id', 'name', 'description', 'icon', 'service_count', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'icon', 'image', 'service_count', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
