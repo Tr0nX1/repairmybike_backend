@@ -1,5 +1,5 @@
 from django.contrib import admin
-from repairmybike.admin_mixins import ImagePreviewMixin
+from repairmybike.admin_mixins import ImagePreviewMixin, StatusColorMixin
 
 
 from .models import (
@@ -52,6 +52,7 @@ class SparePartAdmin(ImagePreviewMixin, admin.ModelAdmin):
     )
     list_filter = ("brand", "category", "in_stock")
     search_fields = ("name", "sku")
+    list_editable = ("sale_price", "in_stock")
     readonly_fields = ("image_preview", "created_at", "updated_at")
     inlines = [SparePartImageInline]
 
@@ -94,20 +95,39 @@ class OrderItemInline(admin.TabularInline):
 
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(StatusColorMixin, admin.ModelAdmin):
     list_display = (
         "id",
         "customer_name",
         "phone",
         "amount_total",
-        "payment_status",
-        "status",
+        "payment_status_display",
+        "order_status_display",
         "created_at",
     )
     list_filter = ("payment_status", "status", "created_at")
     search_fields = ("customer_name", "phone", "session_id")
     readonly_fields = ("created_at", "updated_at")
     inlines = [OrderItemInline]
+    actions = ['mark_as_paid', 'mark_as_dispatched']
+
+    def payment_status_display(self, obj):
+        return self.colored_status(obj, 'payment_status')
+    payment_status_display.short_description = 'Payment'
+
+    def order_status_display(self, obj):
+        return self.colored_status(obj, 'status')
+    order_status_display.short_description = 'Status'
+
+    def mark_as_paid(self, request, queryset):
+        rows_updated = queryset.update(payment_status='paid')
+        self.message_user(request, f"{rows_updated} orders marked as paid.")
+    mark_as_paid.short_description = "Mark selected orders as Paid"
+
+    def mark_as_dispatched(self, request, queryset):
+        rows_updated = queryset.update(status='dispatched')
+        self.message_user(request, f"{rows_updated} orders marked as Dispatched.")
+    mark_as_dispatched.short_description = "Mark selected orders as Dispatched"
 
 
 @admin.register(OrderItem)

@@ -6,11 +6,11 @@ from .models import ServiceCategory, Service, ServicePricing
 
 
 @admin.register(ServiceCategory)
-class ServiceCategoryAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "created_at", "updated_at")
+class ServiceCategoryAdmin(ImagePreviewMixin, admin.ModelAdmin):
+    list_display = ("id", "name", "image_preview", "created_at", "updated_at")
     list_filter = ("created_at",)
     search_fields = ("name",)
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("image_preview", "created_at", "updated_at")
 
 
 @admin.register(Service)

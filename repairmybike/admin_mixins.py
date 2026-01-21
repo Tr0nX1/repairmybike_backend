@@ -32,3 +32,39 @@ class ImagePreviewMixin:
         return "No Image"
 
     image_preview.short_description = 'Preview'
+
+
+class StatusColorMixin:
+    """Mixin to provide colored status badges in the admin list view."""
+
+    def _get_status_color(self, status):
+        """Map status values to colors."""
+        status = str(status).lower()
+        
+        # Success / Positive
+        if status in ['paid', 'confirmed', 'completed', 'active', 'delivered', 'dispatched', 'verified', 'success']:
+            return '#28a745'  # Green
+        
+        # Warning / Neutral
+        if status in ['pending', 'processing', 'ongoing', 'partial', 'shipped', 'warning']:
+            return '#ffc107'  # Amber
+        
+        # Danger / Negative
+        if status in ['failed', 'cancelled', 'cancelled_by_user', 'cancelled_by_staff', 'inactive', 'unpaid', 'out_of_stock', 'rejected', 'error']:
+            return '#dc3545'  # Red
+        
+        return '#6c757d'  # Grey fallback
+
+    def colored_status(self, obj, field_name='status'):
+        """Generic method to render a colored status badge."""
+        status = getattr(obj, field_name, 'Unknown')
+        color = self._get_status_color(status)
+        
+        return format_html(
+            '<span style="background-color: {0}; color: white; padding: 4px 10px; '
+            'border-radius: 12px; font-weight: bold; font-size: 0.85em; text-transform: uppercase;">'
+            '{1}'
+            '</span>',
+            color,
+            status
+        )
