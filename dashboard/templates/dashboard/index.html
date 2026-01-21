@@ -1,0 +1,355 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0c0c0c;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+        }
+
+        .accent-gradient {
+            background: linear-gradient(135deg, #01C9F5 0%, #0186F5 100%);
+        }
+
+        .text-accent {
+            color: #01C9F5;
+        }
+
+        .bg-accent {
+            background-color: #01C9F5;
+        }
+
+        .border-accent {
+            border-color: #01C9F5;
+        }
+
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0px rgba(1, 201, 245, 0.2);
+            }
+
+            100% {
+                box-shadow: 0 0 0 15px rgba(1, 201, 245, 0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0c0c0c;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.06);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 px-6 py-4 glass mx-4 mt-4 mb-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center pulse">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight">Staff <span class="text-accent">Command</span></h1>
+            </div>
+
+            <div class="flex items-center space-x-6">
+                <div class="hidden md:flex flex-col text-right">
+                    <span class="text-xs text-gray-400">Welcome Back</span>
+                    <span class="text-sm font-semibold">{{ user.get_full_name|default:user.username }}</span>
+                </div>
+                <div class="relative">
+                    <div id="notification-bell"
+                        class="w-10 h-10 rounded-full glass flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                        <div id="notification-dot"
+                            class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden"></div>
+                    </div>
+                </div>
+                <a href="/admin/logout/" class="text-sm text-gray-500 hover:text-white">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="px-6 pb-12">
+        <!-- KPI Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <!-- Revenue Card -->
+            <div class="glass p-6 metric-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded-lg">LIVE</span>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium mb-1">Today's Revenue</h3>
+                <div class="flex items-baseline space-x-2">
+                    <span class="text-3xl font-bold">₹{{ metrics.revenue.today }}</span>
+                </div>
+            </div>
+
+            <!-- Pending Bookings -->
+            <div class="glass p-6 metric-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center text-accent">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold">{{ metrics.tasks.pending_bookings }}</span>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium">Pending Bookings</h3>
+                <p class="text-xs text-gray-500 mt-2">Requires staff confirmation</p>
+            </div>
+
+            <!-- Product Orders -->
+            <div class="glass p-6 metric-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div
+                        class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold">{{ metrics.tasks.pending_orders }}</span>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium">Spares to Dispatch</h3>
+                <p class="text-xs text-gray-500 mt-2">New shipping tasks</p>
+            </div>
+
+            <!-- Inventory Status -->
+            <div class="glass p-6 metric-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold text-red-500">{{ metrics.inventory.low_stock }}</span>
+                </div>
+                <h3 class="text-gray-400 text-sm font-medium">Low Stock Alerts</h3>
+                <p class="text-xs text-red-500/60 mt-2">{{ metrics.inventory.out_of_stock }} items out of stock</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Activity Feed -->
+            <div class="lg:col-span-2">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold">Live Activity Feed</h2>
+                    <a href="/admin/bookings/booking/" class="text-sm text-accent hover:underline">View All Bookings</a>
+                </div>
+                <div class="space-y-4" id="activity-feed">
+                    {% for item in activities %}
+                    <div class="glass p-5 flex items-start space-x-4">
+                        <div
+                            class="w-10 h-10 rounded-xl {% if item.type == 'booking' %}bg-accent/10 text-accent{% else %}bg-purple-500/10 text-purple-500{% endif %} flex-shrink-0 flex items-center justify-center">
+                            {% if item.type == 'booking' %}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            {% else %}
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-sm font-bold truncate">{{ item.title }}</h4>
+                                <span class="text-[10px] text-gray-500 font-mono">{{ item.time|timesince }} ago</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">{{ item.subtitle }}</p>
+                            <div class="mt-3 flex items-center space-x-3">
+                                <span
+                                    class="text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded bg-white/5 text-gray-400">{{
+                                    item.status }}</span>
+                                <button class="text-[10px] font-bold text-accent hover:underline">Quick Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right: Operations Summary -->
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-xl font-bold mb-6">Today's Progress</h2>
+                    <div class="glass p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm text-gray-400">Services Completed</span>
+                            <span class="text-lg font-bold">{{ metrics.today_view.completed }}/{{
+                                metrics.today_view.total_bookings }}</span>
+                        </div>
+                        <div class="w-full bg-white/5 rounded-full h-3 mb-6">
+                            <div class="accent-gradient h-3 rounded-full transition-all duration-1000"
+                                style="width: {{ metrics.today_view.progress_percent }}%"></div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/5 p-4 rounded-xl text-center">
+                                <span class="block text-xl font-bold text-accent">{{ metrics.today_view.total_bookings
+                                    }}</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest">Target</span>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl text-center">
+                                <span class="block text-xl font-bold text-green-500">{{ metrics.today_view.completed
+                                    }}</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest">Done</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold mb-6">Quick Actions</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <a href="/admin/spare_parts/sparepart/add/"
+                            class="glass p-4 text-center hover:bg-white/5 transition-colors">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-500 mx-auto mb-2 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-medium">Add Part</span>
+                        </a>
+                        <a href="/admin/bookings/booking/add/"
+                            class="glass p-4 text-center hover:bg-white/5 transition-colors">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-accent/10 text-accent mx-auto mb-2 flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-medium">New Booking</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Audio Chime for Notifications -->
+    <audio id="notification-chime" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2861/2861-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-24 right-6 z-[60] space-y-4"></div>
+
+    <script>
+        // WebSocket logic
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const socketUrl = `${protocol}//${window.location.host}/ws/dashboard/notifications/`;
+        const socket = new WebSocket(socketUrl);
+
+        const bell = document.getElementById('notification-dot');
+        const chime = document.getElementById('notification-chime');
+        const toastContainer = document.getElementById('toast-container');
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'glass p-4 border-l-4 border-accent shadow-2xl translate-x-full transition-transform duration-500 flex items-center space-x-3 w-80';
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-xs font-bold text-white">${message}</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">Updated just now</p>
+                </div>
+            `;
+            toastContainer.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+
+            // Play chime
+            chime.play().catch(e => console.log('Audio autoplay blocked'));
+
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        socket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            console.log('Notification received:', data.message);
+
+            // Show dot and Toast
+            bell.classList.remove('hidden');
+            showToast(data.message);
+        };
+
+        socket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+            // Try to reconnect in 5 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 5000);
+        };
+    </script>
+</body>
+
+</html>

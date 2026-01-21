@@ -28,6 +28,8 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '*', 'repairmybikebackend
 
 # Application definition
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'shop',
     'spare_parts',
     'subscriptions',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'repairmybike.wsgi.application'
+ASGI_APPLICATION = 'repairmybike.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -156,6 +160,25 @@ else:
                 'LOCATION': 'vehicle_repair_fallback',
             }
         }
+
+# Channels Configuration for Dashboard Real-time Features
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [REDIS_URL],
+            },
+        },
+    }
+    print("✓ Configured Redis Channel Layer from REDIS_URL")
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
+    print("✓ Configured In-Memory Channel Layer (no REDIS_URL)")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

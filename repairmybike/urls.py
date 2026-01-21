@@ -6,6 +6,7 @@ from .health import health_check, readiness_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('dashboard/', include('dashboard.urls')),
     path('health/', health_check, name='health_check'),
     path('ready/', readiness_check, name='readiness_check'),
     path('api/auth/', include('authentication.urls')),

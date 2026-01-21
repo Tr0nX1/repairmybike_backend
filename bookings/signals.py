@@ -1,5 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from .models import Booking
 
@@ -28,3 +30,19 @@ def consume_subscription_visit_on_completion(sender, instance: Booking, created,
     except Exception:
         # Silently ignore; do not block booking save
         pass
+
+
+@receiver(post_save, sender=Booking)
+def notify_dashboard_new_booking(sender, instance, created, **kwargs):
+    if created:
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                'dashboard_notifications',
+                {
+                    'type': 'dashboard_message',
+                    'message': f"New Booking: {instance.customer.name} (ID: #{instance.id})"
+                }
+            )
+        except Exception:
+            pass
