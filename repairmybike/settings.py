@@ -218,6 +218,10 @@ if USE_CLOUDINARY:
             'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
         }
     print(f"✓ Media storage: Cloudinary (Cloud Name: {CLOUDINARY_STORAGE.get('CLOUD_NAME', 'via URL')})")
+    
+    # Safety Check: Fail-fast if Cloudinary is enabled but misconfigured
+    if not CLOUDINARY_URL and not (CLOUDINARY_STORAGE.get('CLOUD_NAME') and CLOUDINARY_STORAGE.get('API_KEY')):
+         raise RuntimeError("CRITICAL: USE_CLOUDINARY is True but no CLOUDINARY_URL or credentials provided.")
 
 elif USE_CLOUDFLARE_R2:
     # Cloudflare R2 (S3) configuration

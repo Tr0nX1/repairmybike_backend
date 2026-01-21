@@ -4,10 +4,7 @@ from .models import ServiceCategory, Service, ServicePricing, UserSavedService, 
 
 # Removed build_absolute_media_url - using storage backend directly
 
-try:
-    from cloudinary.utils import cloudinary_url as _cloudinary_url
-except Exception:
-    _cloudinary_url = None
+
 
 
 class ServiceCategorySerializer(serializers.ModelSerializer):
@@ -42,38 +39,40 @@ class ServiceSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_images(self, obj):
-        """Returns absolute URLs from storage backend.
-        Supports:
-        - Single ImageField on Service (obj.images)
-        - Related ServiceImage objects via obj.images.all()
-        - Backward compatibility: Return empty list for old data
-        """
+        """Returns standardized media objects from storage backend."""
+        images = []
         raw = getattr(obj, 'images', None)
         if not raw:
             return []
 
-        # Case 1: ImageField on Service - Use storage backend directly
-        try:
-            if hasattr(raw, 'url'):
-                return [raw.url] if getattr(raw, 'name', None) else []
-        except Exception:
-            pass
+        # Case 1: ImageField on Service
+        if hasattr(raw, 'name') and raw.name:
+            try:
+                url = raw.url
+                images.append({
+                    "thumbnail": url,
+                    "original": url,
+                    "alt_text": obj.name
+                })
+            except Exception:
+                pass
 
-        # Case 2: Related images manager (future-proof) - Use storage backend
+        # Case 2: Related images manager (future-proof)
         if hasattr(raw, 'all'):
-            urls = []
             for item in raw.all():
                 img = getattr(item, 'image', None)
                 if img and getattr(img, 'name', None):
                     try:
-                        urls.append(img.url)  # ✅ Storage backend generates URL
+                        urls = img.url
+                        images.append({
+                            "thumbnail": urls,
+                            "original": urls,
+                            "alt_text": getattr(item, 'alt_text', f"Image for {obj.name}")
+                        })
                     except Exception:
                         continue
-            return urls
-
-        # Case 3: Backward compatibility - old string data is invalid now
-        # Return empty to trigger re-upload via admin
-        return []
+        
+        return images
 
 
 class ServicePricingSerializer(serializers.ModelSerializer):

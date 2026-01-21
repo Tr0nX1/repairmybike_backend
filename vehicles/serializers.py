@@ -12,9 +12,16 @@ class VehicleTypeSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_image(self, obj):
-        """Returns absolute URL from storage backend"""
+        """Returns standardized media object"""
+        if not obj.image:
+            return None
         try:
-            return obj.image.url if obj.image else None
+            url = obj.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": obj.name
+            }
         except Exception:
             return None
 
@@ -29,9 +36,16 @@ class VehicleBrandSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_image(self, obj):
-        """Returns absolute URL from storage backend"""
+        """Returns standardized media object"""
+        if not obj.image:
+            return None
         try:
-            return obj.image.url if obj.image else None
+            url = obj.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": f"{obj.name} - {obj.vehicle_type.name}"
+            }
         except Exception:
             return None
 
@@ -47,9 +61,16 @@ class VehicleModelSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_image(self, obj):
-        """Returns absolute URL from storage backend"""
+        """Returns standardized media object"""
+        if not obj.image:
+            return None
         try:
-            return obj.image.url if obj.image else None
+            url = obj.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": f"{obj.name} - {obj.vehicle_brand.name}"
+            }
         except Exception:
             return None
 

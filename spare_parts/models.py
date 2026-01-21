@@ -10,7 +10,6 @@ class SparePartCategory(models.Model):
     slug = models.SlugField(max_length=120, unique=True)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='spare_parts/categories/', blank=True, null=True)
-    cloudinary_url = models.URLField(blank=True, null=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -26,7 +25,6 @@ class SparePartBrand(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True)
     logo = models.ImageField(upload_to='spare_parts/brands/', blank=True, null=True)
-    cloudinary_url = models.URLField(blank=True, null=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -85,7 +83,6 @@ class SparePartImage(models.Model):
     alt_text = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField(default=False)
     sort_order = models.IntegerField(default=0)
-    cloudinary_url = models.URLField(blank=True, null=True, editable=False)  # Stores the final Cloudinary URL
 
     class Meta:
         db_table = 'spare_part_images'
@@ -93,35 +90,6 @@ class SparePartImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.spare_part.name}"
-
-# Signals to store Cloudinary URL after image upload
-
-@receiver(post_save, sender=SparePartCategory)
-def set_category_cloudinary_url(sender, instance, **kwargs):
-    if instance.image and not instance.cloudinary_url:
-        try:
-            instance.cloudinary_url = instance.image.url
-            instance.save(update_fields=['cloudinary_url'])
-        except Exception as e:
-            print(f"⚠ Failed to set Cloudinary URL for SparePartCategory {instance.id}: {e}")
-
-@receiver(post_save, sender=SparePartBrand)
-def set_brand_cloudinary_url(sender, instance, **kwargs):
-    if instance.logo and not instance.cloudinary_url:
-        try:
-            instance.cloudinary_url = instance.logo.url
-            instance.save(update_fields=['cloudinary_url'])
-        except Exception as e:
-            print(f"⚠ Failed to set Cloudinary URL for SparePartBrand {instance.id}: {e}")
-
-@receiver(post_save, sender=SparePartImage)
-def set_image_cloudinary_url(sender, instance, **kwargs):
-    if instance.image and not instance.cloudinary_url:
-        try:
-            instance.cloudinary_url = instance.image.url
-            instance.save(update_fields=['cloudinary_url'])
-        except Exception as e:
-            print(f"⚠ Failed to set Cloudinary URL for SparePartImage {instance.id}: {e}")
 
 
 class SparePartFitment(models.Model):

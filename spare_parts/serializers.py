@@ -22,13 +22,20 @@ class SparePartCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SparePartCategory
-        fields = ['id', 'name', 'slug', 'description', 'image', 'cloudinary_url', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'slug', 'description', 'image', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_image(self, obj):
-        """Returns absolute URL from storage backend"""
+        """Returns standardized media object"""
+        if not obj.image:
+            return None
         try:
-            return obj.image.url if obj.image else None
+            url = obj.image.url
+            return {
+                "thumbnail": url, # Using standard URL for now, Cloudinary presets can be added later
+                "original": url,
+                "alt_text": obj.name
+            }
         except Exception:
             return None
 
@@ -38,13 +45,20 @@ class SparePartBrandSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SparePartBrand
-        fields = ['id', 'name', 'slug', 'logo', 'cloudinary_url', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'slug', 'logo', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_logo(self, obj):
-        """Returns absolute URL from storage backend"""
+        """Returns standardized media object"""
+        if not obj.logo:
+            return None
         try:
-            return obj.logo.url if obj.logo else None
+            url = obj.logo.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": obj.name
+            }
         except Exception:
             return None
 
@@ -54,13 +68,20 @@ class SparePartImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SparePartImage
-        fields = ['id', 'image', 'cloudinary_url', 'alt_text', 'is_primary', 'sort_order']
+        fields = ['id', 'image', 'alt_text', 'is_primary', 'sort_order']
         read_only_fields = ['id']
 
     def get_image(self, obj):
-        """Returns absolute URL from storage backend"""
+        """Returns standardized media object"""
+        if not obj.image:
+            return None
         try:
-            return obj.image.url if obj.image else None
+            url = obj.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": obj.alt_text or f"Image for {obj.spare_part.name}"
+            }
         except Exception:
             return None
 
@@ -80,12 +101,18 @@ class SparePartListSerializer(serializers.ModelSerializer):
         ]
 
     def get_thumbnail(self, obj):
-        """Returns absolute URL from storage backend"""
-        # Prefer explicitly marked primary image; otherwise fall back to first by sort_order
+        """Returns standardized media object for the primary image"""
         primary = obj.images.filter(is_primary=True).first()
         candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
+        if not candidate or not candidate.image:
+            return None
         try:
-            return candidate.image.url if candidate and candidate.image else None
+            url = candidate.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": candidate.alt_text or obj.name
+            }
         except Exception:
             return None
 
@@ -122,11 +149,30 @@ class SparePartDetailSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     part_name = serializers.CharField(source='spare_part.name', read_only=True)
     sku = serializers.CharField(source='spare_part.sku', read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
-        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'total_price']
+        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'total_price', 'image']
         read_only_fields = ['id', 'unit_price', 'total_price']
+
+    def get_image(self, obj):
+        """Returns standardized media object for the spare part"""
+        if not obj.spare_part:
+            return None
+        primary = obj.spare_part.images.filter(is_primary=True).first()
+        candidate = primary or obj.spare_part.images.order_by('sort_order').first() or obj.spare_part.images.first()
+        if not candidate or not candidate.image:
+            return None
+        try:
+            url = candidate.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": candidate.alt_text or obj.spare_part.name
+            }
+        except Exception:
+            return None
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -149,11 +195,30 @@ class OrderItemSerializer(serializers.ModelSerializer):
     part_name = serializers.CharField(source='spare_part.name', read_only=True)
     sku = serializers.CharField(source='spare_part.sku', read_only=True)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'total_price']
+        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'total_price', 'image']
         read_only_fields = ['id', 'unit_price', 'total_price']
+
+    def get_image(self, obj):
+        """Returns standardized media object for the spare part"""
+        if not obj.spare_part:
+            return None
+        primary = obj.spare_part.images.filter(is_primary=True).first()
+        candidate = primary or obj.spare_part.images.order_by('sort_order').first() or obj.spare_part.images.first()
+        if not candidate or not candidate.image:
+            return None
+        try:
+            url = candidate.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": candidate.alt_text or obj.spare_part.name
+            }
+        except Exception:
+            return None
 
 
 class OrderSerializer(serializers.ModelSerializer):
