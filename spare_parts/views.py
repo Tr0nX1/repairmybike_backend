@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.core.cache import cache
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -55,17 +56,33 @@ class SparePartBrandViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = SparePart.objects.select_related('brand', 'category').all()
+    queryset = SparePart.objects.select_related(
+        'brand', 
+        'category'
+    ).prefetch_related(
+        'images'
+    ).all()
     serializer_class = SparePartDetailSerializer
 
     def list(self, request, *args, **kwargs):
-        q = request.query_params.get('q')
-        category_id = request.query_params.get('category')
-        brand_id = request.query_params.get('brand')
-        in_stock = request.query_params.get('in_stock')
-        price_min = request.query_params.get('price_min')
-        price_max = request.query_params.get('price_max')
-        vehicle_model_id = request.query_params.get('vehicle_model')
+        # Build cache key from query params
+        q = request.query_params.get('q', '')
+        category_id = request.query_params.get('category', '')
+        brand_id = request.query_params.get('brand', '')
+        in_stock = request.query_params.get('in_stock', '')
+        price_min = request.query_params.get('price_min', '')
+        price_max = request.query_params.get('price_max', '')
+        vehicle_model_id = request.query_params.get('vehicle_model', '')
+        
+        cache_key = f'spare_parts_{category_id}_{brand_id}_{in_stock}_{price_min}_{price_max}_{vehicle_model_id}_{q}'
+        cached_data = cache.get(cache_key)
+        
+        if cached_data:
+            return Response({
+                'error': False,
+                'message': 'Spare parts retrieved successfully',
+                'data': cached_data
+            })
 
         qs = self.get_queryset()
 
@@ -85,6 +102,10 @@ class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
             qs = qs.filter(fitments__vehicle_model_id=vehicle_model_id)
 
         serializer = SparePartListSerializer(qs.distinct(), many=True, context={'request': request})
+        
+        # Cache for 5 minutes (300 seconds) - same as Services
+        cache.set(cache_key, serializer.data, 300)
+        
         return Response({
             'error': False,
             'message': 'Spare parts retrieved successfully',
