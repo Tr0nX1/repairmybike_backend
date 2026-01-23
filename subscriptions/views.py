@@ -50,22 +50,13 @@ class PlanViewSet(viewsets.ModelViewSet):
 class SubscriptionViewSet(viewsets.ModelViewSet):
     queryset = Subscription.objects.all().order_by("-created_at")
     serializer_class = SubscriptionSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ["contact_email", "contact_phone", "plan__name", "status"]
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        email = self.request.query_params.get("email")
-        user_id = self.request.query_params.get("user_id")
-        phone = self.request.query_params.get("phone")
-        if email:
-            qs = qs.filter(contact_email=email)
-        if user_id:
-            qs = qs.filter(user_id=user_id)
-        if phone:
-            qs = qs.filter(contact_phone=phone)
-        return qs
+        # Users can only see their own subscriptions
+        return Subscription.objects.filter(user=self.request.user).order_by("-created_at")
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
