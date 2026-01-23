@@ -55,8 +55,24 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     search_fields = ["contact_email", "contact_phone", "plan__name", "status"]
 
     def get_queryset(self):
-        # Users can only see their own subscriptions
-        return Subscription.objects.filter(user=self.request.user).order_by("-created_at")
+        # Users can see subscriptions linked to their account OR their phone number
+        user = self.request.user
+        qs = Subscription.objects.all().order_by("-created_at")
+        
+        if user.is_authenticated:
+            # Match strictly by User ID (Session) as requested
+            return qs.filter(user=user)
+            
+        return qs.none() # Should not happen due to permission_classes
+
+    def perform_create(self, serializer):
+        # Automatically link to authenticated user
+        user = self.request.user
+        serializer.save(
+            user=user if user.is_authenticated else None,
+            contact_email=serializer.validated_data.get('contact_email') or getattr(user, 'email', None),
+            contact_phone=serializer.validated_data.get('contact_phone') or getattr(user, 'phone_number', None)
+        )
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
