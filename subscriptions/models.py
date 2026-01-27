@@ -33,8 +33,9 @@ class Plan(models.Model):
     # New structured fields
     included_services = models.ManyToManyField('services.Service', blank=True, related_name='subscription_plans')
     
-    original_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="The regular price")
+    discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="The offer price (what user actually pays)")
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Legacy original price field")
     currency = models.CharField(max_length=8, default="INR")
     billing_period = models.CharField(max_length=16, choices=BILLING_PERIOD_CHOICES, default="monthly")
     # Number of included service visits within the billing period (e.g., Quarterly = 3)

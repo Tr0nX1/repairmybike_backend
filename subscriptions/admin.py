@@ -11,7 +11,7 @@ class PlanBenefitInline(admin.TabularInline):
 
 @admin.register(Plan)
 class PlanAdmin(ImagePreviewMixin, admin.ModelAdmin):
-    list_display = ("name", "price", "currency", "billing_period", "active", "image_preview")
+    list_display = ("name", "price", "discount_price", "currency", "billing_period", "active", "image_preview")
     list_filter = ("billing_period", "active")
     search_fields = ("name", "description")
     readonly_fields = ("image_preview", "created_at", "updated_at")
@@ -25,7 +25,7 @@ class PlanAdmin(ImagePreviewMixin, admin.ModelAdmin):
             'fields': ('name', 'slug', 'image', 'tier', 'description', 'active')
         }),
         ('Pricing & Billing', {
-            'fields': ('price', 'currency', 'billing_period', 'included_visits')
+            'fields': ('price', 'discount_price', 'currency', 'billing_period', 'included_visits')
         }),
         ('Features (New)', {
             'fields': ('included_services',),

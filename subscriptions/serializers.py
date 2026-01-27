@@ -31,6 +31,7 @@ class PlanSerializer(serializers.ModelSerializer):
             "included_services_details", # Detailed info
             "original_price",
             "price",
+            "discount_price",
             "currency",
             "billing_period",
             "included_visits",
