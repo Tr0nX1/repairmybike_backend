@@ -459,7 +459,7 @@ class PhoneOTPVerifyView(APIView):
                             session_token=session_jwt,
                             defaults={
                                 'refresh_token': refresh_jwt,
-                                'expires_at': timezone.now() + timedelta(hours=8),
+                                'expires_at': timezone.now() + timedelta(days=30),
                                 'is_active': True,
                             }
                         )
@@ -566,7 +566,7 @@ class PhoneLoginView(APIView):
                             session_token=session_jwt,
                             defaults={
                                 'refresh_token': refresh_jwt,
-                                'expires_at': timezone.now() + timedelta(hours=8),
+                                'expires_at': timezone.now() + timedelta(days=30),
                                 'is_active': True,
                             }
                         )
@@ -713,7 +713,7 @@ class StaffLoginView(APIView):
                     session_token=session_jwt,
                     defaults={
                         'refresh_token': refresh_jwt,
-                        'expires_at': timezone.now() + timedelta(hours=8),
+                        'expires_at': timezone.now() + timedelta(days=30),
                         'is_active': True,
                         'device_id': device_id,
                         'user_agent': request.META.get('HTTP_USER_AGENT'),
@@ -769,7 +769,7 @@ class StaffPasswordLoginView(APIView):
                 session_token=token,
                 defaults={
                     'refresh_token': None,
-                    'expires_at': timezone.now() + timedelta(hours=8),
+                    'expires_at': timezone.now() + timedelta(days=30),
                     'is_active': True,
                     'device_id': device_id,
                     'user_agent': request.META.get('HTTP_USER_AGENT'),
