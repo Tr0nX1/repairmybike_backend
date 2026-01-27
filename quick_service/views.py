@@ -11,6 +11,7 @@ class QuickServiceConfigViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = QuickServiceConfig.objects.filter(is_active=True)
     serializer_class = QuickServiceConfigSerializer
     permission_classes = [permissions.AllowAny]
+    pagination_class = None
 
 class QuickServiceRequestViewSet(viewsets.ModelViewSet):
     """
