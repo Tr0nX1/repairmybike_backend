@@ -29,6 +29,7 @@ class PlanSerializer(serializers.ModelSerializer):
             "benefits_list", # Structured
             "included_services", # IDs
             "included_services_details", # Detailed info
+            "original_price",
             "price",
             "currency",
             "billing_period",

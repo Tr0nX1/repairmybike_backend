@@ -37,18 +37,23 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='service_category.name', read_only=True)
     price = serializers.SerializerMethodField()
+    original_price = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
     
     def get_price(self, obj):
         # Get the lowest price across all vehicle models
         pricing = obj.pricing.order_by('price').first()
         return float(pricing.price) if pricing else 0.0
+
+    def get_original_price(self, obj):
+        pricing = obj.pricing.order_by('price').first()
+        return float(pricing.original_price) if pricing and pricing.original_price else None
     
     class Meta:
         model = Service
         fields = [
             'id', 'service_category', 'category_name', 'name', 'description',
-            'rating', 'reviews_count', 'specifications', 'images', 'price',
+            'rating', 'reviews_count', 'specifications', 'images', 'price', 'original_price',
             'is_featured', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
@@ -101,7 +106,7 @@ class ServicePricingSerializer(serializers.ModelSerializer):
         model = ServicePricing
         fields = [
             'id', 'service_id', 'service_name', 'category_id', 'category_name',
-            'description', 'vehicle_model', 'price', 'created_at', 'updated_at'
+            'description', 'vehicle_model', 'original_price', 'price', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
