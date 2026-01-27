@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'spare_parts',
     'subscriptions',
     'dashboard',
+    'content',
 ]
 
 MIDDLEWARE = [

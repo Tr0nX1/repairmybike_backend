@@ -18,6 +18,7 @@ urlpatterns = [
     path('api/shop/', include('shop.urls')),
     path('api/spare-parts/', include('spare_parts.urls')),
     path('api/subscriptions/', include('subscriptions.urls')),
+    path('api/content/', include('content.urls')),
 ]
 
 # Serve media files in development and production (fallback)
