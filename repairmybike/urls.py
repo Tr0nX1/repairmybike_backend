@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/spare-parts/', include('spare_parts.urls')),
     path('api/subscriptions/', include('subscriptions.urls')),
     path('api/content/', include('content.urls')),
+    path('api/quick-service/', include('quick_service.urls')),
 ]
 
 # Serve media files in development and production (fallback)

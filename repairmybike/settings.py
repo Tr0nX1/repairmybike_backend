@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'subscriptions',
     'dashboard',
     'content',
+    'quick_service',
 ]
 
 MIDDLEWARE = [
