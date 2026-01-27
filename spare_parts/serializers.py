@@ -101,18 +101,13 @@ class SparePartListSerializer(serializers.ModelSerializer):
         ]
 
     def get_thumbnail(self, obj):
-        """Returns standardized media object for the primary image"""
+        """Returns the URL of the primary image thumbnail"""
         primary = obj.images.filter(is_primary=True).first()
         candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
         if not candidate or not candidate.image:
             return None
         try:
-            url = candidate.image.url
-            return {
-                "thumbnail": url,
-                "original": url,
-                "alt_text": candidate.alt_text or obj.name
-            }
+            return candidate.image.url
         except Exception:
             return None
 
