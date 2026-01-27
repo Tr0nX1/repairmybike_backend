@@ -41,6 +41,15 @@ class PlanSerializer(serializers.ModelSerializer):
             "updated_at",
         )
         read_only_fields = ("id", "created_at", "updated_at")
+        
+    def to_representation(self, instance):
+        try:
+            return super().to_representation(instance)
+        except Exception as e:
+            print(f"❌ Error serializing Plan {instance.id} ({instance.name}): {e}")
+            import traceback
+            print(traceback.format_exc())
+            raise e
 
     def get_image(self, obj):
         """Returns absolute URL from storage backend"""

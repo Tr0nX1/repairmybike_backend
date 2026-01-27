@@ -15,7 +15,10 @@ class PlanViewSet(viewsets.ModelViewSet):
     search_fields = ["name", "description"]
 
     def _clear_list_cache(self):
-        cache.delete("subscriptions_plans_list")
+        try:
+            cache.delete("subscriptions_plans_list")
+        except Exception as e:
+            print(f"⚠ Cache delete failed: {e}")
 
     def list(self, request, *args, **kwargs):
         key = "subscriptions_plans_list"
