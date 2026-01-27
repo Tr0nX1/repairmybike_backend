@@ -13,6 +13,12 @@ class QuickServiceConfigViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.AllowAny]
     pagination_class = None
 
+    def list(self, request, *args, **kwargs):
+        print("DEBUG: QuickServiceConfigViewSet.list() called")
+        response = super().list(request, *args, **kwargs)
+        print(f"DEBUG: QuickServiceConfigViewSet.list() response: {response.data}")
+        return response
+
 class QuickServiceRequestViewSet(viewsets.ModelViewSet):
     """
     API endpoint for users to create and view their quick service requests.

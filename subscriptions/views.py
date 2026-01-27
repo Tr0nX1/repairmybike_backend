@@ -19,12 +19,29 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         key = "subscriptions_plans_list"
-        cached = cache.get(key)
-        if cached:
-            return Response(cached)
-        response = super().list(request, *args, **kwargs)
-        cache.set(key, response.data, timeout=60)
-        return response
+        try:
+            cached = cache.get(key)
+            if cached:
+                return Response(cached)
+        except Exception as e:
+            print(f"⚠ Cache access failed for {key}: {e}")
+            # Continue without cache
+            
+        try:
+            response = super().list(request, *args, **kwargs)
+            try:
+                cache.set(key, response.data, timeout=60)
+            except Exception as e:
+                 print(f"⚠ Cache set failed for {key}: {e}")
+            return response
+        except Exception as e:
+            import traceback
+            print(f"❌ CRITICAL: PlanViewSet.list failed: {e}")
+            print(traceback.format_exc())
+            return Response(
+                {"error": True, "message": f"Server Error: {str(e)}", "details": traceback.format_exc()},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
