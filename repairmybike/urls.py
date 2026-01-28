@@ -6,6 +6,7 @@ from .health import health_check, readiness_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/health/', health_check, name='health_check'),
     path('dashboard/', include('dashboard.urls')),
     path('health/', health_check, name='health_check'),
     path('ready/', readiness_check, name='readiness_check'),
@@ -20,6 +21,7 @@ urlpatterns = [
     path('api/subscriptions/', include('subscriptions.urls')),
     path('api/content/', include('content.urls')),
     path('api/quick-service/', include('quick_service.urls')),
+    path('api/feedback/', include('feedback.urls')),
 ]
 
 # Serve media files in development and production (fallback)

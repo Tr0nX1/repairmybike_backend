@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'dashboard',
     'content',
     'quick_service',
+    'feedback',
 ]
 
 MIDDLEWARE = [
