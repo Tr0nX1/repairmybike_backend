@@ -15,3 +15,10 @@ def health_check(request):
         health['message'] = str(e)
         
     return JsonResponse(health, status=200 if health['status'] == 'ok' else 500)
+
+def readiness_check(request):
+    """
+    Check if the application is ready to accept traffic.
+    Currently performs the same check as health_check.
+    """
+    return health_check(request)
