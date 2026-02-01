@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from descope import DescopeClient, DeliveryMethod, SESSION_TOKEN_NAME, REFRESH_SESSION_TOKEN_NAME
-from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, StaffDirectory, UserAddress
+from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, StaffDirectory, UserAddress, ContactMessage
 from .serializers import (
     UserSerializer, UserRegistrationSerializer, UserLoginSerializer,
     PasswordResetSerializer, PasswordResetConfirmSerializer,
@@ -24,7 +24,8 @@ from .serializers import (
     UnifiedOTPRequestSerializer, UnifiedOTPVerifySerializer,
     StaffOtpLoginSerializer,
     StaffPasswordLoginSerializer,
-    UserAddressSerializer
+    UserAddressSerializer,
+    ContactMessageSerializer
 )
 from .authentication import DescopeAuthentication
 
@@ -1574,3 +1575,17 @@ class UserAddressViewSet(viewsets.ModelViewSet):
         if serializer.validated_data.get('is_default', False):
             UserAddress.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
         serializer.save()
+
+class ContactFormView(APIView):
+    """View for submitting contact form messages"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = ContactMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Message sent successfully',
+                'id': serializer.data['id']
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

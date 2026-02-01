@@ -44,6 +44,7 @@ class ServicePricingAdmin(admin.ModelAdmin):
         "id",
         "service",
         "vehicle_model",
+        "original_price",
         "price",
         "created_at",
     )

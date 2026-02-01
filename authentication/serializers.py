@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, UserAddress
+from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, UserAddress, ContactMessage
 
 User = get_user_model()
 
@@ -199,6 +199,13 @@ class UnifiedOTPRequestSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Invalid email format")
         
         return data
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    """Serializer for contact form messages"""
+    class Meta:
+        model = ContactMessage
+        fields = ['id', 'name', 'email', 'phone', 'message', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 
 class UnifiedOTPVerifySerializer(serializers.Serializer):

@@ -45,4 +45,7 @@ urlpatterns = [
     path('admin/login/', views.AdminLoginView.as_view(), name='admin-login'),
     path('staff/login/password/', views.StaffPasswordLoginView.as_view(), name='staff-password-login'),
     path('admin/login/password/', views.AdminPasswordLoginView.as_view(), name='admin-password-login'),
+    
+    # Contact form endpoint
+    path('contact/', views.ContactFormView.as_view(), name='contact-form'),
 ]

@@ -46,6 +46,7 @@ class SparePartAdmin(ImagePreviewMixin, admin.ModelAdmin):
         "sku",
         "brand",
         "category",
+        "mrp",
         "sale_price",
         "image_preview",
         "in_stock",

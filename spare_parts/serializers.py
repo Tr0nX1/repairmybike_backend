@@ -145,11 +145,12 @@ class CartItemSerializer(serializers.ModelSerializer):
     part_name = serializers.CharField(source='spare_part.name', read_only=True)
     sku = serializers.CharField(source='spare_part.sku', read_only=True)
     image = serializers.SerializerMethodField()
+    mrp = serializers.DecimalField(source='spare_part.mrp', max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = CartItem
-        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'total_price', 'image']
-        read_only_fields = ['id', 'unit_price', 'total_price']
+        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'mrp', 'total_price', 'image']
+        read_only_fields = ['id', 'unit_price', 'mrp', 'total_price']
 
     def get_image(self, obj):
         """Returns standardized media object for the spare part"""
@@ -191,11 +192,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
     sku = serializers.CharField(source='spare_part.sku', read_only=True)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     image = serializers.SerializerMethodField()
+    mrp = serializers.DecimalField(source='spare_part.mrp', max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'total_price', 'image']
-        read_only_fields = ['id', 'unit_price', 'total_price']
+        fields = ['id', 'spare_part', 'part_name', 'sku', 'quantity', 'unit_price', 'mrp', 'total_price', 'image']
+        read_only_fields = ['id', 'unit_price', 'mrp', 'total_price']
 
     def get_image(self, obj):
         """Returns standardized media object for the spare part"""
