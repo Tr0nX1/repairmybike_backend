@@ -17,6 +17,7 @@
             "shop/**",
             "spare_parts/**",
             "subscriptions/**",
+            "nano/**",
             "manage.py",
             ".env.example"
         ]
