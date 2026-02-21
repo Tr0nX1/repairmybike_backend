@@ -98,6 +98,102 @@ def _merge_guest_data(user, guest_id):
         logger.error(f"Error merging guest data: {e}")
 
 
+def _get_session_expiry():
+    """Returns the standardized session expiry duration."""
+    return timezone.now() + timedelta(days=30)
+
+
+def _persist_user_session(user, auth_response, request, device_id=None):
+    """
+    Persist user session with metadata.
+    """
+    try:
+        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
+        refresh_jwt = auth_response.get(REFRESH_SESSION_TOKEN_NAME, {}).get("jwt")
+        
+        UserSession.objects.update_or_create(
+            user=user,
+            session_token=session_jwt,
+            defaults={
+                'refresh_token': refresh_jwt,
+                'expires_at': _get_session_expiry(),
+                'is_active': True,
+                'device_id': device_id or request.data.get('device_id'),
+                'user_agent': request.META.get('HTTP_USER_AGENT'),
+                'ip_address': request.META.get('REMOTE_ADDR'),
+                'last_activity': timezone.now(),
+            }
+        )
+        return True
+    except Exception as e:
+        logger.warning(f"Failed to persist session: {e}")
+        return False
+
+
+def _get_or_create_user_from_auth(identifier, auth_response, request, method='email'):
+    """
+    Standardized user creation/retrieval from Descope auth response.
+    """
+    user_id = auth_response.get('user', {}).get('userId')
+    if not user_id:
+        user_id = auth_response.get('sub')  # Fallback for Direct JWT responses
+    
+    # Try by descope_user_id
+    try:
+        user = User.objects.get(descope_user_id=user_id)
+        if method == 'email':
+            user.email = identifier
+            user.is_verified = True
+        else:
+            user.phone_number = identifier
+            user.is_phone_verified = True
+        user.save()
+        _merge_guest_data(user, request.META.get('HTTP_X_GUEST_ID'))
+        return user, False
+    except User.DoesNotExist:
+        pass
+        
+    # Try by identifier
+    try:
+        if method == 'email':
+            user = User.objects.get(email=identifier)
+        else:
+            user = User.objects.get(phone_number=identifier)
+            
+        user.descope_user_id = user_id
+        if method == 'email':
+            user.is_verified = True
+        else:
+            user.is_phone_verified = True
+        user.save()
+        _merge_guest_data(user, request.META.get('HTTP_X_GUEST_ID'))
+        return user, False
+    except User.DoesNotExist:
+        pass
+        
+    # Create new user
+    if method == 'email':
+        username = identifier.split('@')[0]
+        user = User.objects.create_user(
+            username=username,
+            email=identifier,
+            descope_user_id=user_id,
+            is_verified=True
+        )
+    else:
+        username = f"user_{identifier.replace('+', '').replace('-', '')}"
+        user = User.objects.create_user(
+            username=username,
+            phone_number=identifier,
+            descope_user_id=user_id,
+            is_phone_verified=True,
+            is_verified=True
+        )
+        
+    _merge_guest_data(user, request.META.get('HTTP_X_GUEST_ID'))
+    return user, True
+
+
 class UserRegistrationView(APIView):
     """Handle user registration using Descope"""
     permission_classes = [permissions.AllowAny]
@@ -169,26 +265,6 @@ class UserLoginView(APIView):
                 }, status=status.HTTP_401_UNAUTHORIZED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def _get_or_create_user(self, auth_response):
-        """Get or create user based on Descope auth response"""
-        user_id = auth_response.get('user', {}).get('userId')
-        email = auth_response.get('user', {}).get('email')
-        name = auth_response.get('user', {}).get('name', '')
-        
-        try:
-            user = User.objects.get(descope_user_id=user_id)
-            return user, False
-        except User.DoesNotExist:
-            user = User.objects.create_user(
-                username=email,
-                email=email,
-                descope_user_id=user_id,
-                first_name=name.split(' ')[0] if name else '',
-                last_name=name.split(' ')[1] if len(name.split(' ')) > 1 else '',
-                is_verified=True
-            )
-            return user, True
 
 
 class UserLogoutView(APIView):
@@ -487,54 +563,6 @@ class PhoneOTPVerifyView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def _get_or_create_user_from_phone(self, phone_number, auth_response):
-        """Get or create user based on phone number and Descope response"""
-        user_id = auth_response.get('user', {}).get('userId')
-        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-        
-        try:
-            # Try to get user by descope_user_id
-            user = User.objects.get(descope_user_id=user_id)
-            user.phone_number = phone_number
-            user.is_phone_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        try:
-            # Try to get user by phone number
-            user = User.objects.get(phone_number=phone_number)
-            user.descope_user_id = user_id
-            user.is_phone_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        # Create new user
-        username = f"user_{phone_number.replace('+', '').replace('-', '')}"
-        user = User.objects.create_user(
-            username=username,
-            phone_number=phone_number,
-            descope_user_id=user_id,
-            is_phone_verified=True,
-            is_verified=True
-        )
-        
-        # Merge Guest Data
-        _merge_guest_data(user, guest_id)
-        
-        return user, True
-
 
 class PhoneLoginView(APIView):
     """Handle phone-based login with OTP"""
@@ -557,22 +585,9 @@ class PhoneLoginView(APIView):
                 
                 if auth_response:
                     # Get or create user
-                    user, created = self._get_or_create_user_from_phone(phone_number, auth_response)
+                    user, created = _get_or_create_user_from_auth(phone_number, auth_response, request, method='phone')
                     # Persist session
-                    try:
-                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
-                        UserSession.objects.update_or_create(
-                            user=user,
-                            session_token=session_jwt,
-                            defaults={
-                                'refresh_token': refresh_jwt,
-                                'expires_at': timezone.now() + timedelta(days=30),
-                                'is_active': True,
-                            }
-                        )
-                    except Exception as persist_err:
-                        logger.warning(f"Failed to persist session: {persist_err}")
+                    _persist_user_session(user, auth_response, request)
                     return Response({
                         'message': 'Login successful',
                         'user': UserSerializer(user).data,
@@ -593,40 +608,6 @@ class PhoneLoginView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def _get_or_create_user_from_phone(self, phone_number, auth_response):
-        """Get or create user based on phone number and Descope response"""
-        user_id = auth_response.get('user', {}).get('userId')
-        
-        try:
-            user = User.objects.get(descope_user_id=user_id)
-            user.phone_number = phone_number
-            user.is_phone_verified = True
-            user.save()
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        try:
-            user = User.objects.get(phone_number=phone_number)
-            user.descope_user_id = user_id
-            user.is_phone_verified = True
-            user.save()
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        # Create new user
-        username = f"user_{phone_number.replace('+', '').replace('-', '')}"
-        user = User.objects.create_user(
-            username=username,
-            phone_number=phone_number,
-            descope_user_id=user_id,
-            is_phone_verified=True,
-            is_verified=True
-        )
-        
-        return user, True
-
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
@@ -706,24 +687,7 @@ class StaffLoginView(APIView):
                 return Response({'error': 'Staff privileges required'}, status=status.HTTP_403_FORBIDDEN)
 
             # Persist session with metadata
-            try:
-                session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
-                UserSession.objects.update_or_create(
-                    user=user,
-                    session_token=session_jwt,
-                    defaults={
-                        'refresh_token': refresh_jwt,
-                        'expires_at': timezone.now() + timedelta(days=30),
-                        'is_active': True,
-                        'device_id': device_id,
-                        'user_agent': request.META.get('HTTP_USER_AGENT'),
-                        'ip_address': request.META.get('REMOTE_ADDR'),
-                        'last_activity': timezone.now(),
-                    }
-                )
-            except Exception as persist_err:
-                logger.warning(f"Failed to persist staff session: {persist_err}")
+            _persist_user_session(user, auth_response, request, device_id=device_id)
 
             return Response({
                 'message': 'Staff login successful',
@@ -827,24 +791,7 @@ class AdminLoginView(APIView):
                 return Response({'error': 'Admin privileges required'}, status=status.HTTP_403_FORBIDDEN)
 
             # Persist session with metadata
-            try:
-                session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
-                UserSession.objects.update_or_create(
-                    user=user,
-                    session_token=session_jwt,
-                    defaults={
-                        'refresh_token': refresh_jwt,
-                        'expires_at': timezone.now() + timedelta(hours=8),
-                        'is_active': True,
-                        'device_id': device_id,
-                        'user_agent': request.META.get('HTTP_USER_AGENT'),
-                        'ip_address': request.META.get('REMOTE_ADDR'),
-                        'last_activity': timezone.now(),
-                    }
-                )
-            except Exception as persist_err:
-                logger.warning(f"Failed to persist admin session: {persist_err}")
+            _persist_user_session(user, auth_response, request, device_id=device_id)
 
             return Response({
                 'message': 'Admin login successful',
@@ -891,7 +838,7 @@ class AdminPasswordLoginView(APIView):
                 session_token=token,
                 defaults={
                     'refresh_token': None,
-                    'expires_at': timezone.now() + timedelta(hours=8),
+                    'expires_at': _get_session_expiry(),
                     'is_active': True,
                     'device_id': device_id,
                     'user_agent': request.META.get('HTTP_USER_AGENT'),
@@ -1052,7 +999,7 @@ class EmailOTPVerifyView(APIView):
                 
                 if auth_response:
                     # Get or create user
-                    user, created = self._get_or_create_user_from_email(email, auth_response)
+                    user, created = _get_or_create_user_from_auth(email, auth_response, request, method='email')
                     
                     # Mark OTP as verified
                     EmailOTP.objects.filter(
@@ -1061,23 +1008,7 @@ class EmailOTPVerifyView(APIView):
                     ).update(is_verified=True)
 
                     # Persist session
-                    try:
-                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
-                        UserSession.objects.update_or_create(
-                            user=user,
-                            session_token=session_jwt,
-                            defaults={
-                                'refresh_token': refresh_jwt,
-                                'expires_at': timezone.now() + timedelta(hours=8),
-                                'is_active': True,
-                                'user_agent': request.META.get('HTTP_USER_AGENT'),
-                                'ip_address': request.META.get('REMOTE_ADDR'),
-                                'last_activity': timezone.now(),
-                            }
-                        )
-                    except Exception as persist_err:
-                        logger.warning(f"Failed to persist session: {persist_err}")
+                    _persist_user_session(user, auth_response, request)
                     
                     return Response({
                         'message': 'OTP verified successfully',
@@ -1099,41 +1030,6 @@ class EmailOTPVerifyView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def _get_or_create_user_from_email(self, email, auth_response):
-        """Get or create user based on email and Descope response"""
-        user_id = auth_response.get('user', {}).get('userId')
-        
-        try:
-            # Try to get user by descope_user_id
-            user = User.objects.get(descope_user_id=user_id)
-            user.email = email
-            user.is_verified = True
-            user.save()
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        try:
-            # Try to get user by email
-            user = User.objects.get(email=email)
-            user.descope_user_id = user_id
-            user.is_verified = True
-            user.save()
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        # Create new user
-        username = email.split('@')[0]
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            descope_user_id=user_id,
-            is_verified=True
-        )
-        
-        return user, True
-
 
 class EmailLoginView(APIView):
     """Handle email-based login with OTP"""
@@ -1157,25 +1053,9 @@ class EmailLoginView(APIView):
                 
                 if auth_response:
                     # Get or create user
-                    user, created = self._get_or_create_user_from_email(email, auth_response)
+                    user, created = _get_or_create_user_from_auth(email, auth_response, request, method='email')
                     # Persist session
-                    try:
-                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
-                        UserSession.objects.update_or_create(
-                            user=user,
-                            session_token=session_jwt,
-                            defaults={
-                                'refresh_token': refresh_jwt,
-                                'expires_at': timezone.now() + timedelta(hours=8),
-                                'is_active': True,
-                                'user_agent': request.META.get('HTTP_USER_AGENT'),
-                                'ip_address': request.META.get('REMOTE_ADDR'),
-                                'last_activity': timezone.now(),
-                            }
-                        )
-                    except Exception as persist_err:
-                        logger.warning(f"Failed to persist session: {persist_err}")
+                    _persist_user_session(user, auth_response, request)
                     
                     return Response({
                         'message': 'Login successful',
@@ -1197,50 +1077,6 @@ class EmailLoginView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def _get_or_create_user_from_email(self, email, auth_response):
-        """Get or create user based on email and Descope response"""
-        try:
-            user = User.objects.get(descope_user_id=user_id)
-            user.email = email
-            user.is_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        try:
-            user = User.objects.get(email=email)
-            user.descope_user_id = user_id
-            user.is_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        # Create new user
-        username = email.split('@')[0]
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            descope_user_id=user_id,
-            is_verified=True
-        )
-        
-        # Merge Guest Data
-        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-        _merge_guest_data(user, guest_id)
-        
-        return user, True
 
 
 class UnifiedOTPRequestView(APIView):
@@ -1354,9 +1190,9 @@ class UnifiedOTPVerifyView(APIView):
                 if auth_response:
                     # Get or create user
                     if method == "phone":
-                        user, created = self._get_or_create_user_from_phone(identifier, auth_response)
+                        user, created = _get_or_create_user_from_auth(identifier, auth_response, request, method='phone')
                     else:
-                        user, created = self._get_or_create_user_from_email(identifier, auth_response)
+                        user, created = _get_or_create_user_from_auth(identifier, auth_response, request, method='email')
                     
                     # Mark OTP as verified
                     if method == "phone":
@@ -1369,21 +1205,9 @@ class UnifiedOTPVerifyView(APIView):
                             email=identifier,
                             is_verified=False
                         ).update(is_verified=True)
-                    # Persist session
-                    try:
-                        session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                        refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
-                        UserSession.objects.update_or_create(
-                            user=user,
-                            session_token=session_jwt,
-                            defaults={
-                                'refresh_token': refresh_jwt,
-                                'expires_at': timezone.now() + timedelta(hours=8),
-                                'is_active': True,
-                            }
-                        )
-                    except Exception as persist_err:
-                        logger.warning(f"Failed to persist session: {persist_err}")
+                    
+                    # Persist session with metadata
+                    _persist_user_session(user, auth_response, request)
                     
                     return Response({
                         'message': 'OTP verified successfully',
@@ -1405,100 +1229,6 @@ class UnifiedOTPVerifyView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def _get_or_create_user_from_phone(self, phone_number, auth_response):
-        """Get or create user based on phone number and Descope response"""
-        user_id = auth_response.get('user', {}).get('userId')
-        
-        try:
-            user = User.objects.get(descope_user_id=user_id)
-            user.phone_number = phone_number
-            user.is_phone_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        try:
-            user = User.objects.get(phone_number=phone_number)
-            user.descope_user_id = user_id
-            user.is_phone_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        # Create new user
-        username = f"user_{phone_number.replace('+', '').replace('-', '')}"
-        user = User.objects.create_user(
-            username=username,
-            phone_number=phone_number,
-            descope_user_id=user_id,
-            is_phone_verified=True,
-            is_verified=True
-        )
-        
-        # Merge Guest Data
-        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-        _merge_guest_data(user, guest_id)
-        
-        return user, True
-
-    def _get_or_create_user_from_email(self, email, auth_response):
-        """Get or create user based on email and Descope response"""
-        user_id = auth_response.get('user', {}).get('userId')
-        
-        try:
-            user = User.objects.get(descope_user_id=user_id)
-            user.email = email
-            user.is_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        try:
-            user = User.objects.get(email=email)
-            user.descope_user_id = user_id
-            user.is_verified = True
-            user.save()
-            
-            # Merge Guest Data
-            guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-            _merge_guest_data(user, guest_id)
-            
-            return user, False
-        except User.DoesNotExist:
-            pass
-        
-        # Create new user
-        username = email.split('@')[0]
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            descope_user_id=user_id,
-            is_verified=True
-        )
-        
-        # Merge Guest Data
-        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-        _merge_guest_data(user, guest_id)
-        
-        return user, True
 
 
 class RefreshTokenView(APIView):
@@ -1528,7 +1258,7 @@ class RefreshTokenView(APIView):
                     UserSession.objects.filter(refresh_token=refresh_token).update(
                         session_token=session_jwt,
                         refresh_token=new_refresh_jwt,
-                        expires_at=timezone.now() + timedelta(hours=8),
+                        expires_at=_get_session_expiry(),
                         last_activity=timezone.now()
                     )
                 except Exception as e:
@@ -1538,7 +1268,8 @@ class RefreshTokenView(APIView):
                  try:
                     UserSession.objects.filter(refresh_token=refresh_token).update(
                         session_token=session_jwt,
-                        last_activity=timezone.now()
+                        last_activity=timezone.now(),
+                        expires_at=_get_session_expiry(),
                     )
                  except Exception:
                      pass

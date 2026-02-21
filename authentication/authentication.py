@@ -76,21 +76,34 @@ class DescopeAuthentication(BaseAuthentication):
         phone_number = jwt_response.get('phone_number', '')
         profile_picture = jwt_response.get('picture', '')
         
+        # Split name into first and last name
+        name_parts = name.split(' ') if name else []
+        first_name = name_parts[0] if name_parts else ''
+        last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+        
         # Try to get user by descope_user_id first
         try:
             user = User.objects.get(descope_user_id=user_id)
             # Update user info if needed
+            changed = False
             if email and user.email != email:
                 user.email = email
-            if name and user.first_name != name.split(' ')[0]:
-                user.first_name = name.split(' ')[0]
-            if len(name.split(' ')) > 1 and user.last_name != name.split(' ')[1]:
-                user.last_name = name.split(' ')[1]
+                changed = True
+            if first_name and user.first_name != first_name:
+                user.first_name = first_name
+                changed = True
+            if last_name and user.last_name != last_name:
+                user.last_name = last_name
+                changed = True
             if phone_number and user.phone_number != phone_number:
                 user.phone_number = phone_number
+                changed = True
             if profile_picture and user.profile_picture != profile_picture:
                 user.profile_picture = profile_picture
-            user.save()
+                changed = True
+            
+            if changed:
+                user.save()
             return user, False
         except User.DoesNotExist:
             pass
@@ -111,8 +124,8 @@ class DescopeAuthentication(BaseAuthentication):
             username=username,
             email=email,
             descope_user_id=user_id,
-            first_name=name.split(' ')[0] if name else '',
-            last_name=name.split(' ')[1] if len(name.split(' ')) > 1 else '',
+            first_name=first_name,
+            last_name=last_name,
             phone_number=phone_number,
             profile_picture=profile_picture,
             is_verified=True  # Descope handles verification
