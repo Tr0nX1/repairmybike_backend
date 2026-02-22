@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 from django.db import transaction
 from django.db.models import Q
+from django.contrib.auth.models import Group, Permission
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -130,6 +131,42 @@ def _persist_user_session(user, auth_response, request, device_id=None):
         return False
 
 
+def _sync_roles_and_permissions(user, auth_response):
+    """
+    Synchronize roles and permissions from Descope response to Django Groups.
+    """
+    # Descope returns roles/permissions in the user object or the main response
+    user_data = auth_response.get('user', {})
+    roles = user_data.get('roleNames', [])
+    
+    # Also check the JWT claims if available (e.g. from sessionToken)
+    # But often the session 'user' object is easiest during login.
+    
+    if not roles:
+        return
+
+    for role_name in roles:
+        group, created = Group.objects.get_or_create(name=role_name)
+        if group not in user.groups.all():
+            user.groups.add(group)
+            logger.info(f"Synchronized role {role_name} for user {user.username}")
+
+    # Update Django flags
+    changed = False
+    if 'admin' in [r.lower() for r in roles]:
+        if not user.is_superuser:
+            user.is_superuser = True
+            user.is_staff = True
+            changed = True
+    elif 'staff' in [r.lower() for r in roles]:
+        if not user.is_staff:
+            user.is_staff = True
+            changed = True
+    
+    if changed:
+        user.save()
+
+
 def _get_or_create_user_from_auth(identifier, auth_response, request, method='email'):
     """
     Standardized user creation/retrieval from Descope auth response.
@@ -149,6 +186,7 @@ def _get_or_create_user_from_auth(identifier, auth_response, request, method='em
             user.is_phone_verified = True
         user.save()
         _merge_guest_data(user, request.META.get('HTTP_X_GUEST_ID'))
+        _sync_roles_and_permissions(user, auth_response)
         return user, False
     except User.DoesNotExist:
         pass
@@ -167,6 +205,7 @@ def _get_or_create_user_from_auth(identifier, auth_response, request, method='em
             user.is_phone_verified = True
         user.save()
         _merge_guest_data(user, request.META.get('HTTP_X_GUEST_ID'))
+        _sync_roles_and_permissions(user, auth_response)
         return user, False
     except User.DoesNotExist:
         pass
@@ -191,7 +230,40 @@ def _get_or_create_user_from_auth(identifier, auth_response, request, method='em
         )
         
     _merge_guest_data(user, request.META.get('HTTP_X_GUEST_ID'))
+    _sync_roles_and_permissions(user, auth_response)
     return user, True
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAdminUser])
+def bootstrap_descope_roles(request):
+    """
+    Utility endpoint to pull all roles from Descope and create them as Django Groups.
+    Requires Admin privileges.
+    """
+    try:
+        descope_client = create_descope_client()
+        # Using the MGMT SDK as per documentation provided
+        resp = descope_client.mgmt.role.load_all()
+        roles = resp.get('roles', [])
+        
+        created_groups = []
+        for role in roles:
+            group, created = Group.objects.get_or_create(
+                name=role.get('name'),
+                defaults={'name': role.get('name')}
+            )
+            if created:
+                created_groups.append(role.get('name'))
+        
+        return Response({
+            'message': f'Successfully synced {len(roles)} roles.',
+            'created_groups': created_groups
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        logger.error(f"Failed to bootstrap roles: {e}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserRegistrationView(APIView):

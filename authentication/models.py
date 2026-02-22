@@ -47,8 +47,8 @@ class UserAddress(models.Model):
 class UserSession(models.Model):
     """Track user sessions for Descope integration"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sessions')
-    session_token = models.CharField(max_length=500, unique=True)
-    refresh_token = models.CharField(max_length=500, blank=True, null=True)
+    session_token = models.CharField(max_length=2048, unique=True)
+    refresh_token = models.CharField(max_length=2048, blank=True, null=True)
     expires_at = models.DateTimeField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)

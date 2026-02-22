@@ -1,6 +1,6 @@
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.auth import get_user_model
 from descope import DescopeClient
 from django.conf import settings
@@ -52,8 +52,9 @@ class DescopeAuthentication(BaseAuthentication):
             if not user_id:
                 return None
                 
-            # Get or create user
+            # Get or create user and sync roles
             user, created = self._get_or_create_user(jwt_response)
+            self._sync_roles_and_permissions(user, jwt_response)
             
             if created:
                 logger.info(f"Created new user: {user.email}")
@@ -132,6 +133,44 @@ class DescopeAuthentication(BaseAuthentication):
         )
         
         return user, True
+
+    def _sync_roles_and_permissions(self, user, jwt_response):
+        """
+        Synchronize roles and permissions from Descope JWT to Django Groups/Permissions.
+        """
+        roles = jwt_response.get('roles', [])
+        permissions = jwt_response.get('permissions', [])
+        
+        if not roles and not permissions:
+            return
+
+        # 1. Handle Roles -> Django Groups
+        for role_name in roles:
+            group, created = Group.objects.get_or_create(name=role_name)
+            if group not in user.groups.all():
+                user.groups.add(group)
+                logger.info(f"Added user {user.username} to group {role_name}")
+
+        # 2. Handle Permissions -> Django Permissions (Optional but good for completeness)
+        # In Django, permissions are usually linked to models. 
+        # Here we just ensure the user has these custom permission strings if needed.
+        # Note: Django's default backend doesn't handle arbitrary strings well without a custom backend,
+        # but we can at least log them or manage them in a custom way.
+        
+        # 3. Update standard Django Flags based on common roles
+        changed = False
+        if 'admin' in [r.lower() for r in roles]:
+            if not user.is_superuser:
+                user.is_superuser = True
+                user.is_staff = True
+                changed = True
+        elif 'staff' in [r.lower() for r in roles]:
+            if not user.is_staff:
+                user.is_staff = True
+                changed = True
+        
+        if changed:
+            user.save()
 
 
 class DescopeSessionAuthentication(BaseAuthentication):

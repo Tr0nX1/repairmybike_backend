@@ -1484,3 +1484,5 @@ WARNING 2026-01-22 00:34:24,580 utils 3256 16772 Dashboard metrics aggregation s
 WARNING 2026-01-22 00:37:02,962 utils 26700 7912 Dashboard metrics aggregation slow: 4371.17ms
 WARNING 2026-01-22 00:38:41,457 utils 28304 10632 Dashboard metrics aggregation slow: 3067.72ms
 WARNING 2026-01-22 00:39:32,431 utils 27748 17780 Dashboard metrics aggregation slow: 3196.03ms
+WARNING 2026-02-22 18:01:24,681 views 14512 32392 Failed to persist session: value too long for type character varying(500)
+

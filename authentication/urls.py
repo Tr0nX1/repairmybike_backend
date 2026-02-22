@@ -40,6 +40,8 @@ urlpatterns = [
     # Session management endpoints
     path('sessions/', views.user_sessions, name='user-sessions'),
     path('sessions/<int:session_id>/revoke/', views.revoke_session, name='revoke-session'),
+    path('bootstrap-roles/', views.bootstrap_descope_roles, name='bootstrap-roles'),
+    
     # Staff/Admin login endpoints
     path('staff/login/', views.StaffLoginView.as_view(), name='staff-login'),
     path('admin/login/', views.AdminLoginView.as_view(), name='admin-login'),
