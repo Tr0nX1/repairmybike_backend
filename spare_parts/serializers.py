@@ -227,6 +227,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'id', 'session_id', 'user', 'customer_name', 'phone', 'address',
             'amount_total', 'currency', 'payment_method', 'payment_status',
             'status', 'items', 'tracking_number', 'courier_name',
+            'shipping_method', 'address_details',
             'estimated_delivery', 'delivered_at', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'user', 'amount_total', 'currency', 'payment_method', 'payment_status', 'status', 'created_at', 'updated_at']
@@ -237,6 +238,8 @@ class CheckoutSerializer(serializers.Serializer):
     customer_name = serializers.CharField()
     phone = serializers.CharField()
     address = serializers.CharField()
+    shipping_method = serializers.CharField(required=False, allow_null=True)
+    address_details = serializers.JSONField(required=False, allow_null=True)
 
 
 class BuyNowSerializer(serializers.Serializer):
@@ -246,6 +249,8 @@ class BuyNowSerializer(serializers.Serializer):
     customer_name = serializers.CharField()
     phone = serializers.CharField()
     address = serializers.CharField()
+    shipping_method = serializers.CharField(required=False, allow_null=True)
+    address_details = serializers.JSONField(required=False, allow_null=True)
 
 class UserSavedPartSerializer(serializers.ModelSerializer):
     spare_part = SparePartListSerializer(read_only=True)

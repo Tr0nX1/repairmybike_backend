@@ -143,6 +143,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             vehicle_model=vehicle_model,
             service_location=data['service_location'],
             address=data.get('address', ''),
+            address_details=data.get('address_details'),
             appointment_date=data['appointment_date'],
             appointment_time=data['appointment_time'],
             total_amount=total_amount,

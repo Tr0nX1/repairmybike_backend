@@ -40,6 +40,7 @@ class BookingCreateSerializer(serializers.Serializer):
     # Booking Details
     service_location = serializers.ChoiceField(choices=['home', 'shop'])
     address = serializers.CharField(required=False, allow_blank=True)
+    address_details = serializers.JSONField(required=False, allow_null=True)
     appointment_date = serializers.DateField()
     appointment_time = serializers.TimeField()
     
@@ -63,8 +64,8 @@ class BookingCreateSerializer(serializers.Serializer):
     
     def validate(self, data):
         # Validate address for home service
-        if data['service_location'] == 'home' and not data.get('address'):
-            raise serializers.ValidationError({"address": "Address is required for home service"})
+        if data['service_location'] == 'home' and not (data.get('address') or data.get('address_details')):
+            raise serializers.ValidationError({"address": "Address or address_details is required for home service"})
         
         return data
 
@@ -80,7 +81,7 @@ class BookingListSerializer(serializers.ModelSerializer):
         model = Booking
         fields = [
             'id', 'customer', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
-            'service_location', 'address', 'appointment_date', 'appointment_time',
+            'service_location', 'address', 'address_details', 'appointment_date', 'appointment_time',
             'total_amount', 'payment_method', 'payment_status', 'booking_status',
             'subscription', 'subscription_remaining_visits',
             'notes', 'booking_services', 'created_at', 'updated_at'
@@ -110,7 +111,7 @@ class BookingDetailSerializer(serializers.ModelSerializer):
         model = Booking
         fields = [
             'id', 'customer', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
-            'vehicle_type_name', 'service_location', 'address', 'appointment_date',
+            'vehicle_type_name', 'service_location', 'address', 'address_details', 'appointment_date',
             'appointment_time', 'total_amount', 'payment_method', 'payment_status',
             'booking_status', 'subscription', 'subscription_remaining_visits',
             'notes', 'booking_services', 'created_at', 'updated_at'

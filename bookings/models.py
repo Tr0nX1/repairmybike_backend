@@ -54,6 +54,7 @@ class Booking(models.Model):
     vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.CASCADE, related_name='bookings')
     service_location = models.CharField(max_length=10, choices=SERVICE_LOCATION_CHOICES)
     address = models.TextField(blank=True, null=True)
+    address_details = models.JSONField(blank=True, null=True, help_text="Structured address data")
     appointment_date = models.DateField(db_index=True)
     appointment_time = models.TimeField()
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)

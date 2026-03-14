@@ -163,6 +163,10 @@ class Order(models.Model):
     payment_method = models.CharField(max_length=20, default='cash')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='cash_due')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='created')
+    
+    # Unified checkout fields
+    shipping_method = models.CharField(max_length=50, blank=True, null=True, help_text="e.g., standard, express")
+    address_details = models.JSONField(blank=True, null=True, help_text="Structured address data")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tracking_number = models.CharField(max_length=100, null=True, blank=True)
