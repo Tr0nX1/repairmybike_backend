@@ -67,6 +67,10 @@ class DescopeAuthentication(BaseAuthentication):
             logger.error(f"Authentication failed: {str(e)}")
             return None
     
+    def authenticate_header(self, request):
+        return 'Bearer'
+
+    
     def _get_or_create_user(self, jwt_response):
         """
         Get or create user based on Descope JWT response
@@ -251,6 +255,10 @@ class PasswordSessionAuthentication(BaseAuthentication):
         except Exception as e:
             logger.error(f"PasswordSessionAuthentication failed: {e}")
             return None
+
+    def authenticate_header(self, request):
+        return 'Bearer'
+
 
 
 class GuestUser(AnonymousUser):

@@ -493,32 +493,13 @@ class PhoneOTPRequestView(APIView):
                 descope_client = create_descope_client()
                 phone_number = serializer.validated_data['phone_number']
                 
-                # Check if phone number is rate limited
-                rate_limited = OTPAttempt.objects.filter(
-                    identifier=phone_number,
-                    attempt_type='phone',
-                    created_at__gte=timezone.now() - timezone.timedelta(hours=1)
-                ).count() >= 5
-                
-                if rate_limited:
-                    return Response(
-                        {'error': 'Too many OTP requests. Please try again later.'},
-                        status=status.HTTP_429_TOO_MANY_REQUESTS
-                    )
-                
                 # Fetch or create a single attempt tracker for this phone number
                 attempt_rec, _ = OTPAttempt.objects.get_or_create(
                     identifier=phone_number,
                     attempt_type='phone',
                     defaults={'attempts_count': 0}
                 )
-                
-                # If currently blocked, short-circuit
-                if attempt_rec.is_blocked_now():
-                    return Response(
-                        {'error': 'Too many OTP requests. Please try again later.'},
-                        status=status.HTTP_429_TOO_MANY_REQUESTS
-                    )
+
                 
                 # Send OTP via Descope
                 try:
