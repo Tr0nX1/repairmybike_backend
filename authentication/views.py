@@ -530,10 +530,7 @@ class PhoneOTPRequestView(APIView):
                 # Update attempt tracker for rate limiting
                 attempt_rec.attempts_count += 1
                 attempt_rec.last_attempt = timezone.now()
-                # Block for an hour if more than 5 attempts in the last hour
-                if attempt_rec.attempts_count >= 5:
-                    attempt_rec.is_blocked = True
-                    attempt_rec.blocked_until = timezone.now() + timezone.timedelta(hours=1)
+                # Rate limiting disabled based on user request.
                 attempt_rec.save()
                 
                 return Response({
@@ -1004,12 +1001,8 @@ class EmailOTPRequestView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def _is_rate_limited(self, identifier, method):
-        """Check if identifier is rate limited"""
-        try:
-            attempt = OTPAttempt.objects.get(identifier=identifier, attempt_type=method)
-            return attempt.is_blocked_now()
-        except OTPAttempt.DoesNotExist:
-            return False
+        """Check if identifier is rate limited - Disabled by User"""
+        return False
     
     def _update_rate_limit(self, identifier, method):
         """Update rate limiting for identifier"""
@@ -1022,10 +1015,7 @@ class EmailOTPRequestView(APIView):
         attempt.attempts_count += 1
         attempt.last_attempt = timezone.now()
         
-        # Block if too many attempts
-        if attempt.attempts_count >= 5:  # Max 5 attempts per hour
-            attempt.is_blocked = True
-            attempt.blocked_until = timezone.now() + timezone.timedelta(hours=1)
+        # Rate limiting block removed based on user request.
         
         attempt.save()
 
@@ -1192,12 +1182,8 @@ class UnifiedOTPRequestView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def _is_rate_limited(self, identifier, method):
-        """Check if identifier is rate limited"""
-        try:
-            attempt = OTPAttempt.objects.get(identifier=identifier, attempt_type=method)
-            return attempt.is_blocked_now()
-        except OTPAttempt.DoesNotExist:
-            return False
+        """Check if identifier is rate limited - Disabled by user"""
+        return False
     
     def _update_rate_limit(self, identifier, method):
         """Update rate limiting for identifier"""
@@ -1210,10 +1196,7 @@ class UnifiedOTPRequestView(APIView):
         attempt.attempts_count += 1
         attempt.last_attempt = timezone.now()
         
-        # Block if too many attempts
-        if attempt.attempts_count >= 5:  # Max 5 attempts per hour
-            attempt.is_blocked = True
-            attempt.blocked_until = timezone.now() + timezone.timedelta(hours=1)
+        # Rate limiting block removed based on user request
         
         attempt.save()
 
