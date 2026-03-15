@@ -1333,8 +1333,30 @@ class UserAddressViewSet(viewsets.ModelViewSet):
         return UserAddress.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # If this is set as default, unset other defaults
-        if serializer.validated_data.get('is_default', False):
+        is_default = serializer.validated_data.get('is_default', False)
+        flat = serializer.validated_data.get('flat_house_no', '').strip()
+        pincode = serializer.validated_data.get('pincode', '').strip()
+
+        # Upsert: if an address with same flat+pincode already exists for this user, update it
+        if flat and pincode:
+            existing = UserAddress.objects.filter(
+                user=self.request.user,
+                flat_house_no__iexact=flat,
+                pincode=pincode,
+            ).first()
+            if existing:
+                # Update in place instead of creating a duplicate
+                for field, value in serializer.validated_data.items():
+                    setattr(existing, field, value)
+                existing.user = self.request.user
+                if is_default:
+                    UserAddress.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+                existing.is_default = is_default
+                existing.save()
+                return
+
+        # Default: create a new address
+        if is_default:
             UserAddress.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
         serializer.save(user=self.request.user)
 
