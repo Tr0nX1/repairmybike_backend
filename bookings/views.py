@@ -151,6 +151,40 @@ class BookingViewSet(viewsets.ModelViewSet):
             subscription=subscription,
             notes=data.get('notes', '')
         )
+
+        # Sync address to user profile if authenticated
+        if request.user.is_authenticated and data.get('address_details'):
+            from authentication.models import UserAddress
+            addr_data = data['address_details']
+            
+            # Simple check to avoid duplicates for the same user
+            existing_addr = UserAddress.objects.filter(
+                user=request.user,
+                flat_house_no=addr_data.get('flat_house_no', ''),
+                area_street=addr_data.get('area_street', ''),
+                pincode=addr_data.get('pincode', ''),
+            ).first()
+            
+            if not existing_addr:
+                # If it's a new unique address, save it to profile and make it default
+                UserAddress.objects.filter(user=request.user, is_default=True).update(is_default=False)
+                UserAddress.objects.create(
+                    user=request.user,
+                    full_name=addr_data.get('full_name', data['customer_name']),
+                    phone_number=addr_data.get('phone_number', data['customer_phone']),
+                    flat_house_no=addr_data.get('flat_house_no', ''),
+                    area_street=addr_data.get('area_street', ''),
+                    landmark=addr_data.get('landmark', ''),
+                    pincode=addr_data.get('pincode', ''),
+                    town_city=addr_data.get('town_city', ''),
+                    state=addr_data.get('state', ''),
+                    is_default=True,
+                )
+            elif not existing_addr.is_default:
+                # If address exists but is not default, make it default
+                UserAddress.objects.filter(user=request.user, is_default=True).update(is_default=False)
+                existing_addr.is_default = True
+                existing_addr.save()
         
         # Create booking services
         for service_id in data['service_ids']:
