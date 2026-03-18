@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'content',
     'quick_service',
     'feedback',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -345,6 +346,9 @@ RAZORPAY_ENABLED = config('RAZORPAY_ENABLED', default=False, cast=bool)
 
 # Staff API Key
 STAFF_API_KEY = config('STAFF_API_KEY', default='')
+
+# Firebase Configuration
+FIREBASE_CREDENTIALS_PATH = config('FIREBASE_CREDENTIALS_PATH', default=os.path.join(BASE_DIR, 'firebase_credentials.json'))
 
 # Security Settings for Production
 if not DEBUG:

@@ -1486,3 +1486,76 @@ WARNING 2026-01-22 00:38:41,457 utils 28304 10632 Dashboard metrics aggregation 
 WARNING 2026-01-22 00:39:32,431 utils 27748 17780 Dashboard metrics aggregation slow: 3196.03ms
 WARNING 2026-02-22 18:01:24,681 views 14512 32392 Failed to persist session: value too long for type character varying(500)
 
+INFO 2026-03-15 09:42:03,298 autoreload 1896 23676 Watching for file changes with StatReloader
+INFO 2026-03-15 09:42:09,361 server 1896 28064 HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+INFO 2026-03-15 09:42:09,362 server 1896 28064 Configuring endpoint tcp:port=8000:interface=127.0.0.1
+INFO 2026-03-15 09:42:09,365 server 1896 28064 Listening on TCP address 127.0.0.1:8000
+WARNING 2026-03-15 09:42:21,176 log 1896 26456 Not Found: /
+WARNING 2026-03-15 09:42:21,177 runserver 1896 28064 [33mHTTP GET / 404 [0.21, 127.0.0.1:59295][0m
+WARNING 2026-03-15 09:42:21,250 log 1896 26456 Not Found: /favicon.ico
+WARNING 2026-03-15 09:42:21,251 runserver 1896 28064 [33mHTTP GET /favicon.ico 404 [0.02, 127.0.0.1:59295][0m
+INFO 2026-03-15 09:42:29,450 runserver 1896 28064 [32mHTTP GET /admin/ 302 [3.75, 127.0.0.1:59295][0m
+INFO 2026-03-15 09:42:33,518 runserver 1896 28064 [mHTTP GET /admin/login/?next=/admin/ 200 [4.06, 127.0.0.1:59295][0m
+INFO 2026-03-15 09:42:33,913 runserver 1896 28064 [mHTTP GET /static/admin/css/base.css 200 [0.37, 127.0.0.1:59295][0m
+INFO 2026-03-15 09:42:33,938 runserver 1896 28064 [mHTTP GET /static/admin/css/nav_sidebar.css 200 [0.38, 127.0.0.1:64359][0m
+INFO 2026-03-15 09:42:33,944 runserver 1896 28064 [mHTTP GET /static/admin/css/login.css 200 [0.38, 127.0.0.1:58648][0m
+INFO 2026-03-15 09:42:33,954 runserver 1896 28064 [mHTTP GET /static/admin/css/responsive.css 200 [0.39, 127.0.0.1:56051][0m
+INFO 2026-03-15 09:42:33,955 runserver 1896 28064 [mHTTP GET /static/admin/css/dark_mode.css 200 [0.40, 127.0.0.1:60169][0m
+INFO 2026-03-15 09:42:33,963 runserver 1896 28064 [mHTTP GET /static/admin/js/nav_sidebar.js 200 [0.05, 127.0.0.1:59295][0m
+INFO 2026-03-15 09:42:33,974 runserver 1896 28064 [mHTTP GET /static/admin/js/theme.js 200 [0.41, 127.0.0.1:60207][0m
+INFO 2026-03-15 09:42:42,583 runserver 1896 28064 [mHTTP POST /admin/login/?next=/admin/ 200 [5.76, 127.0.0.1:60207][0m
+INFO 2026-03-15 09:42:59,538 runserver 1896 28064 [mHTTP POST /admin/login/?next=/admin/ 200 [5.65, 127.0.0.1:60207][0m
+INFO 2026-03-15 09:44:23,865 runserver 1896 28064 [32mHTTP POST /admin/login/?next=/admin/ 302 [8.74, 127.0.0.1:57606][0m
+INFO 2026-03-15 09:44:29,890 runserver 1896 28064 [mHTTP GET /admin/ 200 [6.02, 127.0.0.1:57606][0m
+INFO 2026-03-15 09:44:29,958 runserver 1896 28064 [mHTTP GET /static/admin/css/dashboard.css 200 [0.02, 127.0.0.1:57606][0m
+INFO 2026-03-15 09:44:30,019 runserver 1896 28064 [mHTTP GET /static/admin/img/icon-addlink.svg 200 [0.05, 127.0.0.1:57606][0m
+INFO 2026-03-15 09:44:30,020 runserver 1896 28064 [mHTTP GET /static/admin/img/icon-changelink.svg 200 [0.05, 127.0.0.1:50799][0m
+INFO 2026-03-15 09:45:43,914 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/ 200 [6.68, 127.0.0.1:49253][0m
+INFO 2026-03-15 09:45:43,998 runserver 1896 28064 [mHTTP GET /static/admin/css/changelists.css 200 [0.03, 127.0.0.1:49253][0m
+INFO 2026-03-15 09:45:44,006 runserver 1896 28064 [mHTTP GET /static/admin/css/forms.css 200 [0.03, 127.0.0.1:49671][0m
+INFO 2026-03-15 09:45:44,014 runserver 1896 28064 [mHTTP GET /static/admin/js/jquery.init.js 200 [0.04, 127.0.0.1:62196][0m
+INFO 2026-03-15 09:45:44,047 runserver 1896 28064 [mHTTP GET /static/admin/css/widgets.css 200 [0.03, 127.0.0.1:62196][0m
+INFO 2026-03-15 09:45:44,055 runserver 1896 28064 [mHTTP GET /static/admin/js/core.js 200 [0.05, 127.0.0.1:49253][0m
+INFO 2026-03-15 09:45:44,068 runserver 1896 28064 [mHTTP GET /static/admin/js/admin/RelatedObjectLookups.js 200 [0.06, 127.0.0.1:49671][0m
+INFO 2026-03-15 09:45:44,098 runserver 1896 28064 [mHTTP GET /static/admin/js/urlify.js 200 [0.04, 127.0.0.1:49253][0m
+INFO 2026-03-15 09:45:44,105 runserver 1896 28064 [mHTTP GET /static/admin/js/actions.js 200 [0.06, 127.0.0.1:62196][0m
+INFO 2026-03-15 09:45:44,117 runserver 1896 28064 [mHTTP GET /static/admin/js/prepopulate.js 200 [0.05, 127.0.0.1:49671][0m
+INFO 2026-03-15 09:45:44,118 runserver 1896 28064 [mHTTP GET /static/admin/js/vendor/jquery/jquery.js 200 [0.14, 127.0.0.1:55860][0m
+INFO 2026-03-15 09:45:44,264 runserver 1896 28064 [mHTTP GET /static/admin/js/vendor/xregexp/xregexp.js 200 [0.16, 127.0.0.1:49253][0m
+INFO 2026-03-15 09:45:44,331 runserver 1896 28064 [mHTTP GET /static/admin/js/filters.js 200 [0.04, 127.0.0.1:49253][0m
+INFO 2026-03-15 09:45:45,003 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickservicerequest/ 200 [6.48, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:45:45,084 runserver 1896 28064 [mHTTP GET /static/admin/img/search.svg 200 [0.02, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:45:49,302 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [5.33, 127.0.0.1:65223][0m
+INFO 2026-03-15 09:45:49,389 runserver 1896 28064 [mHTTP GET /static/admin/img/tooltag-add.svg 200 [0.02, 127.0.0.1:65223][0m
+INFO 2026-03-15 09:45:54,375 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [5.07, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:45:54,458 runserver 1896 28064 [mHTTP GET /static/admin/img/sorting-icons.svg 200 [0.02, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:45:54,513 runserver 1896 28064 [mHTTP GET /static/admin/img/icon-viewlink.svg 200 [0.02, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:46:38,161 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/1/change/ 200 [7.27, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:46:38,252 runserver 1896 28064 [mHTTP GET /static/admin/js/prepopulate_init.js 200 [0.04, 127.0.0.1:65223][0m
+INFO 2026-03-15 09:46:38,289 runserver 1896 28064 [mHTTP GET /static/admin/js/change_form.js 200 [0.03, 127.0.0.1:65223][0m
+INFO 2026-03-15 09:46:43,427 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [5.22, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:47:24,779 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/ 200 [6.63, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:47:30,147 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [5.32, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:47:39,998 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/add/ 200 [5.92, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:47:45,289 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [5.26, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:47:52,956 runserver 1896 28064 [32mHTTP POST /admin/quick_service/quickserviceconfig/1/change/ 302 [7.52, 127.0.0.1:53251][0m
+INFO 2026-03-15 09:48:03,351 runserver 1896 28064 [32mHTTP POST /admin/quick_service/quickserviceconfig/1/change/ 302 [7.56, 127.0.0.1:65395][0m
+INFO 2026-03-15 09:48:09,862 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/ 200 [6.51, 127.0.0.1:65395][0m
+INFO 2026-03-15 09:48:15,074 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [5.18, 127.0.0.1:65395][0m
+INFO 2026-03-15 09:48:15,148 runserver 1896 28064 [mHTTP GET /static/admin/img/icon-yes.svg 200 [0.04, 127.0.0.1:65395][0m
+INFO 2026-03-15 09:51:47,110 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/1/change/ 200 [4.73, 127.0.0.1:65270][0m
+INFO 2026-03-15 09:51:51,435 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [4.29, 127.0.0.1:65270][0m
+INFO 2026-03-15 09:58:00,512 runserver 1896 28064 [32mHTTP POST /admin/quick_service/quickserviceconfig/1/change/ 302 [6.18, 127.0.0.1:64011][0m
+INFO 2026-03-15 09:58:06,471 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/ 200 [5.95, 127.0.0.1:64011][0m
+INFO 2026-03-15 09:58:10,684 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [4.17, 127.0.0.1:64011][0m
+INFO 2026-03-15 10:11:31,850 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/1/change/ 200 [6.61, 127.0.0.1:50093][0m
+INFO 2026-03-15 10:11:37,463 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [5.57, 127.0.0.1:50093][0m
+INFO 2026-03-15 10:13:26,361 runserver 1896 28064 [32mHTTP POST /admin/quick_service/quickserviceconfig/1/change/ 302 [7.42, 127.0.0.1:57141][0m
+INFO 2026-03-15 10:13:33,191 runserver 1896 28064 [mHTTP GET /admin/quick_service/quickserviceconfig/ 200 [6.83, 127.0.0.1:57141][0m
+INFO 2026-03-15 10:13:39,515 runserver 1896 28064 [mHTTP GET /admin/jsi18n/ 200 [6.28, 127.0.0.1:57141][0m
+ERROR 2026-03-15 17:26:08,098 utils 35720 21952 Firebase credentials file not found at D:\developer\repairmybike\repairmybike_backend\firebase_credentials.json. Push notifications will not work.
+ERROR 2026-03-15 17:26:14,989 utils 16680 22772 Firebase credentials file not found at D:\developer\repairmybike\repairmybike_backend\firebase_credentials.json. Push notifications will not work.
+INFO 2026-03-18 22:05:05,090 utils 19272 18244 Firebase Admin SDK initialized successfully.
+INFO 2026-03-18 22:05:09,597 utils 7784 30548 Firebase Admin SDK initialized successfully.
+INFO 2026-03-18 22:05:26,712 utils 7540 23276 Firebase Admin SDK initialized successfully.
+INFO 2026-03-18 22:06:59,713 utils 6052 33548 Firebase Admin SDK initialized successfully.

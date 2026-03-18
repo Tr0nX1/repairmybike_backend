@@ -39,3 +39,18 @@ class SupportOption(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.get_option_type_display()})"
+
+class Policy(models.Model):
+    title = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, help_text="Used in URL (e.g., terms-and-conditions)")
+    content = models.TextField(help_text="Markdown or HTML content")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Policies"
+        ordering = ['title']
+
+    def __str__(self):
+        return self.title

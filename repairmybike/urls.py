@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/content/', include('content.urls')),
     path('api/quick-service/', include('quick_service.urls')),
     path('api/feedback/', include('feedback.urls')),
+    path('api/notifications/', include('notifications.urls')),
 ]
 
 # Serve media files in development and production (fallback)

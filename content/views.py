@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
-from .models import CarouselItem, SupportOption
-from .serializers import CarouselItemSerializer, SupportOptionSerializer
+from .models import CarouselItem, SupportOption, Policy
+from .serializers import CarouselItemSerializer, SupportOptionSerializer, PolicySerializer
 
 class CarouselItemViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -19,4 +19,14 @@ class SupportOptionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SupportOption.objects.filter(is_active=True)
     serializer_class = SupportOptionSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
+
+class PolicyViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows policies to be viewed.
+    """
+    queryset = Policy.objects.filter(is_active=True)
+    serializer_class = PolicySerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'slug'
     pagination_class = None
