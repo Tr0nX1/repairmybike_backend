@@ -16,7 +16,7 @@ psycopg2-binary==2.9.11
 
 # Caching and Background Tasks
 django-redis==6.0.0
-redis==7.0.1
+redis==5.0.8
 celery[redis]==5.4.0
 
 # Authentication and Security
