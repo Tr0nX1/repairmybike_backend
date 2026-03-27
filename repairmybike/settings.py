@@ -183,6 +183,13 @@ else:
             "BACKEND": "channels.layers.InMemoryChannelLayer",
         },
     }
+
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'Asia/Kolkata'
+USE_I18N = True
+USE_TZ = True
+
 # Celery Configuration
 CELERY_BROKER_URL = REDIS_URL or 'redis://localhost:6379/1'
 CELERY_RESULT_BACKEND = REDIS_URL or 'redis://localhost:6379/1'
@@ -213,12 +220,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
-
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'
-USE_I18N = True
-USE_TZ = True
 
 # --- Storage Configuration (Static & Media) ---
 

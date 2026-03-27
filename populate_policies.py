@@ -1,40 +1,52 @@
 import os
 import django
 
+# Set up Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'repairmybike.settings')
 django.setup()
 
 from content.models import Policy
 
-policies = [
-    {
-        'title': 'Terms & Conditions',
-        'slug': 'terms-and-conditions',
-        'content': '# Terms & Conditions\n\nWelcome to RepairMyBike. By using our services, you agree to...\n\n## 1. Usage Rules\n...\n',
-    },
-    {
-        'title': 'Privacy Policy',
-        'slug': 'privacy-policy',
-        'content': '# Privacy Policy\n\nWe value your privacy. We collect your phone number and location to...\n',
-    },
-    {
-        'title': 'Refund & Cancellation Policy',
-        'slug': 'refund-and-cancellation-policy',
-        'content': '# Refund & Cancellation Policy\n\nService bookings can be cancelled up to 2 hours before the appointment...\n',
-    },
-    {
-        'title': 'Shipping & Delivery Policy',
-        'slug': 'shipping-and-delivery-policy',
-        'content': '# Shipping & Delivery Policy\n\nSpare parts are typically delivered within 3-5 business days...\n',
-    },
-]
+# Path to the policies directory
+POLICIES_DIR = os.path.join(os.path.dirname(__file__), 'policies')
 
-for p in policies:
-    obj, created = Policy.objects.update_or_create(
-        slug=p['slug'],
-        defaults={'title': p['title'], 'content': p['content'], 'is_active': True}
-    )
-    if created:
-        print(f"Created policy: {p['title']}")
-    else:
-        print(f"Updated policy: {p['title']}")
+# Mapping of file names to (title, slug)
+policy_mapping = {
+    'terms_and_conditions.md': ('Terms & Conditions', 'terms-and-conditions'),
+    'privacy_policy.md': ('Privacy Policy', 'privacy-policy'),
+    'refund_cancellation_policy.md': ('Refund & Cancellation Policy', 'refund-and-cancellation-policy'),
+    'shipping_delivery_policy.md': ('Shipping & Delivery Policy', 'shipping-and-delivery-policy'),
+    'payment_policy.md': ('Payment Policy', 'payment-policy'),
+    'service_policy.md': ('Service Policy', 'service-policy'),
+}
+
+def populate():
+    print(f"Reading policies from: {POLICIES_DIR}")
+    
+    for filename, (title, slug) in policy_mapping.items():
+        file_path = os.path.join(POLICIES_DIR, filename)
+        
+        if not os.path.exists(file_path):
+            print(f"Warning: File not found {file_path}")
+            continue
+            
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        obj, created = Policy.objects.update_or_create(
+            slug=slug,
+            defaults={
+                'title': title,
+                'content': content,
+                'is_active': True
+            }
+        )
+        
+        if created:
+            print(f"✅ Created policy: {title} ({slug})")
+        else:
+            print(f"⏳ Updated policy: {title} ({slug})")
+
+if __name__ == '__main__':
+    populate()
+    print("\nPolicy synchronization complete.")
