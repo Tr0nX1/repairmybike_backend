@@ -108,6 +108,9 @@ class Subscription(models.Model):
     metadata = models.JSONField(default=dict, blank=True)
     # Track how many visits have been consumed in the current period
     visits_consumed = models.PositiveIntegerField(default=0)
+    # Auto-renewal tracking
+    renewed_count = models.PositiveIntegerField(default=0, help_text="Number of times this subscription has been renewed")
+    renewal_history = models.JSONField(default=list, blank=True, help_text="Audit trail of renewal events")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -139,3 +142,55 @@ class Subscription(models.Model):
         if not self.next_billing_date and self.end_date:
             self.next_billing_date = self.end_date
         super().save(*args, **kwargs)
+
+    def renew(self):
+        """
+        Renew the subscription for the next billing period.
+        Returns True if renewed, False otherwise.
+        """
+        if self.status != 'active' or not self.auto_renew:
+            return False
+
+        old_end = self.end_date
+        old_start = self.start_date
+
+        # Set new period
+        self.start_date = old_end or timezone.now()
+        self.end_date = self.compute_end_date()
+        self.next_billing_date = self.end_date
+        self.visits_consumed = 0
+        self.renewed_count += 1
+
+        # Record in history
+        history_entry = {
+            'renewed_at': timezone.now().isoformat(),
+            'renewal_number': self.renewed_count,
+            'old_start': old_start.isoformat() if old_start else None,
+            'old_end': old_end.isoformat() if old_end else None,
+            'new_start': self.start_date.isoformat(),
+            'new_end': self.end_date.isoformat() if self.end_date else None,
+            'plan_name': self.plan.name,
+            'plan_price': str(self.plan.discount_price or self.plan.price),
+        }
+        if not isinstance(self.renewal_history, list):
+            self.renewal_history = []
+        self.renewal_history.append(history_entry)
+
+        self.save()
+        return True
+
+    @property
+    def is_due_for_renewal(self):
+        """Check if subscription is due for renewal."""
+        if not self.auto_renew or self.status != 'active':
+            return False
+        if not self.next_billing_date:
+            return False
+        return self.next_billing_date <= timezone.now()
+
+    @property
+    def is_expired(self):
+        """Check if subscription has passed its end date."""
+        if not self.end_date:
+            return False
+        return self.end_date <= timezone.now()

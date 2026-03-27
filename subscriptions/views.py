@@ -118,3 +118,51 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         sub.auto_renew = False
         sub.save(update_fields=["status", "auto_renew", "updated_at"])
         return Response({"status": "canceled"}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="toggle-auto-renew")
+    def toggle_auto_renew(self, request, pk=None):
+        """Toggle auto-renewal for a subscription."""
+        sub = self.get_object()
+        
+        if sub.status in ("canceled", "expired"):
+            return Response(
+                {"error": True, "message": "Cannot toggle auto-renew for canceled/expired subscriptions"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        sub.auto_renew = not sub.auto_renew
+        # Clear renewal reminder flag when toggling
+        if isinstance(sub.metadata, dict):
+            sub.metadata.pop('renewal_reminder_sent', None)
+        sub.save(update_fields=["auto_renew", "metadata", "updated_at"])
+        
+        return Response({
+            "error": False,
+            "message": f"Auto-renewal {'enabled' if sub.auto_renew else 'disabled'}",
+            "data": {"auto_renew": sub.auto_renew}
+        })
+
+    @action(detail=True, methods=["get"], url_path="renewal-status")
+    def renewal_status(self, request, pk=None):
+        """Get renewal history and status for a subscription."""
+        sub = self.get_object()
+        
+        from django.utils import timezone as tz
+        days_remaining = None
+        if sub.end_date:
+            delta = sub.end_date - tz.now()
+            days_remaining = max(0, delta.days)
+        
+        return Response({
+            "error": False,
+            "message": "Renewal status retrieved",
+            "data": {
+                "auto_renew": sub.auto_renew,
+                "status": sub.status,
+                "end_date": sub.end_date,
+                "next_billing_date": sub.next_billing_date,
+                "days_remaining": days_remaining,
+                "renewed_count": sub.renewed_count,
+                "renewal_history": sub.renewal_history or [],
+            }
+        })

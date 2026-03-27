@@ -1559,3 +1559,34 @@ INFO 2026-03-18 22:05:05,090 utils 19272 18244 Firebase Admin SDK initialized su
 INFO 2026-03-18 22:05:09,597 utils 7784 30548 Firebase Admin SDK initialized successfully.
 INFO 2026-03-18 22:05:26,712 utils 7540 23276 Firebase Admin SDK initialized successfully.
 INFO 2026-03-18 22:06:59,713 utils 6052 33548 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 13:07:47,917 utils 15668 34144 Firebase Admin SDK initialized successfully.
+ERROR 2026-03-19 13:07:54,414 utils 15668 34144 Failed to send email: emails/booking_confirmation.html
+INFO 2026-03-19 13:09:00,446 utils 20812 32424 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 13:09:26,821 utils 20812 32424 Email sent successfully: Booking Confirmed: #3 - RepairMyBike to ['lali420sh@gmail.com']
+INFO 2026-03-19 13:10:18,902 utils 9508 23064 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 13:10:26,508 utils 9508 23064 Email sent successfully: Booking Confirmed: #4 - RepairMyBike to ['lali420sh@gmail.com']
+INFO 2026-03-19 13:16:45,218 utils 10976 11996 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 13:19:37,218 utils 4000 30760 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 13:20:38,337 utils 36540 6100 Firebase Admin SDK initialized successfully.
+ERROR 2026-03-19 13:20:43,417 utils 36540 6100 Error sending push notification: module 'firebase_admin.messaging' has no attribute 'send_multicast'
+INFO 2026-03-19 13:21:27,629 utils 27784 5196 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 13:21:34,041 utils 27784 5196 Sent push notification: Test from Antigravity to 0 devices.
+INFO 2026-03-19 14:17:46,098 utils 26492 24408 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:18:31,069 utils 16668 8816 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:18:37,604 utils 16668 8816 Sent push notification: Hello from RepairMyBike! to 0 devices.
+INFO 2026-03-19 14:18:54,029 utils 2696 30572 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:19:49,848 utils 14964 33272 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:20:01,767 utils 24440 18220 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:21:24,237 utils 35308 15908 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:21:38,220 utils 14484 18840 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:21:44,839 utils 14484 18840 Sent push notification: Yay! Notifications Working to 1 devices.
+INFO 2026-03-19 14:39:33,028 utils 32888 20696 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:40:10,557 utils 29240 29336 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:42:30,143 utils 12032 9572 Firebase Admin SDK initialized successfully.
+INFO 2026-03-19 14:42:37,097 utils 12032 9572 Sent push notification: Hello Mahir! to 1 devices.
+INFO 2026-03-25 22:09:32,845 utils 31120 10616 Firebase Admin SDK initialized successfully.
+INFO 2026-03-25 22:13:38,279 utils 37212 10068 Firebase Admin SDK initialized successfully.
+INFO 2026-03-25 22:15:50,123 utils 37700 29464 Firebase Admin SDK initialized successfully.
+INFO 2026-03-25 22:19:25,391 utils 10908 23604 Firebase Admin SDK initialized successfully.
+INFO 2026-03-25 22:20:42,244 utils 19112 33276 Firebase Admin SDK initialized successfully.
+INFO 2026-03-25 22:22:52,719 utils 2788 14720 Firebase Admin SDK initialized successfully.

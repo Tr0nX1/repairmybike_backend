@@ -1,0 +1,40 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+    <h2>Order Confirmation</h2>
+    <p>Hello <span class="highlight">{{ customer_name }}</span>,</p>
+    <p>Your order for bike spare parts has been successfully placed. Here is a summary of your purchase:</p>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price }}</td>
+            </tr>
+            {% endfor %}
+            <tr style="background: #f9f9f9; font-weight: bold;">
+                <td colspan="2">Total Amount</td>
+                <td>₹{{ total_amount }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="background: #fff3e0; padding: 15px; border-radius: 4px; margin: 20px 0;">
+        <p><strong>Order ID:</strong> #{{ order_id }}</p>
+        <p><strong>Delivery Address:</strong> {{ shipping_address }}</p>
+        <p><strong>Estimated Delivery:</strong> {{ estimated_delivery }}</p>
+    </div>
+
+    <p>We will notify you once your order is shipped with a tracking number.</p>
+    
+    <a href="https://repairmybike.in/orders/{{ order_id }}" class="button">Track Order</a>
+{% endblock %}

@@ -45,4 +45,5 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
-*.swo
+# Firebase
+repairmybike-1fc07-firebase-adminsdk-fbsvc-a155be564a.json

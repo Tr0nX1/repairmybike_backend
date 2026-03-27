@@ -26,6 +26,7 @@ from .serializers import (
     CartSerializer,
     CartAddItemSerializer,
     OrderSerializer,
+    ShipmentUpdateSerializer,
     CheckoutSerializer,
     BuyNowSerializer,
     UserSavedPartSerializer,
@@ -272,6 +273,10 @@ class CartViewSet(viewsets.ViewSet):
             item.spare_part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
 
         cart.items.all().delete()
+        
+        # Send confirmation email
+        from notifications.utils import EmailService
+        EmailService.send_order_confirmation(order)
 
         order_serializer = OrderSerializer(order)
         return Response({'error': False, 'message': 'Checkout successful. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)
@@ -323,6 +328,10 @@ class CartViewSet(viewsets.ViewSet):
             part.in_stock = False
             part.stock_qty = 0
         part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+        
+        # Send confirmation email
+        from notifications.utils import EmailService
+        EmailService.send_order_confirmation(order)
 
         order_serializer = OrderSerializer(order)
         return Response({'error': False, 'message': 'Order created. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)
@@ -384,6 +393,32 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
         instance.save()
         
         return Response({'success': True, 'message': 'Order cancelled successfully'})
+
+    @action(detail=True, methods=['get'])
+    def track(self, request, pk=None):
+        """
+        Get tracking info and shipment updates for an order.
+        """
+        instance = self.get_object()
+        
+        updates = instance.shipment_updates.all()
+        serializer = ShipmentUpdateSerializer(updates, many=True)
+        
+        return Response({
+            'error': False,
+            'message': 'Tracking info retrieved successfully',
+            'data': {
+                'id': instance.id,
+                'status': instance.status,
+                'courier_name': instance.courier_name,
+                'tracking_number': instance.tracking_number,
+                'courier_tracking_url': instance.courier_tracking_url,
+                'estimated_delivery': instance.estimated_delivery,
+                'shipped_at': instance.shipped_at,
+                'delivered_at': instance.delivered_at,
+                'shipment_updates': serializer.data
+            }
+        })
 
 
 class SavedPartViewSet(viewsets.ModelViewSet):

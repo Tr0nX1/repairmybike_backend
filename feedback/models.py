@@ -55,3 +55,41 @@ class ReviewPhoto(models.Model):
 
     class Meta:
         db_table = 'review_photos'
+
+
+class IssueTicket(models.Model):
+    STATUS_CHOICES = [
+        ('open', 'Open'),
+        ('investigating', 'Investigating'),
+        ('resolved', 'Resolved'),
+        ('closed', 'Closed'),
+    ]
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets')
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
+    order = models.ForeignKey('spare_parts.Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
+    
+    subject = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open', db_index=True)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium', db_index=True)
+    
+    internal_notes = models.TextField(blank=True, help_text="Notes for staff/admins")
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets')
+    
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'issue_tickets'
+        ordering = ['-priority', '-created_at']
+
+    def __str__(self):
+        return f"Ticket #{self.id} - {self.subject} ({self.status})"

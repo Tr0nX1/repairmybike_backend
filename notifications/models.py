@@ -50,3 +50,33 @@ class NotificationLog(models.Model):
 
     def __str__(self):
         return f"Notification to {self.user} at {self.sent_at}"
+
+class WhatsAppMessage(models.Model):
+    STATUS_CHOICES = [
+        ('sent', 'Sent'),
+        ('delivered', 'Delivered'),
+        ('read', 'Read'),
+        ('failed', 'Failed'),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='whatsapp_messages'
+    )
+    phone_number = models.CharField(max_length=20)
+    message_text = models.TextField()
+    kapso_message_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='sent')
+    error_message = models.TextField(null=True, blank=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'whatsapp_messages'
+        ordering = ['-sent_at']
+
+    def __str__(self):
+        return f"WhatsApp to {self.phone_number} - {self.status}"

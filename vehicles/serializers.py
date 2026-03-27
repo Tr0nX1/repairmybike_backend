@@ -83,5 +83,21 @@ class UserVehicleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserVehicle
-        fields = ['id', 'vehicle_model_id', 'vehicle_model_details', 'registration_number', 'is_default', 'created_at', 'updated_at']
+        fields = [
+            'id', 'vehicle_model_id', 'vehicle_model_details', 'registration_number', 
+            'is_default', 'last_service_date', 'current_odometer', 'created_at', 'updated_at'
+        ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class VehicleHistorySerializer(serializers.Serializer):
+    """Simple serializer for booking history entries."""
+    id = serializers.IntegerField()
+    appointment_date = serializers.DateField()
+    booking_status = serializers.CharField()
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    odometer_reading = serializers.IntegerField()
+    service_names = serializers.SerializerMethodField()
+
+    def get_service_names(self, obj):
+        return [bs.service.name for bs in obj.booking_services.all()]

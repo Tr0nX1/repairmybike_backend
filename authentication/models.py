@@ -12,8 +12,35 @@ class User(AbstractUser):
     is_verified = models.BooleanField(default=False)
     is_phone_verified = models.BooleanField(default=False)
     default_vehicle = models.ForeignKey('vehicles.VehicleModel', on_delete=models.SET_NULL, null=True, blank=True, related_name='users_default')
+    
+    # CRM Fields
+    internal_notes = models.TextField(blank=True, help_text="Administrative notes about this user")
+    total_ltv = models.DecimalField(max_digits=12, decimal_places=2, default=0, help_text="Lifetime value (total spend)")
+    loyalty_points = models.PositiveIntegerField(default=0, help_text="Current balance of rewards points")
+    
+    # Referral Fields
+    referral_code = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals')
+    
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.referral_code:
+            # Generate a unique referral code
+            import string
+            import random
+            chars = string.ascii_uppercase + string.digits
+            code = ''.join(random.choices(chars, k=8))
+            # Ensure uniqueness
+            while User.objects.filter(referral_code=code).exists():
+                code = ''.join(random.choices(chars, k=8))
+            self.referral_code = code
+        super().save(*args, **kwargs)
+
+    @property
+    def is_high_value(self):
+        return self.total_ltv > 5000 # Example threshold in INR
     
     def __str__(self):
         full_name = f"{self.first_name} {self.last_name}".strip()
@@ -150,20 +177,25 @@ class OTPAttempt(models.Model):
 class StaffDirectory(models.Model):
     """Pre-provisioned staff directory to allow login without manual registration."""
     identifier = models.CharField(max_length=255, unique=True)  # email or phone
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='staff_profile')
     name = models.CharField(max_length=255, blank=True, null=True)
     employee_id = models.CharField(max_length=100, blank=True, null=True)
     role = models.CharField(max_length=100, blank=True, null=True)
+    skills = models.JSONField(default=list, blank=True, help_text="List of service categories or specific skills")
+    is_available = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name_plural = "Staff Directory"
         indexes = [
             models.Index(fields=["identifier", "is_active"]),
+            models.Index(fields=["is_available"]),
         ]
 
     def __str__(self):
-        return f"{self.identifier} ({'active' if self.is_active else 'inactive'})"
+        return f"{self.name or self.identifier} ({self.role})"
 
 
 class GuestSession(models.Model):
@@ -197,3 +229,30 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"Message from {self.name} - {self.email}"
+
+
+class LoyaltyTransaction(models.Model):
+    """Track points earned and redeemed by users"""
+    TRANSACTION_TYPE_CHOICES = [
+        ('earned', 'Earned'),
+        ('redeemed', 'Redeemed'),
+        ('expired', 'Expired'),
+        ('refunded', 'Refunded'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='loyalty_transactions')
+    points = models.IntegerField()  # positive for earned, negative for redeemed
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
+    description = models.CharField(max_length=255)
+    
+    # Optional links to reference the source
+    booking = models.ForeignKey('bookings.Booking', on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey('spare_parts.Order', on_delete=models.SET_NULL, null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.phone_number} - {self.points} pts ({self.transaction_type})"

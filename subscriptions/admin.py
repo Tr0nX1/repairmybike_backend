@@ -45,10 +45,10 @@ class PlanAdmin(ImagePreviewMixin, admin.ModelAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ("plan", "user", "contact_email", "status", "start_date", "end_date", "auto_renew")
+    list_display = ("plan", "user", "contact_email", "status", "start_date", "end_date", "auto_renew", "renewed_count")
     list_filter = ("status", "auto_renew")
     search_fields = ("contact_email", "plan__name")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at", "renewed_count", "renewal_history")
     
     fieldsets = (
         (None, {
@@ -62,6 +62,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
         }),
         ('Usage Tracking', {
             'fields': ('visits_consumed',)
+        }),
+        ('Renewal Tracking', {
+            'fields': ('renewed_count', 'renewal_history'),
+            'description': 'Auto-renewal audit trail.'
         }),
         ('Technical Details', {
             'classes': ('collapse',),

@@ -12,6 +12,7 @@ from .models import (
     OrderItem,
     UserSavedPart,
     GuestSavedPart,
+    ShipmentUpdate,
 )
 # Removed build_absolute_media_url - using storage backend directly
 
@@ -218,19 +219,34 @@ class OrderItemSerializer(serializers.ModelSerializer):
             return None
 
 
+class ShipmentUpdateSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True, default='')
+
+    class Meta:
+        model = ShipmentUpdate
+        fields = ['id', 'status', 'location', 'note', 'timestamp', 'created_by_name', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
+    shipment_updates = ShipmentUpdateSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
         fields = [
             'id', 'session_id', 'user', 'customer_name', 'phone', 'address',
             'amount_total', 'currency', 'payment_method', 'payment_status',
-            'status', 'items', 'tracking_number', 'courier_name',
+            'status', 'items', 'shipment_updates',
+            'tracking_number', 'courier_name', 'courier_tracking_url',
             'shipping_method', 'address_details',
-            'estimated_delivery', 'delivered_at', 'created_at', 'updated_at'
+            'estimated_delivery', 'shipped_at', 'delivered_at', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'user', 'amount_total', 'currency', 'payment_method', 'payment_status', 'status', 'created_at', 'updated_at']
+        read_only_fields = [
+            'id', 'user', 'amount_total', 'currency', 'payment_method', 
+            'payment_status', 'status', 'created_at', 'updated_at',
+            'shipped_at', 'delivered_at'
+        ]
 
 
 class CheckoutSerializer(serializers.Serializer):

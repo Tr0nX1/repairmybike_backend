@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'quick_service',
     'feedback',
     'notifications',
+    'promotions',
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,7 @@ ROOT_URLCONF = 'repairmybike.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -182,7 +183,28 @@ else:
             "BACKEND": "channels.layers.InMemoryChannelLayer",
         },
     }
-    print("✓ Configured In-Memory Channel Layer (no REDIS_URL)")
+# Celery Configuration
+CELERY_BROKER_URL = REDIS_URL or 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND = REDIS_URL or 'redis://localhost:6379/1'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+
+# Celery Beat Schedule
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'process-subscription-renewals-every-6-hours': {
+        'task': 'subscriptions.tasks.process_subscription_renewals_task',
+        'schedule': crontab(hour='0,6,12,18', minute='0'),
+    },
+    'send-periodic-service-reminders-daily': {
+        'task': 'notifications.tasks.send_periodic_service_reminders',
+        'schedule': crontab(hour='10', minute='0'),
+    },
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -347,6 +369,11 @@ RAZORPAY_ENABLED = config('RAZORPAY_ENABLED', default=False, cast=bool)
 # Staff API Key
 STAFF_API_KEY = config('STAFF_API_KEY', default='')
 
+# Kapso Configuration (WhatsApp)
+KAPSO_API_KEY = config('KAPSO_API_KEY', default='')
+KAPSO_PHONE_NUMBER_ID = config('KAPSO_PHONE_NUMBER_ID', default='')
+KAPSO_BASE_URL = config('KAPSO_BASE_URL', default='https://api.kapso.ai/v1/meta/whatsapp')
+
 # Firebase Configuration
 FIREBASE_CREDENTIALS_PATH = config('FIREBASE_CREDENTIALS_PATH', default=os.path.join(BASE_DIR, 'firebase_credentials.json'))
 
@@ -410,3 +437,16 @@ LOGGING = {
 
 # WhiteNoise Configuration removed (consolidated in STORAGES)
 
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.hostinger.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'rajeshkumar@repairmybike.in'
+EMAIL_HOST_PASSWORD = 'YesIDevelop@mail8989'
+
+DEFAULT_FROM_EMAIL = 'rajeshkumar@repairmybike.in'

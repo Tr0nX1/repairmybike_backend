@@ -13,6 +13,7 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 import dashboard.routing
+import bookings.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'repairmybike.settings')
 
@@ -20,7 +21,8 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter(
-            dashboard.routing.websocket_urlpatterns
+            dashboard.routing.websocket_urlpatterns + 
+            bookings.routing.websocket_urlpatterns
         )
     ),
 })

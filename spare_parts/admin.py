@@ -12,6 +12,7 @@ from .models import (
     CartItem,
     Order,
     OrderItem,
+    ShipmentUpdate,
 )
 
 
@@ -95,6 +96,12 @@ class OrderItemInline(admin.TabularInline):
         return obj.total_price
 
 
+class ShipmentUpdateInline(admin.TabularInline):
+    model = ShipmentUpdate
+    extra = 0
+    readonly_fields = ('created_at',)
+
+
 @admin.register(Order)
 class OrderAdmin(StatusColorMixin, admin.ModelAdmin):
     list_display = (
@@ -109,8 +116,8 @@ class OrderAdmin(StatusColorMixin, admin.ModelAdmin):
     list_filter = ("payment_status", "status", "created_at")
     search_fields = ("customer_name", "phone", "session_id")
     readonly_fields = ("created_at", "updated_at")
-    inlines = [OrderItemInline]
-    actions = ['mark_as_paid', 'mark_as_dispatched']
+    inlines = [OrderItemInline, ShipmentUpdateInline]
+    actions = ['mark_as_paid', 'mark_as_shipped']
 
     def payment_status_display(self, obj):
         return self.colored_status(obj, 'payment_status')
@@ -125,13 +132,41 @@ class OrderAdmin(StatusColorMixin, admin.ModelAdmin):
         self.message_user(request, f"{rows_updated} orders marked as paid.")
     mark_as_paid.short_description = "Mark selected orders as Paid"
 
-    def mark_as_dispatched(self, request, queryset):
-        rows_updated = queryset.update(status='dispatched')
-        self.message_user(request, f"{rows_updated} orders marked as Dispatched.")
-    mark_as_dispatched.short_description = "Mark selected orders as Dispatched"
+    def mark_as_shipped(self, request, queryset):
+        rows_updated = queryset.update(status='shipped')
+        self.message_user(request, f"{rows_updated} orders marked as Shipped.")
+    mark_as_shipped.short_description = "Mark selected orders as Shipped"
+
+    fieldsets = (
+        (None, {
+            'fields': ('session_id', 'user', 'customer_name', 'phone', 'address', 'amount_total')
+        }),
+        ('Status', {
+            'fields': ('status', 'payment_status', 'payment_method')
+        }),
+        ('Shipping & Tracking', {
+            'fields': (
+                'shipping_method', 'address_details', 
+                'tracking_number', 'courier_name', 'courier_tracking_url',
+                'estimated_delivery', 'shipped_at', 'delivered_at'
+            )
+        }),
+        ('Important Dates', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+
+@admin.register(ShipmentUpdate)
+class ShipmentUpdateAdmin(admin.ModelAdmin):
+    list_display = ('id', 'order', 'status', 'location', 'timestamp', 'created_by')
+    list_filter = ('status', 'timestamp')
+    search_fields = ('order__id', 'location', 'note')
+    readonly_fields = ('created_at',)
 
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ("id", "order", "spare_part", "quantity", "unit_price")
     list_filter = ("spare_part",)
+

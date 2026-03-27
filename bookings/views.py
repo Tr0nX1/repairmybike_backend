@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.db import transaction
+from django.db import transaction, models
 from django.shortcuts import get_object_or_404
 from .models import Customer, Booking, BookingService
 from .serializers import (
@@ -11,6 +11,7 @@ from .serializers import (
 from services.models import ServicePricing
 from vehicles.models import VehicleModel
 from subscriptions.models import Subscription
+from promotions.models import Coupon, CouponUsage
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -137,6 +138,46 @@ class BookingViewSet(viewsets.ModelViewSet):
                     'message': 'No subscription visits remaining'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Optional Coupon Validation
+        coupon = None
+        discount_amount = 0
+        if data.get('coupon_code'):
+            try:
+                coupon = Coupon.objects.get(code__iexact=data['coupon_code'])
+                is_valid, error_msg = coupon.is_valid(user=request.user if request.user.is_authenticated else None, amount=float(total_amount))
+                if not is_valid:
+                    return Response({'error': True, 'message': error_msg}, status=status.HTTP_400_BAD_REQUEST)
+                
+                discount_amount = coupon.calculate_discount(float(total_amount))
+            except Coupon.DoesNotExist:
+                return Response({'error': True, 'message': 'Invalid coupon code'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Optional Loyalty Points Redemption (1 point = 1 INR)
+        loyalty_discount = 0
+        points_to_redeem = 0
+        if data.get('use_loyalty_points') and request.user.is_authenticated:
+            user = request.user
+            if user.loyalty_points > 0:
+                # Can redeem up to the total amount remaining after coupon
+                max_redeemable = float(total_amount) - float(discount_amount)
+                points_to_redeem = min(user.loyalty_points, int(max_redeemable))
+                loyalty_discount = float(points_to_redeem)
+                
+                if points_to_redeem > 0:
+                    from authentication.models import LoyaltyTransaction
+                    with transaction.atomic():
+                        # Record redemption transaction
+                        LoyaltyTransaction.objects.create(
+                            user=user,
+                            points=-points_to_redeem,
+                            transaction_type='redeemed',
+                            description=f"Points redeemed for Booking",
+                            # booking will be linked after creation
+                        )
+                        # Update user balance
+                        user.loyalty_points -= points_to_redeem
+                        user.save(update_fields=['loyalty_points', 'updated_at'])
+
         # Create booking
         booking = Booking.objects.create(
             customer=customer,
@@ -146,11 +187,32 @@ class BookingViewSet(viewsets.ModelViewSet):
             address_details=data.get('address_details'),
             appointment_date=data['appointment_date'],
             appointment_time=data['appointment_time'],
-            total_amount=total_amount,
+            total_amount=float(total_amount) - float(discount_amount) - float(loyalty_discount),
+            discount_amount=float(discount_amount) + float(loyalty_discount),
+            applied_coupon=coupon,
             payment_method=data.get('payment_method', 'cash'),
             subscription=subscription,
-            notes=data.get('notes', '')
+            notes=data.get('notes', f"Loyalty points used: {points_to_redeem}" if points_to_redeem else '')
         )
+        
+        # Link transaction to booking
+        if points_to_redeem:
+            LoyaltyTransaction.objects.filter(
+                user=request.user, 
+                booking__isnull=True, 
+                transaction_type='redeemed'
+            ).order_by('-created_at').first().update(booking=booking)
+        
+        # If coupon used, record usage and increment count
+        if coupon:
+            CouponUsage.objects.create(
+                coupon=coupon,
+                user=request.user if request.user.is_authenticated else None,
+                booking=booking,
+                discount_applied=discount_amount
+            )
+            coupon.usage_count += 1
+            coupon.save()
 
         # Sync address to user profile if authenticated
         if request.user.is_authenticated and data.get('address_details'):
@@ -202,8 +264,43 @@ class BookingViewSet(viewsets.ModelViewSet):
         
         response_serializer = BookingDetailSerializer(booking)
         
+        # Send confirmation email
+        from notifications.utils import EmailService
+        EmailService.send_booking_confirmation(booking)
+        
         return Response({
             'error': False,
             'message': 'Booking created successfully',
             'data': response_serializer.data
         }, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'])
+    def live_location(self, request, pk=None):
+        """Update and broadcast mechanic's live location."""
+        booking = self.get_object()
+        lat = request.data.get('lat')
+        lng = request.data.get('lng')
+        
+        if not lat or not lng:
+            return Response({'error': True, 'message': 'lat and lng are required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Broadcast to WebSocket
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        from django.utils import timezone
+        
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'tracking_{booking.id}',
+            {
+                'type': 'tracking_message',
+                'message': {
+                    'booking_id': booking.id,
+                    'lat': float(lat),
+                    'lng': float(lng),
+                    'timestamp': timezone.now().isoformat()
+                }
+            }
+        )
+        
+        return Response({'error': False, 'message': 'Location broadcasted'})

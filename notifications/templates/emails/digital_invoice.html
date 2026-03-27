@@ -1,0 +1,50 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+    <h2>Tax Invoice</h2>
+    <p>Dear <span class="highlight">{{ customer_name }}</span>,</p>
+    <p>Your bike service has been completed successfully. Please find the details of your invoice below.</p>
+    
+    <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; margin: 20px 0; font-size: 14px;">
+        <p><strong>Invoice No:</strong> INV-{{ booking_id }}-{{ timestamp_suffix }}</p>
+        <p><strong>Date:</strong> {{ date }}</p>
+        <p><strong>Vehicle:</strong> {{ vehicle_model }}</p>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Service / Part</th>
+                <th>Qty</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in services %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>1</td>
+                <td>₹{{ item.price }}</td>
+            </tr>
+            {% endfor %}
+            <tr style="border-top: 2px solid #1a237e; font-weight: bold;">
+                <td colspan="2">Subtotal</td>
+                <td>₹{{ subtotal }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">GST (Included)</td>
+                <td>-</td>
+            </tr>
+            <tr style="background: #e8eaf6; font-size: 18px; font-weight: bold;">
+                <td colspan="2">Grand Total</td>
+                <td>₹{{ total_amount }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>Payment Status:</strong> <span style="color: #2e7d32; font-weight: bold;">{{ payment_status|upper }}</span></p>
+
+    <p>Thank you for trusting **RepairMyBike**. We hope your ride is now smoother and safer!</p>
+    
+    <a href="https://repairmybike.in/feedback/{{ booking_id }}" class="button">Rate Our Service</a>
+{% endblock %}

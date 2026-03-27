@@ -6,8 +6,10 @@ from .serializers import (
     VehicleTypeSerializer, 
     VehicleBrandSerializer, 
     VehicleModelSerializer,
-    UserVehicleSerializer
+    UserVehicleSerializer,
+    VehicleHistorySerializer
 )
+from rest_framework.decorators import action
 
 
 class VehicleTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -127,3 +129,35 @@ class UserVehicleViewSet(viewsets.ModelViewSet):
         if serializer.validated_data.get('is_default', False):
             UserVehicle.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
         serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['get'])
+    def history(self, request, pk=None):
+        """Get service history for this specific vehicle."""
+        vehicle = self.get_object()
+        history_queryset = vehicle.get_history()
+        serializer = VehicleHistorySerializer(history_queryset, many=True)
+        return Response({
+            'error': False,
+            'message': 'Vehicle history retrieved successfully',
+            'data': serializer.data
+        })
+
+    @action(detail=True, methods=['get'])
+    def stats(self, request, pk=None):
+        """Get maintenance statistics for this vehicle."""
+        vehicle = self.get_object()
+        history = vehicle.get_history()
+        
+        total_services = history.count()
+        total_spent = sum(h.total_amount for h in history)
+        
+        return Response({
+            'error': False,
+            'message': 'Vehicle stats retrieved successfully',
+            'data': {
+                'total_services': total_services,
+                'total_spent': float(total_spent),
+                'last_service': vehicle.last_service_date,
+                'current_odometer': vehicle.current_odometer,
+            }
+        })

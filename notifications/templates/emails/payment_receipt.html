@@ -1,0 +1,31 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+    <h2>Payment Receipt</h2>
+    <p>Hi <span class="highlight">{{ customer_name }}</span>,</p>
+    <p>We have successfully received your payment for Booking #{{ booking_id }}.</p>
+    
+    <div style="border: 2px dashed #eee; padding: 20px; text-align: center; margin: 20px 0;">
+        <p style="font-size: 24px; color: #2e7d32; font-weight: bold; margin: 0;">₹{{ amount }}</p>
+        <p style="color: #666; margin: 5px 0 0 0;">Transaction Successful</p>
+    </div>
+
+    <table class="table">
+        <tr>
+            <td><strong>Payment ID</strong></td>
+            <td>{{ razorpay_payment_id }}</td>
+        </tr>
+        <tr>
+            <td><strong>Order ID</strong></td>
+            <td>{{ razorpay_order_id }}</td>
+        </tr>
+        <tr>
+            <td><strong>Date & Time</strong></td>
+            <td>{{ timestamp }}</td>
+        </tr>
+    </table>
+
+    <p>Thank you for using **RepairMyBike** digital payments.</p>
+    
+    <a href="https://repairmybike.in/invoice/{{ booking_id }}" class="button">Download Invoice</a>
+{% endblock %}

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from vehicles.models import VehicleModel, VehicleBrand, VehicleType
 
 
@@ -149,8 +150,13 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ('created', 'Created'),
         ('confirmed', 'Confirmed'),
+        ('processing', 'Processing'),
+        ('shipped', 'Shipped'),
+        ('out_for_delivery', 'Out For Delivery'),
+        ('delivered', 'Delivered'),
         ('fulfilled', 'Fulfilled'),
         ('cancelled', 'Cancelled'),
+        ('returned', 'Returned'),
     ]
 
     session_id = models.CharField(max_length=64, db_index=True)
@@ -169,11 +175,14 @@ class Order(models.Model):
     address_details = models.JSONField(blank=True, null=True, help_text="Structured address data")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Shipping & tracking fields
     tracking_number = models.CharField(max_length=100, null=True, blank=True)
     courier_name = models.CharField(max_length=100, null=True, blank=True)
+    courier_tracking_url = models.URLField(max_length=500, null=True, blank=True, help_text="Direct URL to courier tracking page")
     estimated_delivery = models.DateTimeField(null=True, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True)
     delivered_at = models.DateTimeField(null=True, blank=True)
-
 
     class Meta:
         db_table = 'spare_part_orders'
@@ -181,6 +190,37 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} ({self.session_id})"
+
+    @property
+    def is_cancellable(self):
+        """Orders can only be cancelled before shipping."""
+        return self.status in ('created', 'confirmed', 'processing')
+
+    @property
+    def is_trackable(self):
+        """Orders are trackable once shipped."""
+        return self.status in ('shipped', 'out_for_delivery', 'delivered')
+
+
+class ShipmentUpdate(models.Model):
+    """Tracks individual shipping status updates for an order."""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='shipment_updates')
+    status = models.CharField(max_length=50)
+    location = models.CharField(max_length=200, blank=True, help_text="City or hub location")
+    note = models.TextField(blank=True, help_text="Description of the update")
+    timestamp = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        help_text="Staff member who added this update"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'shipment_updates'
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"Order #{self.order_id} - {self.status} at {self.timestamp.strftime('%d %b %H:%M')}"
 
 
 class OrderItem(models.Model):

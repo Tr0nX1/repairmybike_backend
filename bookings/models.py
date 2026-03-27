@@ -1,8 +1,11 @@
 from django.db import models
+from django.conf import settings
 from django.core.validators import RegexValidator
 from vehicles.models import VehicleModel
 from services.models import Service
 from subscriptions.models import Subscription
+
+from authentication.models import StaffDirectory
 
 
 phone_regex = RegexValidator(
@@ -15,6 +18,11 @@ class Customer(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(validators=[phone_regex], max_length=17, unique=True)
     email = models.EmailField(blank=True, null=True)
+    
+    # Management Fields
+    internal_notes = models.TextField(blank=True, help_text="Administrative notes for staff")
+    total_spent = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -45,6 +53,7 @@ class Booking(models.Model):
     BOOKING_STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('confirmed', 'Confirmed'),
+        ('assigned', 'Staff Assigned'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
@@ -52,12 +61,17 @@ class Booking(models.Model):
     
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='bookings')
     vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.CASCADE, related_name='bookings')
+    user_vehicle = models.ForeignKey('vehicles.UserVehicle', on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
+    assigned_staff = models.ForeignKey(StaffDirectory, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_bookings')
     service_location = models.CharField(max_length=10, choices=SERVICE_LOCATION_CHOICES)
     address = models.TextField(blank=True, null=True)
     address_details = models.JSONField(blank=True, null=True, help_text="Structured address data")
     appointment_date = models.DateField(db_index=True)
     appointment_time = models.TimeField()
+    odometer_reading = models.PositiveIntegerField(null=True, blank=True, help_text="Vehicle odometer at time of service")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    applied_coupon = models.ForeignKey('promotions.Coupon', on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='cash')
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='pending', db_index=True)
     booking_status = models.CharField(max_length=15, choices=BOOKING_STATUS_CHOICES, default='pending', db_index=True)
@@ -88,3 +102,20 @@ class BookingService(models.Model):
     
     def __str__(self):
         return f"{self.booking.id} - {self.service.name}"
+
+
+class BookingStatusUpdate(models.Model):
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='status_history')
+    status = models.CharField(max_length=20)
+    note = models.TextField(blank=True, null=True)
+    location_lat = models.DecimalField(max_digits=12, decimal_places=9, null=True, blank=True)
+    location_lng = models.DecimalField(max_digits=12, decimal_places=9, null=True, blank=True)
+    updated_by = models.ForeignKey(getattr(settings, "AUTH_USER_MODEL", "auth.User"), on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'booking_status_updates'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Booking #{self.booking.id} - {self.status} at {self.created_at}"
