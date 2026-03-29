@@ -248,11 +248,14 @@ class BookingViewSet(viewsets.ModelViewSet):
         
         # Link transaction to booking
         if points_to_redeem:
-            LoyaltyTransaction.objects.filter(
+            loyalty_txn = LoyaltyTransaction.objects.filter(
                 user=request.user, 
                 booking__isnull=True, 
                 transaction_type='redeemed'
-            ).order_by('-created_at').first().update(booking=booking)
+            ).order_by('-created_at').first()
+            if loyalty_txn:
+                loyalty_txn.booking = booking
+                loyalty_txn.save(update_fields=['booking'])
         
         # If coupon used, record usage and increment count
         if coupon:
