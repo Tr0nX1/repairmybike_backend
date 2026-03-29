@@ -243,6 +243,11 @@ STORAGES = {
     },
 }
 
+# Legacy support for older third-party apps like cloudinary-storage
+# These were replaced by the STORAGES dict in Django 4.2+
+DEFAULT_FILE_STORAGE = STORAGES["default"]["BACKEND"]
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
+
 if USE_CLOUDINARY:
     # Cloudinary configuration
     if 'cloudinary_storage' not in INSTALLED_APPS:
