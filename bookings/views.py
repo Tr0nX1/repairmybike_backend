@@ -36,8 +36,18 @@ class BookingViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
-            # Filter bookings by the authenticated user's phone number
-            customer = Customer.objects.get(phone=request.user.phone_number)
+            # First, check if a Customer entry exists for this user's phone
+            customer = Customer.objects.filter(phone=request.user.phone_number).first()
+            
+            if not customer:
+                # If no customer profile exists, it means they have no bookings yet.
+                # We return a successful empty list instead of letting it fail.
+                return Response({
+                    'error': False,
+                    'message': 'No bookings found',
+                    'data': []
+                })
+
             queryset = self.get_queryset().filter(customer=customer)
             serializer = self.get_serializer(queryset, many=True)
             
@@ -46,12 +56,12 @@ class BookingViewSet(viewsets.ModelViewSet):
                 'message': 'Booking history retrieved successfully',
                 'data': serializer.data
             })
-        except Customer.DoesNotExist:
+        except Exception as e:
+            logger.error(f"Error fetching bookings: {e}")
             return Response({
-                'error': False,
-                'message': 'No bookings found',
-                'data': []
-            })
+                'error': True,
+                'message': 'Failed to retrieve booking history'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
