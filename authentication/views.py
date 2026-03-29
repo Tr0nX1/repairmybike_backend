@@ -33,7 +33,7 @@ from .authentication import DescopeAuthentication
 logger = logging.getLogger(__name__)
 
 # Added helper for Descope client with increased JWT leeway
-JWT_LEEWAY_SECONDS = 30  # allow 30 seconds clock skew
+JWT_LEEWAY_SECONDS = 60  # allow 60 seconds clock skew (safer for network delays)
 
 
 def create_descope_client():
@@ -1257,10 +1257,28 @@ class UnifiedOTPVerifyView(APIView):
                     }, status=status.HTTP_400_BAD_REQUEST)
                     
             except Exception as e:
-                logger.error(f"Unified OTP verification failed: {str(e)}")
+                # Extract specific error message from Descope exception if available
+                error_msg = 'OTP verification failed'
+                details = str(e)
+                
+                # Check if it's a descope dict with errorDescription
+                try:
+                    import ast
+                    # The e might be a string representation of a dict or a Descope error object
+                    if '{' in details:
+                        # Extract errorDescription if it exists
+                        import re
+                        match = re.search(r"['\"]errorDescription['\"]\s*:\s*['\"]([^'\"]+)['\"]", details)
+                        if match:
+                            error_msg = match.group(1)
+                except Exception:
+                    pass
+
+                logger.error(f"Unified OTP verification failed: {details}")
                 return Response({
-                    'error': 'OTP verification failed',
-                    'details': str(e)
+                    'message': error_msg,
+                    'error': True,
+                    'details': details
                 }, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
