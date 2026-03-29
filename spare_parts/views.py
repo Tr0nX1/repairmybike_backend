@@ -314,9 +314,13 @@ class CartViewSet(viewsets.ViewSet):
 
         cart.items.all().delete()
         
-        # Send confirmation email
-        from notifications.utils import EmailService
-        EmailService.send_order_confirmation(order)
+        # Send confirmation email — wrapped so email failures never kill a successful order
+        try:
+            from notifications.utils import EmailService
+            EmailService.send_order_confirmation(order)
+        except Exception as email_err:
+            import logging
+            logging.getLogger(__name__).error(f"Order #{order.id} created but confirmation email failed: {email_err}")
 
         order_serializer = OrderSerializer(order)
         return Response({'error': False, 'message': 'Checkout successful. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)
@@ -410,9 +414,13 @@ class CartViewSet(viewsets.ViewSet):
             part.stock_qty = 0
         part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
         
-        # Send confirmation email
-        from notifications.utils import EmailService
-        EmailService.send_order_confirmation(order)
+        # Send confirmation email — wrapped so email failures never kill a successful order
+        try:
+            from notifications.utils import EmailService
+            EmailService.send_order_confirmation(order)
+        except Exception as email_err:
+            import logging
+            logging.getLogger(__name__).error(f"Order #{order.id} created but confirmation email failed: {email_err}")
 
         order_serializer = OrderSerializer(order)
         return Response({'error': False, 'message': 'Order created. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)

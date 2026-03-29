@@ -250,29 +250,42 @@ class EmailService:
     def send_order_confirmation(cls, order):
         """
         Send confirmation email for a spare parts order.
+        Gracefully skips if no valid recipient email is available.
         """
-        items = [
-            {'name': item.spare_part.name, 'quantity': item.quantity, 'price': item.unit_price}
-            for item in order.items.all()
-        ]
-        context = {
-            'customer_name': order.customer_name,
-            'order_id': order.id,
-            'items': items,
-            'total_amount': order.amount_total,
-            'shipping_address': order.address,
-            'estimated_delivery': '3-5 Business Days',
-        }
-        recipient = order.user.email if order.user else None
+        # Guard: do not attempt send if there is no valid email address
+        # order.user may be None (guest) or user.email may be blank/None
+        recipient = None
+        if order.user and order.user.email and order.user.email.strip():
+            recipient = order.user.email.strip()
+        
+        # Fallback: try the phone-based lookup won't help for email,
+        # so skip silently rather than crash
         if not recipient:
+            logger.info(f"Skipping order confirmation email for order #{order.id}: no valid recipient email.")
             return False
-            
-        return cls.send_html_email(
-            subject=f"Order Confirmed: #{order.id} - RepairMyBike Parts",
-            template_name='emails/order_confirmation.html',
-            context=context,
-            recipient_list=[recipient]
-        )
+
+        try:
+            items = [
+                {'name': item.spare_part.name, 'quantity': item.quantity, 'price': item.unit_price}
+                for item in order.items.all()
+            ]
+            context = {
+                'customer_name': order.customer_name,
+                'order_id': order.id,
+                'items': items,
+                'total_amount': order.amount_total,
+                'shipping_address': order.address,
+                'estimated_delivery': '3-5 Business Days',
+            }
+            return cls.send_html_email(
+                subject=f"Order Confirmed: #{order.id} - RepairMyBike Parts",
+                template_name='emails/order_confirmation.html',
+                context=context,
+                recipient_list=[recipient]
+            )
+        except Exception as e:
+            logger.error(f"Failed to build order confirmation email for order #{order.id}: {e}")
+            return False
 
     @classmethod
     def send_payment_receipt(cls, payment):
