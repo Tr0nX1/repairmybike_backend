@@ -250,7 +250,7 @@ STORAGES = {
 if USE_CLOUDINARY:
     # Cloudinary configuration
     if 'cloudinary_storage' not in INSTALLED_APPS:
-        INSTALLED_APPS = ['cloudinary_storage'] + INSTALLED_APPS
+        INSTALLED_APPS.append('cloudinary_storage')
     if 'cloudinary' not in INSTALLED_APPS:
         INSTALLED_APPS.append('cloudinary')
 
