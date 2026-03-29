@@ -170,8 +170,8 @@ class Order(models.Model):
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='cash_due')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='created')
     
-    # Unified checkout fields
     shipping_method = models.CharField(max_length=50, blank=True, null=True, help_text="e.g., standard, express")
+    address_details = models.JSONField(null=True, blank=True, help_text="Snapshot of the address at the time of order")
     user_address = models.ForeignKey('authentication.UserAddress', on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     idempotency_key = models.UUIDField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
