@@ -1603,3 +1603,4 @@ INFO 2026-03-28 00:31:11,619 utils 30056 23120 Firebase Admin SDK initialized su
 INFO 2026-03-28 00:33:29,582 autoreload 37468 11708 D:\developer\repairmybike\repairmybike_backend\repairmybike\settings.py changed, reloading.
 INFO 2026-03-28 00:33:31,318 utils 18324 9304 Firebase Admin SDK initialized successfully.
 INFO 2026-03-28 00:33:31,339 autoreload 18324 9304 Watching for file changes with StatReloader
+INFO 2026-03-29 18:09:19,201 utils 10216 2168 Firebase Admin SDK initialized successfully.
