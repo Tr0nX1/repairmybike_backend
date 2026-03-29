@@ -188,6 +188,45 @@ class BookingViewSet(viewsets.ModelViewSet):
                         user.loyalty_points -= points_to_redeem
                         user.save(update_fields=['loyalty_points', 'updated_at'])
 
+        # Idempotency Check
+        idempotency_key = data.get('idempotency_key')
+        if idempotency_key:
+            existing_booking = Booking.objects.filter(idempotency_key=idempotency_key).first()
+            if existing_booking:
+                response_serializer = BookingDetailSerializer(existing_booking)
+                return Response({
+                    'error': False,
+                    'message': 'Booking retrieved (Idempotent)',
+                    'data': response_serializer.data
+                }, status=status.HTTP_200_OK)
+
+        # Handle UserAddress Linkage & Snapshotting
+        user_address = None
+        user_address_id = data.get('user_address_id')
+        if user_address_id:
+            from authentication.models import UserAddress
+            try:
+                user_address = UserAddress.objects.get(id=user_address_id)
+                # Auto-snapshot from the linked address if not manually provided
+                if not data.get('address_details'):
+                    data['address_details'] = {
+                        'full_name': user_address.full_name,
+                        'phone_number': user_address.phone_number,
+                        'address_type': user_address.address_type,
+                        'flat_house_no': user_address.flat_house_no,
+                        'area_street': user_address.area_street,
+                        'landmark': user_address.landmark,
+                        'pincode': user_address.pincode,
+                        'town_city': user_address.town_city,
+                        'state': user_address.state,
+                        'latitude': float(user_address.latitude) if user_address.latitude else None,
+                        'longitude': float(user_address.longitude) if user_address.longitude else None,
+                    }
+                if not data.get('address'):
+                    data['address'] = f"{user_address.flat_house_no}, {user_address.area_street}, {user_address.town_city}"
+            except UserAddress.DoesNotExist:
+                return Response({'error': True, 'message': 'Invalid user address ID'}, status=status.HTTP_400_BAD_REQUEST)
+
         # Create booking
         booking = Booking.objects.create(
             customer=customer,
@@ -202,7 +241,9 @@ class BookingViewSet(viewsets.ModelViewSet):
             applied_coupon=coupon,
             payment_method=data.get('payment_method', 'cash'),
             subscription=subscription,
-            notes=data.get('notes', f"Loyalty points used: {points_to_redeem}" if points_to_redeem else '')
+            notes=data.get('notes', f"Loyalty points used: {points_to_redeem}" if points_to_redeem else ''),
+            user_address=user_address,
+            idempotency_key=idempotency_key
         )
         
         # Link transaction to booking

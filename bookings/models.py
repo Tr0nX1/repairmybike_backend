@@ -79,6 +79,8 @@ class Booking(models.Model):
     subscription = models.ForeignKey(Subscription, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     # Internal flag to avoid double-counting visit consumption
     subscription_visit_consumed = models.BooleanField(default=False)
+    user_address = models.ForeignKey('authentication.UserAddress', on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
+    idempotency_key = models.UUIDField(null=True, blank=True, db_index=True)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

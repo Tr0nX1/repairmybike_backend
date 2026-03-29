@@ -72,6 +72,10 @@ class BookingCreateSerializer(serializers.Serializer):
     # Optional loyalty points
     use_loyalty_points = serializers.BooleanField(default=False)
     
+    # Production Hardening
+    user_address_id = serializers.IntegerField(required=False, allow_null=True)
+    idempotency_key = serializers.UUIDField(required=False, allow_null=True)
+    
     def validate_customer_phone(self, value):
         # Basic phone validation
         import re
@@ -115,7 +119,7 @@ class BookingListSerializer(serializers.ModelSerializer):
             'id', 'customer', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
             'service_location', 'address', 'address_details', 'appointment_date', 'appointment_time',
             'total_amount', 'payment_method', 'payment_status', 'booking_status',
-            'subscription', 'subscription_remaining_visits',
+            'subscription', 'subscription_remaining_visits', 'user_address', 'idempotency_key',
             'notes', 'booking_services', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
@@ -148,7 +152,7 @@ class BookingDetailSerializer(serializers.ModelSerializer):
             'vehicle_type_name', 'service_location', 'address', 'address_details', 'appointment_date',
             'appointment_time', 'total_amount', 'payment_method', 'payment_status',
             'booking_status', 'subscription', 'subscription_remaining_visits',
-            'assigned_staff', 'status_history',
+            'assigned_staff', 'status_history', 'user_address', 'idempotency_key',
             'notes', 'booking_services', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']

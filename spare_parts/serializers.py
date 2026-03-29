@@ -14,9 +14,6 @@ from .models import (
     GuestSavedPart,
     ShipmentUpdate,
 )
-# Removed build_absolute_media_url - using storage backend directly
-
-
 
 class SparePartCategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -27,19 +24,17 @@ class SparePartCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_image(self, obj):
-        """Returns standardized media object"""
         if not obj.image:
             return None
         try:
             url = obj.image.url
             return {
-                "thumbnail": url, # Using standard URL for now, Cloudinary presets can be added later
+                "thumbnail": url,
                 "original": url,
                 "alt_text": obj.name
             }
         except Exception:
             return None
-
 
 class SparePartBrandSerializer(serializers.ModelSerializer):
     logo = serializers.SerializerMethodField()
@@ -50,7 +45,6 @@ class SparePartBrandSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_logo(self, obj):
-        """Returns standardized media object"""
         if not obj.logo:
             return None
         try:
@@ -63,7 +57,6 @@ class SparePartBrandSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
-
 class SparePartImageSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
@@ -73,7 +66,6 @@ class SparePartImageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def get_image(self, obj):
-        """Returns standardized media object"""
         if not obj.image:
             return None
         try:
@@ -85,7 +77,6 @@ class SparePartImageSerializer(serializers.ModelSerializer):
             }
         except Exception:
             return None
-
 
 class SparePartListSerializer(serializers.ModelSerializer):
     brand_name = serializers.CharField(source='brand.name', read_only=True)
@@ -102,7 +93,6 @@ class SparePartListSerializer(serializers.ModelSerializer):
         ]
 
     def get_thumbnail(self, obj):
-        """Returns the URL of the primary image thumbnail"""
         primary = obj.images.filter(is_primary=True).first()
         candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
         if not candidate or not candidate.image:
@@ -111,7 +101,6 @@ class SparePartListSerializer(serializers.ModelSerializer):
             return candidate.image.url
         except Exception:
             return None
-
 
 class SparePartDetailSerializer(serializers.ModelSerializer):
     brand_name = serializers.CharField(source='brand.name', read_only=True)
@@ -141,7 +130,6 @@ class SparePartDetailSerializer(serializers.ModelSerializer):
             })
         return items
 
-
 class CartItemSerializer(serializers.ModelSerializer):
     part_name = serializers.CharField(source='spare_part.name', read_only=True)
     sku = serializers.CharField(source='spare_part.sku', read_only=True)
@@ -154,7 +142,6 @@ class CartItemSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'unit_price', 'mrp', 'total_price']
 
     def get_image(self, obj):
-        """Returns standardized media object for the spare part"""
         if not obj.spare_part:
             return None
         primary = obj.spare_part.images.filter(is_primary=True).first()
@@ -171,7 +158,6 @@ class CartItemSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
-
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
     total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
@@ -181,12 +167,10 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ['id', 'session_id', 'items', 'total_amount', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
-
 class CartAddItemSerializer(serializers.Serializer):
     session_id = serializers.CharField()
     spare_part_id = serializers.IntegerField()
     quantity = serializers.IntegerField(min_value=1, default=1)
-
 
 class OrderItemSerializer(serializers.ModelSerializer):
     part_name = serializers.CharField(source='spare_part.name', read_only=True)
@@ -201,7 +185,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'unit_price', 'mrp', 'total_price']
 
     def get_image(self, obj):
-        """Returns standardized media object for the spare part"""
         if not obj.spare_part:
             return None
         primary = obj.spare_part.images.filter(is_primary=True).first()
@@ -218,7 +201,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
-
 class ShipmentUpdateSerializer(serializers.ModelSerializer):
     created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True, default='')
 
@@ -226,7 +208,6 @@ class ShipmentUpdateSerializer(serializers.ModelSerializer):
         model = ShipmentUpdate
         fields = ['id', 'status', 'location', 'note', 'timestamp', 'created_by_name', 'created_at']
         read_only_fields = ['id', 'created_at']
-
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
@@ -239,15 +220,14 @@ class OrderSerializer(serializers.ModelSerializer):
             'amount_total', 'currency', 'payment_method', 'payment_status',
             'status', 'items', 'shipment_updates',
             'tracking_number', 'courier_name', 'courier_tracking_url',
-            'shipping_method', 'address_details',
+            'shipping_method', 'address_details', 'user_address', 'idempotency_key',
             'estimated_delivery', 'shipped_at', 'delivered_at', 'created_at', 'updated_at'
         ]
         read_only_fields = [
             'id', 'user', 'amount_total', 'currency', 'payment_method', 
             'payment_status', 'status', 'created_at', 'updated_at',
-            'shipped_at', 'delivered_at'
+            'shipped_at', 'delivered_at', 'user_address', 'idempotency_key'
         ]
-
 
 class CheckoutSerializer(serializers.Serializer):
     session_id = serializers.CharField()
@@ -256,7 +236,8 @@ class CheckoutSerializer(serializers.Serializer):
     address = serializers.CharField()
     shipping_method = serializers.CharField(required=False, allow_null=True)
     address_details = serializers.JSONField(required=False, allow_null=True)
-
+    user_address_id = serializers.IntegerField(required=False, allow_null=True)
+    idempotency_key = serializers.UUIDField(required=False, allow_null=True)
 
 class BuyNowSerializer(serializers.Serializer):
     session_id = serializers.CharField()
@@ -267,6 +248,8 @@ class BuyNowSerializer(serializers.Serializer):
     address = serializers.CharField()
     shipping_method = serializers.CharField(required=False, allow_null=True)
     address_details = serializers.JSONField(required=False, allow_null=True)
+    user_address_id = serializers.IntegerField(required=False, allow_null=True)
+    idempotency_key = serializers.UUIDField(required=False, allow_null=True)
 
 class UserSavedPartSerializer(serializers.ModelSerializer):
     spare_part = SparePartListSerializer(read_only=True)
@@ -275,7 +258,6 @@ class UserSavedPartSerializer(serializers.ModelSerializer):
         model = UserSavedPart
         fields = ['id', 'spare_part', 'created_at']
         read_only_fields = ['id', 'created_at']
-
 
 class GuestSavedPartSerializer(serializers.ModelSerializer):
     spare_part = SparePartListSerializer(read_only=True)

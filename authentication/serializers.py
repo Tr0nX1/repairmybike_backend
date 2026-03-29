@@ -9,9 +9,10 @@ class UserAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAddress
         fields = [
-            'id', 'full_name', 'phone_number', 'flat_house_no',
+            'id', 'full_name', 'phone_number', 'address_type', 'flat_house_no',
             'area_street', 'landmark', 'pincode', 'town_city',
-            'state', 'is_default', 'delivery_instructions', 'created_at'
+            'state', 'latitude', 'longitude', 'is_default', 'is_deleted', 
+            'delivery_instructions', 'created_at'
         ]
         read_only_fields = ['id', 'created_at']
 

@@ -172,7 +172,8 @@ class Order(models.Model):
     
     # Unified checkout fields
     shipping_method = models.CharField(max_length=50, blank=True, null=True, help_text="e.g., standard, express")
-    address_details = models.JSONField(blank=True, null=True, help_text="Structured address data")
+    user_address = models.ForeignKey('authentication.UserAddress', on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+    idempotency_key = models.UUIDField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

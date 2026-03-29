@@ -244,6 +244,44 @@ class CartViewSet(viewsets.ViewSet):
                 return Response({'error': True, 'message': 'Insufficient stock for one or more items'}, status=status.HTTP_400_BAD_REQUEST)
             amount_total += item.unit_price * item.quantity
 
+        # Idempotency Check
+        idempotency_key = serializer.validated_data.get('idempotency_key')
+        if idempotency_key:
+            existing_order = Order.objects.filter(idempotency_key=idempotency_key).first()
+            if existing_order:
+                order_serializer = OrderSerializer(existing_order)
+                return Response({
+                    'error': False,
+                    'message': 'Order retrieved (Idempotent)',
+                    'data': order_serializer.data
+                }, status=status.HTTP_200_OK)
+
+        # Handle UserAddress Linkage & Snapshotting
+        user_address = None
+        user_address_id = serializer.validated_data.get('user_address_id')
+        if user_address_id:
+            from authentication.models import UserAddress
+            try:
+                user_address = UserAddress.objects.get(id=user_address_id)
+                if not serializer.validated_data.get('address_details'):
+                    serializer.validated_data['address_details'] = {
+                        'full_name': user_address.full_name,
+                        'phone_number': user_address.phone_number,
+                        'address_type': user_address.address_type,
+                        'flat_house_no': user_address.flat_house_no,
+                        'area_street': user_address.area_street,
+                        'landmark': user_address.landmark,
+                        'pincode': user_address.pincode,
+                        'town_city': user_address.town_city,
+                        'state': user_address.state,
+                        'latitude': float(user_address.latitude) if user_address.latitude else None,
+                        'longitude': float(user_address.longitude) if user_address.longitude else None,
+                    }
+                if not address:
+                    address = f"{user_address.flat_house_no}, {user_address.area_street}, {user_address.town_city}"
+            except UserAddress.DoesNotExist:
+                return Response({'error': True, 'message': 'Invalid user address ID'}, status=status.HTTP_400_BAD_REQUEST)
+
         order = Order.objects.create(
             session_id=session_id,
             user=request.user if request.user and request.user.is_authenticated else None,
@@ -257,6 +295,8 @@ class CartViewSet(viewsets.ViewSet):
             payment_method='cash',
             payment_status='cash_due',
             status='created',
+            user_address=user_address,
+            idempotency_key=idempotency_key
         )
 
         for item in items:
@@ -301,6 +341,45 @@ class CartViewSet(viewsets.ViewSet):
             return Response({'error': True, 'message': 'Insufficient stock'}, status=status.HTTP_400_BAD_REQUEST)
 
         amount_total = part.sale_price * quantity
+        
+        # Idempotency Check
+        idempotency_key = serializer.validated_data.get('idempotency_key')
+        if idempotency_key:
+            existing_order = Order.objects.filter(idempotency_key=idempotency_key).first()
+            if existing_order:
+                order_serializer = OrderSerializer(existing_order)
+                return Response({
+                    'error': False,
+                    'message': 'Order retrieved (Idempotent)',
+                    'data': order_serializer.data
+                }, status=status.HTTP_200_OK)
+
+        # Handle UserAddress Linkage & Snapshotting
+        user_address = None
+        user_address_id = serializer.validated_data.get('user_address_id')
+        if user_address_id:
+            from authentication.models import UserAddress
+            try:
+                user_address = UserAddress.objects.get(id=user_address_id)
+                if not serializer.validated_data.get('address_details'):
+                    serializer.validated_data['address_details'] = {
+                        'full_name': user_address.full_name,
+                        'phone_number': user_address.phone_number,
+                        'address_type': user_address.address_type,
+                        'flat_house_no': user_address.flat_house_no,
+                        'area_street': user_address.area_street,
+                        'landmark': user_address.landmark,
+                        'pincode': user_address.pincode,
+                        'town_city': user_address.town_city,
+                        'state': user_address.state,
+                        'latitude': float(user_address.latitude) if user_address.latitude else None,
+                        'longitude': float(user_address.longitude) if user_address.longitude else None,
+                    }
+                if not address:
+                    address = f"{user_address.flat_house_no}, {user_address.area_street}, {user_address.town_city}"
+            except UserAddress.DoesNotExist:
+                return Response({'error': True, 'message': 'Invalid user address ID'}, status=status.HTTP_400_BAD_REQUEST)
+
         order = Order.objects.create(
             session_id=session_id,
             user=request.user if request.user and request.user.is_authenticated else None,
@@ -314,6 +393,8 @@ class CartViewSet(viewsets.ViewSet):
             payment_method='cash',
             payment_status='cash_due',
             status='created',
+            user_address=user_address,
+            idempotency_key=idempotency_key
         )
 
         OrderItem.objects.create(

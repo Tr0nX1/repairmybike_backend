@@ -49,16 +49,26 @@ class User(AbstractUser):
 
 class UserAddress(models.Model):
     """Store detailed user address information"""
+    ADDRESS_TYPE_CHOICES = [
+        ('home', 'Home'),
+        ('work', 'Work'),
+        ('other', 'Other'),
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
     full_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
+    address_type = models.CharField(max_length=10, choices=ADDRESS_TYPE_CHOICES, default='home')
     flat_house_no = models.CharField(max_length=255)
     area_street = models.CharField(max_length=255)
     landmark = models.CharField(max_length=255, blank=True, null=True)
     pincode = models.CharField(max_length=10)
     town_city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
-    is_default = models.BooleanField(default=True)
+    latitude = models.DecimalField(max_digits=12, decimal_places=9, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=12, decimal_places=9, null=True, blank=True)
+    is_default = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
     delivery_instructions = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
