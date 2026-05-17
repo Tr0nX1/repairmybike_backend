@@ -44,13 +44,106 @@ def create_descope_client():
 def _merge_guest_data(user, guest_id):
     """
     Merge guest data (bookings, etc.) associated with guest_id into the user account.
-    Currently a stub to prevent NameError.
     """
     if not guest_id:
         return
-    logger.info(f"Merging guest data for guest_id: {guest_id} into user: {user.id}")
-    # Implementation logic for merging guest data can be added here
-    pass
+    
+    try:
+        from .models import GuestSession
+        guest_session = GuestSession.objects.filter(guest_id=guest_id).first()
+        if not guest_session:
+            return
+            
+        logger.info(f"Merging guest data for guest_id: {guest_id} into user: {user.id}")
+        
+        # Update bookings
+        Booking.objects.filter(guest_session=guest_session).update(
+            user=user,
+            guest_session=None
+        )
+        
+        # Update cart
+        from spare_parts.models import Cart
+        Cart.objects.filter(guest_session=guest_session).update(
+            user=user,
+            guest_session=None
+        )
+        
+        # Update saved items
+        from spare_parts.models import GuestSavedPart
+        from spare_parts.models import SavedPart
+        guest_saved = GuestSavedPart.objects.filter(guest_session=guest_session)
+        for item in guest_saved:
+            SavedPart.objects.get_or_create(user=user, spare_part=item.spare_part)
+        guest_saved.delete()
+        
+    except Exception as e:
+        logger.error(f"Error merging guest data: {e}")
+
+def get_or_create_user_from_auth_response(auth_response, phone_number=None, email=None, guest_id=None):
+    """
+    Helper to get or create a user from a Descope auth response.
+    Returns (user, created)
+    """
+    user_id = auth_response.get('user', {}).get('userId')
+    if not user_id:
+        raise ValueError("No userId in Descope response")
+
+    # 1. Try to get user by descope_user_id
+    try:
+        user = User.objects.get(descope_user_id=user_id)
+        if phone_number:
+            user.phone_number = phone_number
+            user.is_phone_verified = True
+        if email:
+            user.email = email
+            user.is_verified = True
+        user.save()
+        _merge_guest_data(user, guest_id)
+        return user, False
+    except User.DoesNotExist:
+        pass
+
+    # 2. Try to get user by phone/email to link existing accounts
+    if phone_number:
+        try:
+            user = User.objects.get(phone_number=phone_number)
+            user.descope_user_id = user_id
+            user.is_phone_verified = True
+            user.save()
+            _merge_guest_data(user, guest_id)
+            return user, False
+        except User.DoesNotExist:
+            pass
+            
+    if email:
+        try:
+            user = User.objects.get(email=email)
+            user.descope_user_id = user_id
+            user.is_verified = True
+            user.save()
+            _merge_guest_data(user, guest_id)
+            return user, False
+        except User.DoesNotExist:
+            pass
+
+    # 3. Create new user
+    if phone_number:
+        username = f"user_{phone_number.replace('+', '').replace('-', '')}"
+    else:
+        username = email.split('@')[0] if email else f"user_{user_id[:8]}"
+        
+    user = User.objects.create_user(
+        username=username,
+        email=email or '',
+        phone_number=phone_number or '',
+        descope_user_id=user_id,
+        is_phone_verified=bool(phone_number),
+        is_verified=True
+    )
+    _merge_guest_data(user, guest_id)
+    return user, True
+
 
 class ContactSubmissionViewSet(viewsets.ModelViewSet):
     queryset = ContactSubmission.objects.all()
@@ -262,10 +355,16 @@ class PhoneOTPVerifyView(APIView):
                 otp_code = serializer.validated_data['otp_code']
                 auth_response = descope_client.otp.verify_code(method=DeliveryMethod.SMS, login_id=phone_number, code=otp_code)
                 if auth_response:
-                    user, created = self._get_or_create_user_from_phone(phone_number, auth_response)
+                    guest_id = request.META.get('HTTP_X_GUEST_ID')
+                    user, created = get_or_create_user_from_auth_response(auth_response, phone_number=phone_number, guest_id=guest_id)
                     PhoneOTP.objects.filter(phone_number=phone_number, is_verified=False).update(is_verified=True)
-                    session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                    refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                    
+                    session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    
+                    if not session_jwt:
+                         return Response({'error': 'No session token returned from Descope'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True}
@@ -279,32 +378,6 @@ class PhoneOTPVerifyView(APIView):
                 logger.error(f"OTP verification failed: {str(e)}")
                 return Response({'error': 'OTP verification failed', 'details': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def _get_or_create_user_from_phone(self, phone_number, auth_response):
-        user_id = auth_response.get('user', {}).get('userId')
-        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
-        try:
-            user = User.objects.get(descope_user_id=user_id)
-            user.phone_number = phone_number
-            user.is_phone_verified = True
-            user.save()
-            _merge_guest_data(user, guest_id)
-            return user, False
-        except User.DoesNotExist:
-            pass
-        try:
-            user = User.objects.get(phone_number=phone_number)
-            user.descope_user_id = user_id
-            user.is_phone_verified = True
-            user.save()
-            _merge_guest_data(user, guest_id)
-            return user, False
-        except User.DoesNotExist:
-            pass
-        username = f"user_{phone_number.replace('+', '').replace('-', '')}"
-        user = User.objects.create_user(username=username, phone_number=phone_number, descope_user_id=user_id, is_phone_verified=True, is_verified=True)
-        _merge_guest_data(user, guest_id)
-        return user, True
 
 class PhoneLoginView(APIView):
     """Handle phone-based login with OTP"""
@@ -318,9 +391,12 @@ class PhoneLoginView(APIView):
                 otp_code = serializer.validated_data['otp_code']
                 auth_response = descope_client.otp.verify_code(method=DeliveryMethod.SMS, login_id=phone_number, code=otp_code)
                 if auth_response:
-                    user, created = PhoneOTPVerifyView()._get_or_create_user_from_phone(phone_number, auth_response)
-                    session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                    refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                    guest_id = request.META.get('HTTP_X_GUEST_ID')
+                    user, created = get_or_create_user_from_auth_response(auth_response, phone_number=phone_number, guest_id=guest_id)
+                    
+                    session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True}
@@ -364,10 +440,13 @@ class EmailOTPVerifyView(APIView):
                 descope_client = create_descope_client()
                 auth_response = descope_client.otp.verify_code(method=DeliveryMethod.EMAIL, login_id=email, code=otp_code)
                 if auth_response:
-                    user, created = self._get_or_create_user_from_email(email, auth_response)
+                    guest_id = request.META.get('HTTP_X_GUEST_ID')
+                    user, created = get_or_create_user_from_auth_response(auth_response, email=email, guest_id=guest_id)
                     EmailOTP.objects.filter(email=email, is_verified=False).update(is_verified=True)
-                    session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                    refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                    
+                    session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
                         defaults={
@@ -384,28 +463,6 @@ class EmailOTPVerifyView(APIView):
                 logger.error(f"Email OTP verification failed: {str(e)}")
                 return Response({'error': 'OTP verification failed', 'details': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def _get_or_create_user_from_email(self, email, auth_response):
-        user_id = auth_response.get('user', {}).get('userId')
-        try:
-            user = User.objects.get(descope_user_id=user_id)
-            user.email = email
-            user.is_verified = True
-            user.save()
-            return user, False
-        except User.DoesNotExist:
-            pass
-        try:
-            user = User.objects.get(email=email)
-            user.descope_user_id = user_id
-            user.is_verified = True
-            user.save()
-            return user, False
-        except User.DoesNotExist:
-            pass
-        username = email.split('@')[0]
-        user = User.objects.create_user(username=username, email=email, descope_user_id=user_id, is_verified=True)
-        return user, True
 
 class EmailLoginView(APIView):
     """Handle email-based login with OTP"""
@@ -419,9 +476,12 @@ class EmailLoginView(APIView):
                 descope_client = create_descope_client()
                 auth_response = descope_client.otp.verify_code(method=DeliveryMethod.EMAIL, login_id=email, code=otp_code)
                 if auth_response:
-                    user, created = EmailOTPVerifyView()._get_or_create_user_from_email(email, auth_response)
-                    session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                    refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                    guest_id = request.META.get('HTTP_X_GUEST_ID')
+                    user, created = get_or_create_user_from_auth_response(auth_response, email=email, guest_id=guest_id)
+                    
+                    session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'last_activity': timezone.now()}
@@ -462,6 +522,7 @@ class UnifiedOTPVerifyView(APIView):
     """Handle unified OTP verification (phone or email)"""
     permission_classes = [permissions.AllowAny]
     def post(self, request):
+        logger.info(f"OTP verify request: {request.data}")
         serializer = UnifiedOTPVerifySerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -471,17 +532,23 @@ class UnifiedOTPVerifyView(APIView):
                 descope_client = create_descope_client()
                 descope_method = DeliveryMethod.SMS if method == "phone" else DeliveryMethod.EMAIL
                 auth_response = descope_client.otp.verify_code(method=descope_method, login_id=identifier, code=otp_code)
+                logger.info(f"Descope response: {auth_response}")
                 if auth_response:
+                    guest_id = request.META.get('HTTP_X_GUEST_ID')
                     if method == "phone":
-                        user, created = PhoneOTPVerifyView()._get_or_create_user_from_phone(identifier, auth_response)
-                    else:
-                        user, created = EmailOTPVerifyView()._get_or_create_user_from_email(identifier, auth_response)
-                    if method == "phone":
+                        user, created = get_or_create_user_from_auth_response(auth_response, phone_number=identifier, guest_id=guest_id)
                         PhoneOTP.objects.filter(phone_number=identifier, is_verified=False).update(is_verified=True)
                     else:
+                        user, created = get_or_create_user_from_auth_response(auth_response, email=identifier, guest_id=guest_id)
                         EmailOTP.objects.filter(email=identifier, is_verified=False).update(is_verified=True)
-                    session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-                    refresh_jwt = auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+                    
+                    # Fix token extraction
+                    session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    
+                    if not session_jwt:
+                         return Response({'error': 'No session token returned from Descope'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True}
@@ -507,9 +574,11 @@ class RefreshTokenView(APIView):
             descope_client = create_descope_client()
             auth_response = descope_client.refresh_session(refresh_token)
             if not auth_response:
-                return Response({'error': 'Token refresh failed'}, status=status.HTTP_401_UNAUTHORIZED)
-            session_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"]
-            new_refresh_jwt = auth_response.get(REFRESH_SESSION_TOKEN_NAME, {}).get("jwt")
+                return Response({'error': 'Token refresh failed'}, status=status.HTTP_41_UNAUTHORIZED)
+            
+            session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+            new_refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+            
             if new_refresh_jwt:
                 UserSession.objects.filter(refresh_token=refresh_token).update(
                     session_token=session_jwt, refresh_token=new_refresh_jwt,
@@ -584,7 +653,10 @@ class StaffLoginView(APIView):
                     return Response({'error': 'User not found'}, status=status.HTTP_403_FORBIDDEN)
             if not (user.is_staff or user.is_superuser):
                 return Response({'error': 'Staff privileges required'}, status=status.HTTP_403_FORBIDDEN)
-            session_jwt, refresh_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"], auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+            
+            session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+            refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+            
             UserSession.objects.update_or_create(user=user, session_token=session_jwt, defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
             return Response({'message': 'Staff login successful', 'user': UserSerializer(user).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -621,7 +693,10 @@ class AdminLoginView(APIView):
             try:
                 user = User.objects.get((Q(email=identifier) | Q(phone_number=identifier)), is_active=True, is_superuser=True)
             except User.DoesNotExist: return Response({'error': 'Admin privileges required'}, status=status.HTTP_403_FORBIDDEN)
-            session_jwt, refresh_jwt = auth_response[SESSION_TOKEN_NAME]["jwt"], auth_response[REFRESH_SESSION_TOKEN_NAME]["jwt"]
+            
+            session_jwt = auth_response.get("sessionToken", {}).get("jwt")
+            refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+            
             UserSession.objects.update_or_create(user=user, session_token=session_jwt, defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
             return Response({'message': 'Admin login successful', 'user': UserSerializer(user).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
         except Exception as e: return Response({'error': 'Login failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
