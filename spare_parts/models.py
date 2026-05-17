@@ -60,6 +60,11 @@ class SparePart(models.Model):
     height_mm = models.IntegerField(blank=True, null=True)
     rating_average = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     rating_count = models.IntegerField(default=0)
+    thumbnail = models.ImageField(
+        upload_to='spare_parts/thumbnails/',
+        null=True, blank=True,
+        help_text='Primary display image for this part'
+    )
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -71,6 +76,22 @@ class SparePart(models.Model):
             models.Index(fields=['slug']),
             models.Index(fields=['sku']),
             models.Index(fields=['brand', 'category']),
+            models.Index(fields=['name', 'sale_price', 'stock_qty']),
+            models.Index(fields=['category']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(mrp__gte=0),
+                name='sparepart_mrp_non_negative'
+            ),
+            models.CheckConstraint(
+                check=models.Q(sale_price__gte=0),
+                name='sparepart_sale_price_non_negative'
+            ),
+            models.CheckConstraint(
+                check=models.Q(stock_qty__gte=0),
+                name='sparepart_stock_qty_non_negative'
+            ),
         ]
 
     def __str__(self):
@@ -174,6 +195,10 @@ class Order(models.Model):
     class Meta:
         db_table = 'spare_part_orders'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'status', 'created_at']),
+            models.Index(fields=['session_id']),
+        ]
 
     def __str__(self):
         return f"Order {self.id} ({self.session_id})"

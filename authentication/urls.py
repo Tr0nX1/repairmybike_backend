@@ -4,6 +4,12 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'addresses', views.UserAddressViewSet, basename='useraddress')
+# Register at both 'staff' and 'staff-directory' for backward compatibility
+# Next.js calls /api/auth/staff/, backend should have /api/auth/staff-directory/
+router.register(r'staff', views.StaffDirectoryViewSet, basename='staff')
+router.register(r'staff-directory', views.StaffDirectoryViewSet, basename='staff-directory')
+router.register(r'customers', views.CustomerViewSet, basename='customers')
+router.register(r'contact', views.ContactSubmissionViewSet, basename='contact')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -32,6 +38,7 @@ urlpatterns = [
     
     # User profile endpoints
     path('profile/', views.UserProfileView.as_view(), name='user-profile'),
+    path('profile/upload-photo/', views.UserProfileUploadView.as_view(), name='user-profile-upload-photo'),
     
     # Password reset endpoints
     path('password-reset/', views.PasswordResetView.as_view(), name='password-reset'),

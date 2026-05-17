@@ -1,5 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.cache import cache
 from .models import VehicleType, VehicleBrand, VehicleModel, UserVehicle
 from .serializers import (
@@ -10,109 +12,67 @@ from .serializers import (
 )
 
 
-class VehicleTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = VehicleType.objects.all()
+class VehicleTypeViewSet(viewsets.ModelViewSet):
+    queryset = VehicleType.objects.all().order_by('name')
     serializer_class = VehicleTypeSerializer
-    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     
-    def list(self, request, *args, **kwargs):
-        cache_key = 'vehicle_types_list'
-        cached_data = cache.get(cache_key)
-        
-        if cached_data:
-            return Response({
-                'error': False,
-                'message': 'Vehicle types retrieved successfully',
-                'data': cached_data
-            })
-        
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        
-        # Cache for 1 hour
-        cache.set(cache_key, serializer.data, 3600)
-        
-        return Response({
-            'error': False,
-            'message': 'Vehicle types retrieved successfully',
-            'data': serializer.data
-        })
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
+
+    def perform_create(self, serializer):
+        serializer.save()
+        cache.delete('vehicle_types_list')
+
+    def perform_update(self, serializer):
+        serializer.save()
+        cache.delete('vehicle_types_list')
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        cache.delete('vehicle_types_list')
 
 
-class VehicleBrandViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = VehicleBrand.objects.select_related('vehicle_type').all()
+class VehicleBrandViewSet(viewsets.ModelViewSet):
+    queryset = VehicleBrand.objects.select_related('vehicle_type').all().order_by('name')
     serializer_class = VehicleBrandSerializer
-    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     filterset_fields = ['vehicle_type']
-    
-    def list(self, request, *args, **kwargs):
-        vehicle_type_id = request.query_params.get('vehicle_type')
-        
-        if not vehicle_type_id:
-            return Response({
-                'error': True,
-                'message': 'vehicle_type query parameter is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        cache_key = f'vehicle_brands_type_{vehicle_type_id}'
-        cached_data = cache.get(cache_key)
-        
-        if cached_data:
-            return Response({
-                'error': False,
-                'message': 'Vehicle brands retrieved successfully',
-                'data': cached_data
-            })
-        
-        queryset = self.get_queryset().filter(vehicle_type_id=vehicle_type_id)
-        serializer = self.get_serializer(queryset, many=True)
-        
-        # Cache for 1 hour
-        cache.set(cache_key, serializer.data, 3600)
-        
-        return Response({
-            'error': False,
-            'message': 'Vehicle brands retrieved successfully',
-            'data': serializer.data
-        })
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
+
+    def perform_create(self, serializer):
+        brand = serializer.save()
+        cache.delete(f'vehicle_brands_type_{brand.vehicle_type_id}')
+
+    def perform_update(self, serializer):
+        brand = serializer.save()
+        cache.delete(f'vehicle_brands_type_{brand.vehicle_type_id}')
 
 
-class VehicleModelViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = VehicleModel.objects.select_related('vehicle_brand__vehicle_type').all()
+class VehicleModelViewSet(viewsets.ModelViewSet):
+    queryset = VehicleModel.objects.select_related('vehicle_brand__vehicle_type').all().order_by('name')
     serializer_class = VehicleModelSerializer
-    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     filterset_fields = ['vehicle_brand']
-    
-    def list(self, request, *args, **kwargs):
-        vehicle_brand_id = request.query_params.get('vehicle_brand')
-        
-        if not vehicle_brand_id:
-            return Response({
-                'error': True,
-                'message': 'vehicle_brand query parameter is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        cache_key = f'vehicle_models_brand_{vehicle_brand_id}'
-        cached_data = cache.get(cache_key)
-        
-        if cached_data:
-            return Response({
-                'error': False,
-                'message': 'Vehicle models retrieved successfully',
-                'data': cached_data
-            })
-        
-        queryset = self.get_queryset().filter(vehicle_brand_id=vehicle_brand_id)
-        serializer = self.get_serializer(queryset, many=True)
-        
-        # Cache for 1 hour
-        cache.set(cache_key, serializer.data, 3600)
-        
-        return Response({
-            'error': False,
-            'message': 'Vehicle models retrieved successfully',
-            'data': serializer.data
-        })
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
+
+    def perform_create(self, serializer):
+        model = serializer.save()
+        cache.delete(f'vehicle_models_brand_{model.vehicle_brand_id}')
+
+    def perform_update(self, serializer):
+        model = serializer.save()
+        cache.delete(f'vehicle_models_brand_{model.vehicle_brand_id}')
 
 
 class UserVehicleViewSet(viewsets.ModelViewSet):

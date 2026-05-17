@@ -102,12 +102,21 @@ class SparePartListSerializer(serializers.ModelSerializer):
 
     def get_thumbnail(self, obj):
         """Returns standardized media object for the primary image"""
-        primary = obj.images.filter(is_primary=True).first()
-        candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
-        if not candidate or not candidate.image:
-            return None
         try:
-            url = candidate.image.url
+            request = self.context.get('request')
+            if obj.thumbnail:
+                url = request.build_absolute_uri(obj.thumbnail.url) if request else obj.thumbnail.url
+                return {
+                    "thumbnail": url,
+                    "original": url,
+                    "alt_text": obj.name
+                }
+            
+            primary = obj.images.filter(is_primary=True).first()
+            candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
+            if not candidate or not candidate.image:
+                return None
+            url = request.build_absolute_uri(candidate.image.url) if request else candidate.image.url
             return {
                 "thumbnail": url,
                 "original": url,

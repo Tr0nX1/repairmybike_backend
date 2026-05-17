@@ -10,9 +10,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='plan',
-            name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='plans/images/'),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.AddField(
+                    model_name='plan',
+                    name='image',
+                    field=models.ImageField(blank=True, null=True, upload_to='plans/images/'),
+                ),
+            ],
         ),
     ]

@@ -15,19 +15,53 @@ JWT_LEEWAY_SECONDS = 30
 
 class DescopeAuthentication(BaseAuthentication):
     """
-    Custom authentication class for Descope integration
+    Custom authentication class for Descope integration with lazy initialization.
+    Handles development mode where credentials may not be available.
     """
     
-    def __init__(self):
-        self.descope_client = DescopeClient(
-            project_id=settings.DESCOPE_PROJECT_ID,
-            management_key=settings.DESCOPE_MANAGEMENT_KEY,
-            jwt_validation_leeway=JWT_LEEWAY_SECONDS
-        )
+    _descope_client = None
+    _client_initialized = False
+    _client_failed = False
+    
+    @classmethod
+    def _get_descope_client(cls):
+        """
+        Lazily initialize Descope client on first use.
+        Returns None if credentials are not available (development mode).
+        """
+        if cls._client_failed:
+            return None
+        
+        if cls._client_initialized and cls._descope_client:
+            return cls._descope_client
+        
+        try:
+            project_id = settings.DESCOPE_PROJECT_ID
+            management_key = settings.DESCOPE_MANAGEMENT_KEY
+            
+            # Allow development mode without Descope credentials
+            if not project_id or not management_key:
+                logger.warning("Descope credentials not configured - Descope authentication disabled")
+                cls._client_failed = True
+                return None
+            
+            cls._descope_client = DescopeClient(
+                project_id=project_id,
+                management_key=management_key,
+                jwt_validation_leeway=JWT_LEEWAY_SECONDS
+            )
+            cls._client_initialized = True
+            logger.info("Descope client initialized successfully")
+            return cls._descope_client
+        except Exception as e:
+            logger.error(f"Failed to initialize Descope client: {str(e)}")
+            cls._client_failed = True
+            return None
     
     def authenticate(self, request):
         """
-        Authenticate user using Descope session token
+        Authenticate user using Descope session token.
+        Returns None if no auth header (allows other authenticators).
         """
         auth_header = request.META.get('HTTP_AUTHORIZATION')
         
@@ -41,8 +75,15 @@ class DescopeAuthentication(BaseAuthentication):
                 
             token = auth_header.split(' ')[1]
             
+            # Get Descope client (lazy initialization)
+            descope_client = self._get_descope_client()
+            
+            if not descope_client:
+                logger.warning("Descope authentication requested but client not available")
+                return None
+            
             # Validate token with Descope
-            jwt_response = self.descope_client.validate_session(token)
+            jwt_response = descope_client.validate_session(token)
             
             if not jwt_response:
                 return None
@@ -63,7 +104,7 @@ class DescopeAuthentication(BaseAuthentication):
             return (user, token)
             
         except Exception as e:
-            logger.error(f"Authentication failed: {str(e)}")
+            logger.error(f"Descope authentication failed: {str(e)}")
             return None
     
     def _get_or_create_user(self, jwt_response):

@@ -8,10 +8,25 @@ class User(AbstractUser):
     """Custom User model with Descope integration"""
     descope_user_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
-    profile_picture = models.URLField(blank=True, null=True)
+    profile_picture = models.ImageField(
+        upload_to='users/profiles/',
+        null=True, blank=True
+    )
+    fcm_token = models.CharField(max_length=500, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     is_phone_verified = models.BooleanField(default=False)
+    is_manager = models.BooleanField(default=False)
     default_vehicle = models.ForeignKey('vehicles.VehicleModel', on_delete=models.SET_NULL, null=True, blank=True, related_name='users_default')
+    
+    # Internal & Analytics Fields
+    internal_notes = models.TextField(null=True, blank=True)
+    total_ltv = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    loyalty_points = models.IntegerField(default=0)
+    
+    # Referral System
+    referral_code = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals')
+
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -153,6 +168,10 @@ class StaffDirectory(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     employee_id = models.CharField(max_length=100, blank=True, null=True)
     role = models.CharField(max_length=100, blank=True, null=True)
+    photo = models.ImageField(
+        upload_to='staff/photos/',
+        null=True, blank=True
+    )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -182,3 +201,25 @@ class GuestSession(models.Model):
 
     def __str__(self):
         return f"Guest-{str(self.guest_id)[:8]}"
+
+
+class ContactSubmission(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('replied', 'Replied'),
+    ]
+
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'contact_submissions'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"

@@ -18,13 +18,26 @@ import secrets
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default=secrets.token_urlsafe(50))
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.2.2', '*', 'repairmybikebackend-production.up.railway.app']
+from django.core.exceptions import ImproperlyConfigured
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-that-is-at-least-32-chars-long')
+
+# ============================================================================
+# SECRET_KEY VALIDATION - CRITICAL SECURITY CHECK
+# ============================================================================
+if not DEBUG and 'django-insecure' in SECRET_KEY:
+    raise ImproperlyConfigured("Insecure SECRET_KEY in production")
+
+# ============================================================================
+# ALLOWED_HOSTS CONFIGURATION - STRICT HOST HEADER VALIDATION
+# ============================================================================
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+if not DEBUG and '*' in ALLOWED_HOSTS:
+    raise ImproperlyConfigured("Wildcard ALLOWED_HOSTS in production")
 
 # Application definition
 INSTALLED_APPS = [
@@ -45,6 +58,9 @@ INSTALLED_APPS = [
     'shop',
     'spare_parts',
     'subscriptions',
+    'cms',
+    'content',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -103,7 +119,7 @@ if DATABASE_URL:
         'sslmode': 'require',
         'connect_timeout': 10,
     }
-    print("✓ Configured PostgreSQL database from DATABASE_URL")
+    print("[OK] Configured PostgreSQL database from DATABASE_URL")
 else:
     DATABASES = {
         'default': {
@@ -111,7 +127,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    print("✓ Configured SQLite database (no DATABASE_URL provided)")
+    print("[OK] Configured SQLite database (no DATABASE_URL provided)")
 
 
 
@@ -127,7 +143,7 @@ if DEBUG or not REDIS_URL:
             'LOCATION': 'vehicle_repair_local',
         }
     }
-    print("✓ Configured local memory cache for development")
+    print("[OK] Configured local memory cache for development")
 else:
     # Production - use Redis cache
     try:
@@ -147,7 +163,7 @@ else:
                 'TIMEOUT': 300,
             }
         }
-        print("✓ Configured Redis cache from REDIS_URL")
+        print("[OK] Configured Redis cache from REDIS_URL")
     except Exception as e:
         print(f"⚠ Redis configuration failed, falling back to local cache: {e}")
         CACHES = {
@@ -217,7 +233,7 @@ if USE_CLOUDINARY:
             'API_KEY': config('CLOUDINARY_API_KEY', default=''),
             'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
         }
-    print(f"✓ Media storage: Cloudinary (Cloud Name: {CLOUDINARY_STORAGE.get('CLOUD_NAME', 'via URL')})")
+    print(f"[OK] Media storage: Cloudinary (Cloud Name: {CLOUDINARY_STORAGE.get('CLOUD_NAME', 'via URL')})")
     
     # Safety Check: Fail-fast if Cloudinary is enabled but misconfigured
     if not CLOUDINARY_URL and not (CLOUDINARY_STORAGE.get('CLOUD_NAME') and CLOUDINARY_STORAGE.get('API_KEY')):
@@ -246,9 +262,9 @@ elif USE_CLOUDFLARE_R2:
     elif AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
         MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
     
-    print("✓ Media storage: Cloudflare R2")
+    print("[OK] Media storage: Cloudflare R2")
 else:
-    print("✓ Media storage: Local Filesystem")
+    print("[OK] Media storage: Local Filesystem")
 
 
 
@@ -258,9 +274,36 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User Model
 AUTH_USER_MODEL = 'authentication.User'
 
-# Descope Configuration
-DESCOPE_PROJECT_ID = config('DESCOPE_PROJECT_ID', default='P320Gzmd6mIOt2NOn7WbViy50YyA')
-DESCOPE_MANAGEMENT_KEY = config('DESCOPE_MANAGEMENT_KEY', default='T320HLo8895TfVVsGuEztaj1onlt')
+# ============================================================================
+# DESCOPE CONFIGURATION - REQUIRE EXPLICIT ENVIRONMENT VARIABLES
+# ============================================================================
+# Use config() from decouple to properly read from .env files
+DESCOPE_PROJECT_ID = config('DESCOPE_PROJECT_ID', default=None)
+DESCOPE_MANAGEMENT_KEY = config('DESCOPE_MANAGEMENT_KEY', default=None)
+
+# Validate Descope configuration at startup (production only)
+if not DEBUG:
+    if not DESCOPE_PROJECT_ID or not DESCOPE_MANAGEMENT_KEY:
+        raise ValueError(
+            'CRITICAL SECURITY ERROR: DESCOPE_PROJECT_ID and DESCOPE_MANAGEMENT_KEY environment variables '
+            'are required in production for authentication. Set these to valid Descope credentials.'
+        )
+    print("[OK] Descope credentials configured for production")
+elif DESCOPE_PROJECT_ID and DESCOPE_MANAGEMENT_KEY:
+    # Development mode with Descope enabled
+    print("[OK] Descope credentials configured for development")
+else:
+    # Development mode without Descope - will fall back to other auth methods
+    print("[WARNING] Descope not configured - development mode with basic auth only")
+
+if DESCOPE_PROJECT_ID and DESCOPE_PROJECT_ID.startswith('P320Gzmd6m'):
+    if not DEBUG:
+        raise ValueError(
+            'WARNING: DESCOPE_PROJECT_ID appears to be a development/example key. '
+            'Please set DESCOPE_PROJECT_ID to your actual production project ID.'
+        )
+    # In development mode, it's OK to use example credentials for testing
+
 
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
@@ -291,22 +334,41 @@ REST_FRAMEWORK = {
     },
 }
 
-# CORS Configuration
-CORS_ALLOW_ALL_ORIGINS = True
+# ============================================================================
+# CORS CONFIGURATION - ENVIRONMENT-BASED ALLOWED ORIGINS
+# ============================================================================
+from corsheaders.defaults import default_headers
+
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:8080').split(',')
 CORS_ALLOW_CREDENTIALS = True
 
-from corsheaders.defaults import default_headers
+# Allow specific custom headers for guest and session authentication
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'x-guest-id',
     'x-session-token',
 ]
 
-# CSRF Configuration
-CSRF_TRUSTED_ORIGINS = [
-    'https://repairmybikebackend-production.up.railway.app',
-    'https://www.repairmybike.in',
-    'https://repairmybike.in',
-]
+# ============================================================================
+# CSRF CONFIGURATION - SYNCHRONIZED WITH ALLOWED_HOSTS
+# ============================================================================
+if DEBUG:
+    # Development: Allow localhost variants
+    CSRF_TRUSTED_ORIGINS = [
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'http://localhost:8080',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:8000',
+    ]
+else:
+    # Production: Load from environment, synchronized with frontend URL
+    csrf_origins_str = config('CSRF_TRUSTED_ORIGINS', default=None)
+    if csrf_origins_str:
+        CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_str.split(',')]
+    else:
+        # Fallback to CORS origins if not explicitly set
+        CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if '*' not in host]
+    print(f"[OK] Production CSRF Trusted Origins: {CSRF_TRUSTED_ORIGINS}")
 
 # Proxy settings (crucial for Railway)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -319,6 +381,9 @@ RAZORPAY_ENABLED = config('RAZORPAY_ENABLED', default=False, cast=bool)
 
 # Staff API Key
 STAFF_API_KEY = config('STAFF_API_KEY', default='')
+
+# Firebase Cloud Messaging
+FIREBASE_CREDENTIALS_JSON = config('FIREBASE_CREDENTIALS_JSON', default='')
 
 # Security Settings for Production
 if not DEBUG:
@@ -379,4 +444,83 @@ LOGGING = {
 }
 
 # WhiteNoise Configuration removed (consolidated in STORAGES)
+
+# ============================================================================
+# COMPREHENSIVE SECURITY VALIDATION AT STARTUP
+# ============================================================================
+def _validate_security_configuration():
+    """
+    Comprehensive security check to catch critical misconfigurations at startup.
+    Runs immediately when settings are loaded.
+    """
+    errors = []
+    warnings = []
+    
+    # 1. ALLOWED_HOSTS validation
+    if '*' in ALLOWED_HOSTS:
+        errors.append('CRITICAL: ALLOWED_HOSTS contains "*" (wildcard) - this allows any Host header')
+    
+    # 2. CORS validation
+    if not CORS_ALLOWED_ORIGINS:
+        errors.append('CRITICAL: CORS_ALLOWED_ORIGINS is empty - no frontend origins are allowed')
+    
+    if CORS_ALLOW_CREDENTIALS and not CORS_ALLOWED_ORIGINS:
+        errors.append('CRITICAL: CORS_ALLOW_CREDENTIALS is True but no origins are whitelisted')
+    
+    # 3. SECRET_KEY validation
+    if not SECRET_KEY or len(SECRET_KEY) < 32:
+        errors.append('CRITICAL: SECRET_KEY is missing or too short (< 32 characters)')
+    
+    # 4. Production security settings
+    if not DEBUG:
+        if not SECURE_SSL_REDIRECT:
+            errors.append('CRITICAL: Production mode with SECURE_SSL_REDIRECT disabled')
+        
+        if SESSION_COOKIE_SECURE is not True:
+            errors.append('CRITICAL: Production mode with SESSION_COOKIE_SECURE disabled')
+        
+        if CSRF_COOKIE_SECURE is not True:
+            errors.append('CRITICAL: Production mode with CSRF_COOKIE_SECURE disabled')
+        
+        if not ALLOWED_HOSTS or len(ALLOWED_HOSTS) == 0:
+            errors.append('CRITICAL: Production mode with no ALLOWED_HOSTS configured')
+        
+        # 5. Descope validation
+        if not DESCOPE_PROJECT_ID or not DESCOPE_MANAGEMENT_KEY:
+            warnings.append('WARNING: Descope credentials not configured - authentication may fail')
+    
+    # Report errors and warnings
+    if errors:
+        print("\n" + "="*80)
+        print("SECURITY CONFIGURATION ERRORS - APPLICATION WILL NOT START")
+        print("="*80)
+        for error in errors:
+            print(f"❌ {error}")
+        print("="*80 + "\n")
+        raise RuntimeError(
+            f"Security validation failed with {len(errors)} critical error(s). "
+            "See above for details."
+        )
+    
+    if warnings:
+        print("\n" + "="*80)
+        print("SECURITY CONFIGURATION WARNINGS")
+        print("="*80)
+        for warning in warnings:
+            print(f"⚠️  {warning}")
+        print("="*80 + "\n")
+    
+    print("\n" + "="*80)
+    print("✅ SECURITY CONFIGURATION VALIDATED")
+    print("="*80)
+    print(f"  - DEBUG mode: {'ON (Development)' if DEBUG else 'OFF (Production)'}")
+    print(f"  - ALLOWED_HOSTS: {len(ALLOWED_HOSTS)} host(s) allowed")
+    print(f"  - CORS Origins: {len(CORS_ALLOWED_ORIGINS)} origin(s) allowed")
+    if not DEBUG:
+        print(f"  - SSL Redirect: {'ENABLED' if SECURE_SSL_REDIRECT else 'DISABLED'}")
+        print(f"  - HSTS: {SECURE_HSTS_SECONDS} seconds")
+    print("="*80 + "\n")
+
+# Execute security validation
+_validate_security_configuration()
 

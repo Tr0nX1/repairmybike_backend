@@ -10,9 +10,15 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='plan',
-            name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='subscriptions/plans/'),
+        migrations.SeparateDatabaseAndState(
+            # DB is already expected to have `subscriptions_plan.image` via 0006_plan_image.
+            database_operations=[],
+            state_operations=[
+                migrations.AddField(
+                    model_name='plan',
+                    name='image',
+                    field=models.ImageField(blank=True, null=True, upload_to='subscriptions/plans/'),
+                ),
+            ],
         ),
     ]

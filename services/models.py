@@ -8,6 +8,7 @@ class ServiceCategory(models.Model):
     description = models.TextField(blank=True, null=True)
     icon = models.CharField(max_length=10, default='🔧')
     image = models.ImageField(upload_to='categories/images/', blank=True, null=True)
+    active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -32,6 +33,7 @@ class Service(models.Model):
     specifications = models.JSONField(default=list)
     images = models.ImageField(upload_to='services/images/', blank=True, null=True)
     is_featured = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

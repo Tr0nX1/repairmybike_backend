@@ -3,7 +3,15 @@ from django.urls import reverse
 from django.utils.html import format_html
 from repairmybike.admin_mixins import StatusColorMixin
 
-from .models import Customer, Booking, BookingService
+from .models import Customer, Booking, BookingService, Feedback
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'booking', 'rating', 'category', 'status', 'created_at')
+    list_filter = ('status', 'category', 'rating', 'created_at')
+    search_fields = ('comment', 'user__username', 'booking__id')
+    readonly_fields = ('created_at',)
 
 
 @admin.register(Customer)

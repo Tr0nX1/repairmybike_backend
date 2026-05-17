@@ -49,6 +49,12 @@ class Plan(models.Model):
             models.Index(fields=["active"], name="subscriptions_plan_active_idx"),
             models.Index(fields=["tier"], name="subscriptions_plan_tier_idx"),
         ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(price__gte=0),
+                name='plan_price_non_negative'
+            ),
+        ]
 
     def __str__(self):
         return self.name

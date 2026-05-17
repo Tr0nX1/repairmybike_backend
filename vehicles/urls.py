@@ -6,6 +6,9 @@ router = DefaultRouter()
 router.register(r'vehicle-types', VehicleTypeViewSet, basename='vehicle-type')
 router.register(r'vehicle-brands', VehicleBrandViewSet, basename='vehicle-brand')
 router.register(r'vehicle-models', VehicleModelViewSet, basename='vehicle-model')
+router.register(r'types', VehicleTypeViewSet, basename='vehicle-type-alias')
+router.register(r'brands', VehicleBrandViewSet, basename='vehicle-brand-alias')
+router.register(r'models', VehicleModelViewSet, basename='vehicle-model-alias')
 router.register(r'user-vehicles', UserVehicleViewSet, basename='user-vehicle')
 
 urlpatterns = [

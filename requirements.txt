@@ -110,3 +110,4 @@ certifi==2025.8.3
 charset-normalizer==3.4.3
 idna==3.10
 sqlparse==0.5.3
+firebase-admin==6.6.0

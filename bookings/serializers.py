@@ -1,8 +1,32 @@
 from rest_framework import serializers
 from django.utils import timezone
 from datetime import datetime
-from .models import Customer, Booking, BookingService
-from services.models import ServicePricing
+from .models import Customer, Booking, BookingService, BookingPart, Feedback
+
+
+class BookingPartSerializer(serializers.ModelSerializer):
+    part_name = serializers.CharField(source='spare_part.name', read_only=True)
+    sku = serializers.CharField(source='spare_part.sku', read_only=True)
+    approved_by_name = serializers.CharField(source='approved_by.get_full_name', read_only=True)
+    
+    class Meta:
+        model = BookingPart
+        fields = [
+            'id',
+            'spare_part',
+            'part_name',
+            'sku',
+            'quantity',
+            'unit_price',
+            'total_price',
+            'approval_status',
+            'approved_by',
+            'approved_by_name',
+            'approved_at',
+            'price_locked_at',
+            'created_at',
+        ]
+        read_only_fields = ['id', 'total_price', 'approved_by', 'approved_at', 'price_locked_at', 'created_at']
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -72,18 +96,23 @@ class BookingCreateSerializer(serializers.Serializer):
 class BookingListSerializer(serializers.ModelSerializer):
     customer = CustomerSerializer(read_only=True)
     booking_services = BookingServiceSerializer(many=True, read_only=True)
+    booking_parts = BookingPartSerializer(many=True, read_only=True)
     vehicle_model_name = serializers.CharField(source='vehicle_model.name', read_only=True)
     vehicle_brand_name = serializers.CharField(source='vehicle_model.vehicle_brand.name', read_only=True)
+
+    mechanic_id = serializers.IntegerField(read_only=True)
+    mechanic_name = serializers.CharField(source='mechanic.get_full_name', read_only=True)
+
     subscription_remaining_visits = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Booking
         fields = [
-            'id', 'customer', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
-            'service_location', 'address', 'appointment_date', 'appointment_time',
-            'total_amount', 'payment_method', 'payment_status', 'booking_status',
-            'subscription', 'subscription_remaining_visits',
-            'notes', 'booking_services', 'created_at', 'updated_at'
+            'id', 'customer', 'mechanic', 'mechanic_id', 'mechanic_name', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
+            'service_location', 'address', 'appointment_date',
+            'appointment_time', 'total_amount', 'payment_method', 'payment_status',
+            'booking_status', 'stock_deducted', 'subscription', 'subscription_remaining_visits',
+            'customer_notes', 'internal_notes', 'staff_notes', 'booking_services', 'booking_parts', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
@@ -101,19 +130,22 @@ class BookingListSerializer(serializers.ModelSerializer):
 class BookingDetailSerializer(serializers.ModelSerializer):
     customer = CustomerSerializer(read_only=True)
     booking_services = BookingServiceSerializer(many=True, read_only=True)
+    booking_parts = BookingPartSerializer(many=True, read_only=True)
     vehicle_model_name = serializers.CharField(source='vehicle_model.name', read_only=True)
     vehicle_brand_name = serializers.CharField(source='vehicle_model.vehicle_brand.name', read_only=True)
     vehicle_type_name = serializers.CharField(source='vehicle_model.vehicle_brand.vehicle_type.name', read_only=True)
+    mechanic_id = serializers.IntegerField(read_only=True)
+    mechanic_name = serializers.CharField(source='mechanic.get_full_name', read_only=True)
     subscription_remaining_visits = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = Booking
         fields = [
-            'id', 'customer', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
+            'id', 'customer', 'mechanic', 'mechanic_id', 'mechanic_name', 'vehicle_model', 'vehicle_model_name', 'vehicle_brand_name',
             'vehicle_type_name', 'service_location', 'address', 'appointment_date',
             'appointment_time', 'total_amount', 'payment_method', 'payment_status',
-            'booking_status', 'subscription', 'subscription_remaining_visits',
-            'notes', 'booking_services', 'created_at', 'updated_at'
+            'booking_status', 'stock_deducted', 'subscription', 'subscription_remaining_visits',
+            'customer_notes', 'internal_notes', 'staff_notes', 'booking_services', 'booking_parts', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
@@ -126,3 +158,21 @@ class BookingDetailSerializer(serializers.ModelSerializer):
             return max(0, included - consumed)
         except Exception:
             return None
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='booking.customer.name', read_only=True)
+    booking_id_display = serializers.IntegerField(source='booking.id', read_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = [
+            'id', 'user', 'booking', 'booking_id_display', 'customer_name', 
+            'rating', 'comment', 'category', 'status', 'created_at'
+        ]
+        read_only_fields = ['id', 'user', 'created_at']
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5")
+        return value

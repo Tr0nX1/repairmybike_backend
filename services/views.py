@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.cache import cache
 from .models import ServiceCategory, Service, ServicePricing, UserSavedService, GuestSavedService
 from .serializers import (
@@ -14,7 +15,29 @@ from authentication.models import GuestSession
 class ServiceCategoryViewSet(viewsets.ModelViewSet):
     queryset = ServiceCategory.objects.all()
     serializer_class = ServiceCategorySerializer
-    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
+
+    def perform_create(self, serializer):
+        image = self.request.FILES.get('image')
+        if image:
+            serializer.save(image=image)
+        else:
+            serializer.save()
+        cache.delete('service_categories_list')
+
+    def perform_update(self, serializer):
+        image = self.request.FILES.get('image')
+        if image:
+            serializer.save(image=image)
+        else:
+            serializer.save()
+        cache.delete('service_categories_list')
+
     
     def list(self, request, *args, **kwargs):
         cache_key = 'service_categories_list'
@@ -43,7 +66,29 @@ class ServiceCategoryViewSet(viewsets.ModelViewSet):
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
+
+    def perform_create(self, serializer):
+        images = self.request.FILES.get('images')
+        if images:
+            serializer.save(images=images)
+        else:
+            serializer.save()
+        cache.delete('services_all')
+
+    def perform_update(self, serializer):
+        images = self.request.FILES.get('images')
+        if images:
+            serializer.save(images=images)
+        else:
+            serializer.save()
+        cache.delete('services_all')
+
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -94,13 +139,17 @@ class ServiceViewSet(viewsets.ModelViewSet):
         })
 
 
-class ServicePricingViewSet(viewsets.ReadOnlyModelViewSet):
+class ServicePricingViewSet(viewsets.ModelViewSet):
     queryset = ServicePricing.objects.select_related(
         'service__service_category',
         'vehicle_model'
     ).all()
     serializer_class = ServicePricingSerializer
-    permission_classes = [permissions.AllowAny]
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
     
     @action(detail=False, methods=['get'], url_path='by-vehicle')
     def by_vehicle(self, request):

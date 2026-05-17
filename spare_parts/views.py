@@ -1,12 +1,15 @@
 from django.db.models import Q
+from django.db import transaction
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .models import (
     SparePartCategory,
     SparePartBrand,
     SparePart,
+    SparePartImage,
     SparePartFitment,
     Cart,
     CartItem,
@@ -22,6 +25,7 @@ from .serializers import (
     SparePartBrandSerializer,
     SparePartListSerializer,
     SparePartDetailSerializer,
+    SparePartImageSerializer,
     CartSerializer,
     CartAddItemSerializer,
     OrderSerializer,
@@ -30,16 +34,54 @@ from .serializers import (
     UserSavedPartSerializer,
     GuestSavedPartSerializer,
 )
+from staff.models import ActivityLog
 
 
-class SparePartCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class IsOrderOwner(permissions.BasePermission):
+    """
+    Permission to check if user owns the order or is staff/admin.
+    - Authenticated users can only access their own orders
+    - Guest users can only access orders with their session_id
+    - Staff/Admin can access all orders
+    """
+    
+    def has_object_permission(self, request, view, obj):
+        # Staff and admins have full access
+        if request.user and (request.user.is_staff or request.user.is_superuser):
+            return True
+        
+        # Authenticated users can only access their own orders
+        if request.user and request.user.is_authenticated:
+            return obj.user_id == request.user.id
+        
+        # Guest users can only access orders matching their session
+        if getattr(request.user, 'is_guest', False):
+            session_id = getattr(request.user, 'session_id', None)
+            return session_id and obj.session_id == session_id
+        
+        return False
+
+
+class SparePartCategoryViewSet(viewsets.ModelViewSet):
     queryset = SparePartCategory.objects.all()
     serializer_class = SparePartCategorySerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
 
-class SparePartBrandViewSet(viewsets.ReadOnlyModelViewSet):
+class SparePartBrandViewSet(viewsets.ModelViewSet):
     queryset = SparePartBrand.objects.all()
     serializer_class = SparePartBrandSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
     def list(self, request, *args, **kwargs):
         category_id = request.query_params.get('category')
@@ -54,9 +96,15 @@ class SparePartBrandViewSet(viewsets.ReadOnlyModelViewSet):
         })
 
 
-class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
+class SparePartViewSet(viewsets.ModelViewSet):
     queryset = SparePart.objects.select_related('brand', 'category').all()
     serializer_class = SparePartDetailSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'compatibility']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
 
     def list(self, request, *args, **kwargs):
         q = request.query_params.get('q')
@@ -100,6 +148,91 @@ class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
             'data': serializer.data
         })
 
+    def perform_create(self, serializer):
+        thumbnail = self.request.FILES.get('thumbnail')
+        instance = serializer.save(thumbnail=thumbnail) if thumbnail else serializer.save()
+        
+        ActivityLog.objects.create(
+            user=self.request.user,
+            action_type='staff_created',
+            description=f"Spare part {instance.name} created",
+            content_object=instance
+        )
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        old_stock = instance.stock_qty
+        old_price = instance.sale_price
+        
+        thumbnail = self.request.FILES.get('thumbnail')
+        if thumbnail:
+             updated_instance = serializer.save(thumbnail=thumbnail)
+        else:
+             updated_instance = serializer.save()
+        
+        # LOG STOCK UPDATE
+        if 'stock_qty' in serializer.validated_data:
+            new_stock = serializer.validated_data['stock_qty']
+            if old_stock != new_stock:
+                ActivityLog.objects.create(
+                    user=self.request.user,
+                    action_type='stock_update',
+                    description=f"Stock for {updated_instance.name} updated from {old_stock} to {new_stock}",
+                    content_object=updated_instance,
+                    metadata={'old_stock': old_stock, 'new_stock': new_stock}
+                )
+                
+        # LOG PRICE UPDATE
+        if 'sale_price' in serializer.validated_data:
+            new_price = float(serializer.validated_data['sale_price'])
+            if float(old_price) != new_price:
+                ActivityLog.objects.create(
+                    user=self.request.user,
+                    action_type='price_change',
+                    description=f"Price for {updated_instance.name} changed from ₹{old_price} to ₹{new_price}",
+                    content_object=updated_instance,
+                    metadata={'old_price': float(old_price), 'new_price': new_price}
+                )
+
+    @action(detail=True, methods=['post'], url_path='upload-image', permission_classes=[permissions.IsAdminUser])
+    def upload_image(self, request, pk=None):
+        """Action: POST /api/spare-parts/parts/<id>/upload-image/"""
+        part = self.get_object()
+        image_file = request.FILES.get('image')
+        if not image_file:
+            return Response({'error': True, 'message': 'No image file provided'}, status=400)
+        
+        is_primary = request.data.get('is_primary', 'false').lower() == 'true'
+        
+        if is_primary:
+            # Unset other primary images
+            part.images.filter(is_primary=True).update(is_primary=False)
+            
+        new_image = SparePartImage.objects.create(
+            spare_part=part,
+            image=image_file,
+            is_primary=is_primary,
+            alt_text=request.data.get('alt_text', '')
+        )
+        
+        serializer = SparePartImageSerializer(new_image, context={'request': request})
+        return Response({
+            'error': False,
+            'message': 'Image uploaded to gallery',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['delete'], url_path='images/(?P<image_id>[^/.]+)', permission_classes=[permissions.IsAdminUser])
+    def delete_image(self, request, pk=None, image_id=None):
+        """Action: DELETE /api/spare-parts/parts/<id>/images/<image_id>/"""
+        part = self.get_object()
+        try:
+            image = part.images.get(id=image_id)
+            image.delete()
+            return Response({'error': False, 'message': 'Image removed from gallery'}, status=status.HTTP_200_OK)
+        except SparePartImage.DoesNotExist:
+            return Response({'error': True, 'message': 'Image not found'}, status=status.HTTP_404_NOT_FOUND)
+
     @action(detail=True, methods=['get'])
     def compatibility(self, request, pk=None):
         part = self.get_object()
@@ -120,6 +253,115 @@ class SparePartViewSet(viewsets.ReadOnlyModelViewSet):
             'data': data
         })
 
+    @action(detail=False, methods=['post'], url_path='bulk-upload', permission_classes=[permissions.IsAdminUser])
+    def bulk_upload(self, request):
+        """
+        Bulk upload/upsert spare parts via CSV.
+        Expected columns: name, category_slug, brand_slug, sku, mrp, sale_price, stock_qty, description
+        """
+        import csv
+        import io
+        from decimal import Decimal, InvalidOperation
+
+        csv_file = request.FILES.get('file')
+        if not csv_file:
+            return Response({'error': True, 'message': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not csv_file.name.endswith('.csv'):
+            return Response({'error': True, 'message': 'File is not a CSV'}, status=status.HTTP_400_BAD_REQUEST)
+
+        decoded_file = csv_file.read().decode('utf-8')
+        io_string = io.StringIO(decoded_file)
+        reader = csv.DictReader(io_string)
+
+        # Expected columns validation
+        required_cols = ['name', 'category_slug', 'brand_slug', 'sku', 'mrp', 'sale_price', 'stock_qty']
+        for col in required_cols:
+            if col not in reader.fieldnames:
+                return Response({
+                    'error': True, 
+                    'message': f'Missing required column: {col}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        created_count = 0
+        updated_count = 0
+        errors = []
+
+        with transaction.atomic():
+            for row_idx, row in enumerate(reader, start=2):
+                try:
+                    sku = row['sku'].strip()
+                    if not sku:
+                        raise ValueError("SKU is required")
+
+                    # Basic numeric validation
+                    mrp = Decimal(row['mrp'])
+                    sale_price = Decimal(row['sale_price'])
+                    stock_qty = int(row['stock_qty'])
+
+                    if mrp < 0 or sale_price < 0:
+                        raise ValueError("Prices cannot be negative")
+                    if stock_qty < 0:
+                        raise ValueError("Stock quantity cannot be negative")
+
+                    # Look up category and brand by slug
+                    try:
+                        category = SparePartCategory.objects.get(slug=row['category_slug'].strip())
+                        brand = SparePartBrand.objects.get(slug=row['brand_slug'].strip())
+                    except SparePartCategory.DoesNotExist:
+                        raise ValueError(f"Category slug '{row['category_slug']}' not found")
+                    except SparePartBrand.DoesNotExist:
+                        raise ValueError(f"Brand slug '{row['brand_slug']}' not found")
+
+                    # Upsert logic
+                    part, created = SparePart.objects.update_or_create(
+                        sku=sku,
+                        defaults={
+                            'name': row['name'].strip(),
+                            'category': category,
+                            'brand': brand,
+                            'mrp': mrp,
+                            'sale_price': sale_price,
+                            'stock_qty': stock_qty,
+                            'description': row.get('description', '').strip(),
+                            'in_stock': stock_qty > 0,
+                            'slug': sku.lower(), # Fallback slug if needed, usually sku is unique
+                        }
+                    )
+
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
+
+                except (ValueError, InvalidOperation, Exception) as e:
+                    errors.append({'row': row_idx, 'error': str(e)})
+                    # Optional: transaction.set_rollback(True) if we want "all or nothing"
+                    # But the prompt says "if ANY row fails validation, reject entire upload"
+                    transaction.set_rollback(True)
+                    return Response({
+                        'error': True,
+                        'message': 'Bulk upload failed due to row errors',
+                        'row_errors': errors
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Log the successful batch
+            ActivityLog.objects.create(
+                user=request.user,
+                action_type='bulk_import',
+                description=f"Bulk imported spare parts: {created_count} created, {updated_count} updated",
+                metadata={'created': created_count, 'updated': updated_count}
+            )
+
+        return Response({
+            'error': False,
+            'message': 'Bulk upload completed successfully',
+            'data': {
+                'created': created_count,
+                'updated': updated_count,
+            }
+        }, status=status.HTTP_201_CREATED)
+
 
 class CartViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
@@ -133,7 +375,7 @@ class CartViewSet(viewsets.ViewSet):
         if not session_id:
             return Response({'error': True, 'message': 'session_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         cart = self._get_or_create_cart(session_id, request.user if request.user and request.user.is_authenticated else None)
-        serializer = CartSerializer(cart)
+        serializer = CartSerializer(cart, context={'request': request})
         return Response({'error': False, 'message': 'Cart retrieved successfully', 'data': serializer.data})
 
     @action(detail=False, methods=['post'])
@@ -160,7 +402,7 @@ class CartViewSet(viewsets.ViewSet):
             item.unit_price = part.sale_price
             item.save()
 
-        cart_serializer = CartSerializer(cart)
+        cart_serializer = CartSerializer(cart, context={'request': request})
         return Response({'error': False, 'message': 'Item added to cart', 'data': cart_serializer.data}, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['patch'])
@@ -177,7 +419,7 @@ class CartViewSet(viewsets.ViewSet):
             return Response({'error': True, 'message': 'Cart item not found'}, status=status.HTTP_404_NOT_FOUND)
         item.quantity = int(quantity)
         item.save()
-        cart_serializer = CartSerializer(cart)
+        cart_serializer = CartSerializer(cart, context={'request': request})
         return Response({'error': False, 'message': 'Cart item updated', 'data': cart_serializer.data})
 
     @action(detail=False, methods=['delete'])
@@ -188,7 +430,7 @@ class CartViewSet(viewsets.ViewSet):
             return Response({'error': True, 'message': 'session_id and item_id are required'}, status=status.HTTP_400_BAD_REQUEST)
         cart = self._get_or_create_cart(session_id)
         deleted, _ = cart.items.filter(id=item_id).delete()
-        cart_serializer = CartSerializer(cart)
+        cart_serializer = CartSerializer(cart, context={'request': request})
         return Response({'error': False, 'message': 'Item removed' if deleted else 'Item not found', 'data': cart_serializer.data})
 
     @action(detail=False, methods=['delete'])
@@ -198,11 +440,15 @@ class CartViewSet(viewsets.ViewSet):
             return Response({'error': True, 'message': 'session_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         cart = self._get_or_create_cart(session_id)
         cart.items.all().delete()
-        cart_serializer = CartSerializer(cart)
+        cart_serializer = CartSerializer(cart, context={'request': request})
         return Response({'error': False, 'message': 'Cart cleared', 'data': cart_serializer.data})
 
     @action(detail=False, methods=['post'])
     def checkout(self, request):
+        """
+        Secure checkout with transaction atomicity and inventory locking.
+        Validates all items before processing, prevents race conditions and overselling.
+        """
         serializer = CheckoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         session_id = serializer.validated_data['session_id']
@@ -215,46 +461,95 @@ class CartViewSet(viewsets.ViewSet):
         if not items:
             return Response({'error': True, 'message': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
 
-        amount_total = 0
-        for item in items:
-            part = item.spare_part
-            if not part.active or not part.in_stock or part.stock_qty < item.quantity:
-                return Response({'error': True, 'message': 'Insufficient stock for one or more items'}, status=status.HTTP_400_BAD_REQUEST)
-            amount_total += item.unit_price * item.quantity
+        with transaction.atomic():
+            # Lock all spare parts in the cart to prevent concurrent modifications
+            spare_part_ids = [item.spare_part_id for item in items]
+            locked_parts = {
+                part.id: part for part in SparePart.objects.filter(id__in=spare_part_ids).select_for_update()
+            }
+            
+            # Validate stock for ALL items before processing ANY
+            out_of_stock_items = []
+            for item in items:
+                part = locked_parts.get(item.spare_part_id)
+                if not part:
+                    out_of_stock_items.append({
+                        'part_name': item.spare_part.name,
+                        'requested': item.quantity,
+                        'available': 0
+                    })
+                elif not part.active or not part.in_stock or part.stock_qty < item.quantity:
+                    out_of_stock_items.append({
+                        'part_name': part.name,
+                        'requested': item.quantity,
+                        'available': max(0, part.stock_qty) if part.in_stock else 0
+                    })
+            
+            # If any item has insufficient stock, return error without processing
+            if out_of_stock_items:
+                items_detail = '; '.join([
+                    f"{item['part_name']} (requested: {item['requested']}, available: {item['available']})"
+                    for item in out_of_stock_items
+                ])
+                return Response({
+                    'error': True,
+                    'message': f'Insufficient stock for: {items_detail}',
+                    'out_of_stock_items': out_of_stock_items
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        order = Order.objects.create(
-            session_id=session_id,
-            user=request.user if request.user and request.user.is_authenticated else None,
-            customer_name=customer_name,
-            phone=phone,
-            address=address,
-            amount_total=amount_total,
-            currency='INR',
-            payment_method='cash',
-            payment_status='cash_due',
-            status='created',
-        )
+            # Calculate total amount
+            amount_total = 0
+            for item in items:
+                amount_total += item.unit_price * item.quantity
 
-        for item in items:
-            OrderItem.objects.create(
-                order=order,
-                spare_part=item.spare_part,
-                quantity=item.quantity,
-                unit_price=item.unit_price,
+            # Create order
+            order = Order.objects.create(
+                session_id=session_id,
+                user=request.user if request.user and request.user.is_authenticated else None,
+                customer_name=customer_name,
+                phone=phone,
+                address=address,
+                amount_total=amount_total,
+                currency='INR',
+                payment_method='cash',
+                payment_status='cash_due',
+                status='created',
             )
-            item.spare_part.stock_qty -= item.quantity
-            if item.spare_part.stock_qty <= 0:
-                item.spare_part.in_stock = False
-                item.spare_part.stock_qty = 0
-            item.spare_part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
 
-        cart.items.all().delete()
+            # Deduct stock ONLY after all validation passes
+            for item in items:
+                part = locked_parts[item.spare_part_id]
+                
+                OrderItem.objects.create(
+                    order=order,
+                    spare_part=part,
+                    quantity=item.quantity,
+                    unit_price=item.unit_price,
+                )
+                
+                # Deduct stock and update in_stock flag
+                part.stock_qty -= item.quantity
+                if part.stock_qty <= 0:
+                    part.in_stock = False
+                    part.stock_qty = 0
+                part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
 
-        order_serializer = OrderSerializer(order)
-        return Response({'error': False, 'message': 'Checkout successful. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)
+            # Clear cart after successful checkout
+            cart.items.all().delete()
+
+            order_serializer = OrderSerializer(order, context={'request': request})
+            return Response({
+                'error': False,
+                'message': 'Checkout successful. Pay cash on delivery.',
+                'data': order_serializer.data
+            }, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
     def buy_now(self, request):
+        """
+        Secure buy_now with transaction atomicity and inventory locking.
+        Validates stock before creating order, prevents race conditions.
+        """
         serializer = BuyNowSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         session_id = serializer.validated_data['session_id']
@@ -264,101 +559,206 @@ class CartViewSet(viewsets.ViewSet):
         phone = serializer.validated_data['phone']
         address = serializer.validated_data['address']
 
-        try:
-            part = SparePart.objects.get(id=spare_part_id, active=True)
-        except SparePart.DoesNotExist:
-            return Response({'error': True, 'message': 'Spare part not found'}, status=status.HTTP_404_NOT_FOUND)
+        with transaction.atomic():
+            try:
+                # Lock the spare part to prevent concurrent modifications
+                part = SparePart.objects.select_for_update().get(id=spare_part_id, active=True)
+            except SparePart.DoesNotExist:
+                return Response({'error': True, 'message': 'Spare part not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        if not part.in_stock or part.stock_qty < quantity:
-            return Response({'error': True, 'message': 'Insufficient stock'}, status=status.HTTP_400_BAD_REQUEST)
+            # Validate stock availability
+            if not part.in_stock or part.stock_qty < quantity:
+                return Response({
+                    'error': True,
+                    'message': f'Insufficient stock for {part.name}. Available: {max(0, part.stock_qty) if part.in_stock else 0}, Requested: {quantity}',
+                    'out_of_stock_item': {
+                        'part_name': part.name,
+                        'requested': quantity,
+                        'available': max(0, part.stock_qty) if part.in_stock else 0
+                    }
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        amount_total = part.sale_price * quantity
-        order = Order.objects.create(
-            session_id=session_id,
-            user=request.user if request.user and request.user.is_authenticated else None,
-            customer_name=customer_name,
-            phone=phone,
-            address=address,
-            amount_total=amount_total,
-            currency='INR',
-            payment_method='cash',
-            payment_status='cash_due',
-            status='created',
-        )
+            # Calculate order total
+            amount_total = part.sale_price * quantity
+            
+            # Create order
+            order = Order.objects.create(
+                session_id=session_id,
+                user=request.user if request.user and request.user.is_authenticated else None,
+                customer_name=customer_name,
+                phone=phone,
+                address=address,
+                amount_total=amount_total,
+                currency='INR',
+                payment_method='cash',
+                payment_status='cash_due',
+                status='created',
+            )
 
-        OrderItem.objects.create(
-            order=order,
-            spare_part=part,
-            quantity=quantity,
-            unit_price=part.sale_price,
-        )
+            # Create order item
+            OrderItem.objects.create(
+                order=order,
+                spare_part=part,
+                quantity=quantity,
+                unit_price=part.sale_price,
+            )
 
-        part.stock_qty -= quantity
-        if part.stock_qty <= 0:
-            part.in_stock = False
-            part.stock_qty = 0
-        part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+            # Deduct stock and update in_stock flag
+            part.stock_qty -= quantity
+            if part.stock_qty <= 0:
+                part.in_stock = False
+                part.stock_qty = 0
+            part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
 
-        order_serializer = OrderSerializer(order)
-        return Response({'error': False, 'message': 'Order created. Pay cash on delivery.', 'data': order_serializer.data}, status=status.HTTP_201_CREATED)
+            order_serializer = OrderSerializer(order, context={'request': request})
+            return Response({
+                'error': False,
+                'message': 'Order created. Pay cash on delivery.',
+                'data': order_serializer.data
+            }, status=status.HTTP_201_CREATED)
 
 
-class OrderViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [permissions.AllowAny]
-    queryset = Order.objects.all()
+class OrderViewSet(viewsets.ModelViewSet):
+    """
+    OrderViewSet with IDOR protection.
+    - Users can only view/cancel their own orders
+    - Guests can only view orders from their session
+    - Staff can access all orders
+    """
+    queryset = Order.objects.prefetch_related('items__spare_part').all()
     serializer_class = OrderSerializer
+    
+    def get_permissions(self):
+        """
+        Assign permissions based on action:
+        - list/retrieve/create/cancel: Requires IsGuestOrAuthenticated + object ownership check
+        - update/delete: Restricted to admin only
+        """
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [permissions.IsAdminUser]
+        else:
+            permission_classes = [IsGuestOrAuthenticated, IsOrderOwner]
+        
+        return [permission() for permission in permission_classes]
+    
+    def get_queryset(self):
+        """
+        Filter orders based on user authentication and role.
+        - Authenticated users: only their own orders
+        - Guest users: only orders matching their session
+        - Staff/Admin: all orders
+        """
+        user = self.request.user
+        
+        # Staff and admins see all orders
+        if user and (user.is_staff or user.is_superuser):
+            return self.queryset.order_by('-created_at')
+        
+        # Authenticated users see only their orders
+        if user and user.is_authenticated:
+            return self.queryset.filter(user=user).order_by('-created_at')
+        
+        # Guest users see only orders from their session
+        if getattr(user, 'is_guest', False):
+            session_id = getattr(user, 'session_id', None)
+            if session_id:
+                return self.queryset.filter(session_id=session_id).order_by('-created_at')
+        
+        # No access for unauthenticated/unidentified users
+        return Order.objects.none()
 
     def list(self, request, *args, **kwargs):
-        session_id = request.query_params.get('session_id')
-        phone = request.query_params.get('phone')
-        qs = self.get_queryset()
+        """
+        List orders - filtered by get_queryset() based on user role.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
         
-        # Priority: authenticated user > session_id
-        if request.user and request.user.is_authenticated:
-            qs = qs.filter(user=request.user)
-        elif session_id:
-            qs = qs.filter(session_id=session_id)
-        else:
-            return Response({'error': True, 'message': 'Authentication or session_id required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not queryset.exists():
+            return Response({
+                'error': False,
+                'message': 'No orders found',
+                'data': []
+            })
         
-        serializer = self.get_serializer(qs.order_by('-created_at'), many=True)
-        return Response({'error': False, 'message': 'Orders retrieved successfully', 'data': serializer.data})
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'error': False,
+            'message': 'Orders retrieved successfully',
+            'data': serializer.data
+        })
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
+        """
+        Retrieve a specific order.
+        """
+        try:
+            instance = self.get_object()
+        except Order.DoesNotExist:
+            return Response(
+                {'error': True, 'message': 'Order not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        self.check_object_permissions(request, instance)
+        
         serializer = self.get_serializer(instance)
-        return Response({'error': False, 'message': 'Order details retrieved successfully', 'data': serializer.data})
+        return Response({
+            'error': False,
+            'message': 'Order details retrieved successfully',
+            'data': serializer.data
+        })
 
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
-        instance = self.get_object()
-        
-        # Check current status
-        if instance.status not in ['created', 'pending', 'confirmed']:
+        """
+        Cancel an order with ownership verification, atomicity, and stock reversal.
+        """
+        try:
+            instance = self.get_object()
+        except Order.DoesNotExist:
             return Response(
-                {
-                    'error': True,
-                    'message': f'Cannot cancel order in {instance.status} status'
-                },
-                status=status.HTTP_400_BAD_REQUEST
+                {'error': True, 'message': 'Order not found'},
+                status=status.HTTP_404_NOT_FOUND
             )
-            
+        
+        self.check_object_permissions(request, instance)
+        
         if instance.status == 'cancelled':
-             return Response(
+            return Response(
                 {'error': True, 'message': 'Order is already cancelled'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Restore stock for each item
-        for item in instance.items.all():
-            part = item.spare_part
-            part.stock_qty += item.quantity
-            part.save()
-
-        instance.status = 'cancelled'
-        instance.save()
         
-        return Response({'success': True, 'message': 'Order cancelled successfully'})
+        if instance.status not in ['created', 'pending', 'confirmed']:
+            return Response(
+                {'error': True, 'message': f'Cannot cancel order in {instance.status} status'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        with transaction.atomic():
+            instance = Order.objects.select_for_update().get(pk=pk)
+            
+            if instance.status == 'cancelled':
+                return Response(
+                    {'error': True, 'message': 'Order was already cancelled'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Reverse stock
+            order_items = list(instance.items.select_related('spare_part').select_for_update())
+            for item in order_items:
+                part = SparePart.objects.select_for_update().get(id=item.spare_part_id)
+                part.stock_qty += item.quantity
+                part.in_stock = True
+                part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+
+            instance.status = 'cancelled'
+            instance.save(update_fields=['status', 'updated_at'])
+            
+            return Response({
+                'error': False,
+                'message': 'Order cancelled successfully. Stock has been restored.'
+            }, status=status.HTTP_200_OK)
 
 
 class SavedPartViewSet(viewsets.ModelViewSet):
@@ -374,7 +774,6 @@ class SavedPartViewSet(viewsets.ModelViewSet):
         if user.is_authenticated:
             return UserSavedPart.objects.filter(user=user)
         
-        # Guest User logic
         guest_id = getattr(user, 'guest_id', None)
         if guest_id:
             return GuestSavedPart.objects.filter(guest_session__guest_id=guest_id)
@@ -401,9 +800,8 @@ class SavedPartViewSet(viewsets.ModelViewSet):
             saved_obj, created = UserSavedPart.objects.get_or_create(
                 user=user, spare_part_id=spare_part_id
             )
-            serializer = UserSavedPartSerializer(saved_obj)
+            serializer = UserSavedPartSerializer(saved_obj, context={'request': request})
         else:
-            # Guest Logic
             guest_id = getattr(user, 'guest_id', None)
             guest_session = GuestSession.objects.filter(guest_id=guest_id).first()
             if not guest_session:
@@ -412,7 +810,7 @@ class SavedPartViewSet(viewsets.ModelViewSet):
             saved_obj, created = GuestSavedPart.objects.get_or_create(
                 guest_session=guest_session, spare_part_id=spare_part_id
             )
-            serializer = GuestSavedPartSerializer(saved_obj)
+            serializer = GuestSavedPartSerializer(saved_obj, context={'request': request})
 
         return Response({
             'error': False,
