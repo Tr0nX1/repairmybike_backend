@@ -31,8 +31,10 @@ class SparePartCategorySerializer(serializers.ModelSerializer):
             return None
         try:
             url = obj.image.url
+            if '/authenticated/' in url:
+                url = url.replace('/authenticated/', '/upload/')
             return {
-                "thumbnail": url, # Using standard URL for now, Cloudinary presets can be added later
+                "thumbnail": url,
                 "original": url,
                 "alt_text": obj.name
             }
@@ -54,6 +56,8 @@ class SparePartBrandSerializer(serializers.ModelSerializer):
             return None
         try:
             url = obj.logo.url
+            if '/authenticated/' in url:
+                url = url.replace('/authenticated/', '/upload/')
             return {
                 "thumbnail": url,
                 "original": url,
@@ -77,6 +81,8 @@ class SparePartImageSerializer(serializers.ModelSerializer):
             return None
         try:
             url = obj.image.url
+            if '/authenticated/' in url:
+                url = url.replace('/authenticated/', '/upload/')
             return {
                 "thumbnail": url,
                 "original": url,
@@ -106,6 +112,8 @@ class SparePartListSerializer(serializers.ModelSerializer):
             request = self.context.get('request')
             if obj.thumbnail:
                 url = request.build_absolute_uri(obj.thumbnail.url) if request else obj.thumbnail.url
+                if '/authenticated/' in url:
+                    url = url.replace('/authenticated/', '/upload/')
                 return {
                     "thumbnail": url,
                     "original": url,
@@ -117,6 +125,8 @@ class SparePartListSerializer(serializers.ModelSerializer):
             if not candidate or not candidate.image:
                 return None
             url = request.build_absolute_uri(candidate.image.url) if request else candidate.image.url
+            if '/authenticated/' in url:
+                url = url.replace('/authenticated/', '/upload/')
             return {
                 "thumbnail": url,
                 "original": url,
@@ -175,6 +185,8 @@ class CartItemSerializer(serializers.ModelSerializer):
             return None
         try:
             url = candidate.image.url
+            if '/authenticated/' in url:
+                url = url.replace('/authenticated/', '/upload/')
             return {
                 "thumbnail": url,
                 "original": url,
@@ -221,6 +233,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
             return None
         try:
             url = candidate.image.url
+            if '/authenticated/' in url:
+                url = url.replace('/authenticated/', '/upload/')
             return {
                 "thumbnail": url,
                 "original": url,

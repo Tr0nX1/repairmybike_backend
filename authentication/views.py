@@ -238,23 +238,12 @@ class PhoneOTPRequestView(APIView):
             try:
                 descope_client = create_descope_client()
                 phone_number = serializer.validated_data['phone_number']
-                attempt_rec, _ = OTPAttempt.objects.get_or_create(
-                    identifier=phone_number, attempt_type='phone', defaults={'attempts_count': 0}
-                )
-                if attempt_rec.is_blocked_now():
-                    return Response({'error': 'Too many OTP requests. Please try again later.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
                 try:
                     descope_client.otp.sign_up_or_in(method=DeliveryMethod.SMS, login_id=phone_number)
                 except Exception as descope_error:
                     logger.error(f"Descope OTP error: {str(descope_error)}")
                     return Response({'error': 'Failed to send verification code.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
                 PhoneOTP.objects.create(phone_number=phone_number, otp_code="****", expires_at=timezone.now() + timedelta(minutes=5))
-                attempt_rec.attempts_count += 1
-                attempt_rec.last_attempt = timezone.now()
-                if attempt_rec.attempts_count >= 5:
-                    attempt_rec.is_blocked = True
-                    attempt_rec.blocked_until = timezone.now() + timedelta(hours=1)
-                attempt_rec.save()
                 return Response({'message': 'Verification code sent successfully', 'phone_number': phone_number, 'expires_in': 300}, status=status.HTTP_200_OK)
             except Exception as e:
                 logger.error(f"OTP request failed: {str(e)}")
@@ -354,33 +343,14 @@ class EmailOTPRequestView(APIView):
         if serializer.is_valid():
             try:
                 email = serializer.validated_data['email']
-                if self._is_rate_limited(email, 'email'):
-                    return Response({'error': 'Too many OTP requests.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
                 descope_client = create_descope_client()
                 descope_client.otp.sign_up_or_in(method=DeliveryMethod.EMAIL, login_id=email)
                 EmailOTP.objects.create(email=email, otp_code="****", expires_at=timezone.now() + timedelta(minutes=5))
-                self._update_rate_limit(email, 'email')
                 return Response({'message': 'Verification code sent successfully', 'email': email, 'expires_in': 300}, status=status.HTTP_200_OK)
             except Exception as e:
                 logger.error(f"Email OTP request failed: {str(e)}")
                 return Response({'error': 'Failed to send OTP', 'details': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def _is_rate_limited(self, identifier, method):
-        try:
-            attempt = OTPAttempt.objects.get(identifier=identifier, attempt_type=method)
-            return attempt.is_blocked_now()
-        except OTPAttempt.DoesNotExist:
-            return False
-    
-    def _update_rate_limit(self, identifier, method):
-        attempt, _ = OTPAttempt.objects.get_or_create(identifier=identifier, attempt_type=method, defaults={'attempts_count': 0})
-        attempt.attempts_count += 1
-        attempt.last_attempt = timezone.now()
-        if attempt.attempts_count >= 5:
-            attempt.is_blocked = True
-            attempt.blocked_until = timezone.now() + timedelta(hours=1)
-        attempt.save()
 
 class EmailOTPVerifyView(APIView):
     """Handle email OTP verification using Descope"""
@@ -475,8 +445,6 @@ class UnifiedOTPRequestView(APIView):
             try:
                 identifier = serializer.validated_data['identifier']
                 method = serializer.validated_data['method']
-                if EmailOTPRequestView()._is_rate_limited(identifier, method):
-                    return Response({'error': 'Too many OTP requests.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
                 descope_client = create_descope_client()
                 descope_method = DeliveryMethod.SMS if method == "phone" else DeliveryMethod.EMAIL
                 descope_client.otp.sign_up_or_in(method=descope_method, login_id=identifier)
@@ -484,7 +452,6 @@ class UnifiedOTPRequestView(APIView):
                     PhoneOTP.objects.create(phone_number=identifier, otp_code="****", expires_at=timezone.now() + timedelta(minutes=5))
                 else:
                     EmailOTP.objects.create(email=identifier, otp_code="****", expires_at=timezone.now() + timedelta(minutes=5))
-                EmailOTPRequestView()._update_rate_limit(identifier, method)
                 return Response({'message': 'OTP sent successfully', 'identifier': identifier, 'method': method, 'expires_in': 300}, status=status.HTTP_200_OK)
             except Exception as e:
                 logger.error(f"Unified OTP request failed: {str(e)}")

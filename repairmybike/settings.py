@@ -232,6 +232,7 @@ if USE_CLOUDINARY:
             'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
             'API_KEY': config('CLOUDINARY_API_KEY', default=''),
             'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+            'SECURE': True,
         }
     print(f"[OK] Media storage: Cloudinary (Cloud Name: {CLOUDINARY_STORAGE.get('CLOUD_NAME', 'via URL')})")
     
@@ -324,14 +325,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
     ],
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/hour',
-        'user': '1000/hour',
-    },
+    'DEFAULT_THROTTLE_CLASSES': [],
+    'DEFAULT_THROTTLE_RATES': {},
 }
 
 # ============================================================================
@@ -339,7 +334,11 @@ REST_FRAMEWORK = {
 # ============================================================================
 from corsheaders.defaults import default_headers
 
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:8080').split(',')
+CORS_ALLOWED_ORIGINS = [
+    origin.strip().rstrip('/') 
+    for origin in config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:8080').split(',')
+    if origin.strip()
+]
 CORS_ALLOW_CREDENTIALS = True
 
 # Allow specific custom headers for guest and session authentication
