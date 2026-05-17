@@ -3,10 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import BookingViewSet
 
 router = DefaultRouter()
-# Register at root level so /api/bookings/ works directly (for Flutter)
-# Also keep the nested path for backward compatibility
-router.register(r'', BookingViewSet, basename='booking')
-router.register(r'bookings', BookingViewSet, basename='booking-nested')
+# Standardize on /api/bookings/bookings/ for all actions
+router.register(r'bookings', BookingViewSet, basename='booking')
 
 urlpatterns = [
     path('', include(router.urls)),

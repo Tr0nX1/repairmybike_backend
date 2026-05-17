@@ -522,7 +522,6 @@ class UnifiedOTPVerifyView(APIView):
     """Handle unified OTP verification (phone or email)"""
     permission_classes = [permissions.AllowAny]
     def post(self, request):
-        logger.info(f"OTP verify request: {request.data}")
         serializer = UnifiedOTPVerifySerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -532,7 +531,6 @@ class UnifiedOTPVerifyView(APIView):
                 descope_client = create_descope_client()
                 descope_method = DeliveryMethod.SMS if method == "phone" else DeliveryMethod.EMAIL
                 auth_response = descope_client.otp.verify_code(method=descope_method, login_id=identifier, code=otp_code)
-                logger.info(f"Descope response: {auth_response}")
                 if auth_response:
                     guest_id = request.META.get('HTTP_X_GUEST_ID')
                     if method == "phone":
@@ -543,8 +541,18 @@ class UnifiedOTPVerifyView(APIView):
                         EmailOTP.objects.filter(email=identifier, is_verified=False).update(is_verified=True)
                     
                     # Fix token extraction
-                    session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    session_token_data = auth_response.get("sessionToken", "")
+                    refresh_token_data = auth_response.get("refreshToken", "")
+                    
+                    if isinstance(session_token_data, dict):
+                        session_jwt = session_token_data.get("jwt")
+                    else:
+                        session_jwt = session_token_data
+                        
+                    if isinstance(refresh_token_data, dict):
+                        refresh_jwt = refresh_token_data.get("jwt")
+                    else:
+                        refresh_jwt = refresh_token_data
                     
                     if not session_jwt:
                          return Response({'error': 'No session token returned from Descope'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

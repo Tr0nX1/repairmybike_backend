@@ -619,6 +619,29 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
     
     serializer_class = BookingDetailSerializer
 
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        user = request.user
+        qs = self.get_queryset()
+        
+        from django.utils import timezone
+        today = timezone.now().date()
+        
+        return Response({
+            'total_assigned': qs.count(),
+            'pending': qs.filter(
+                booking_status='pending'
+            ).count(),
+            'in_progress': qs.filter(
+                booking_status='in_progress'
+            ).count(),
+            'completed_today': qs.filter(
+                booking_status='completed',
+                updated_at__date=today
+            ).count(),
+            'cash_collected_today': 0,
+        })
+
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
@@ -816,27 +839,6 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
         )
 
         return Response({'error': False, 'message': 'Part removed', 'data': BookingDetailSerializer(booking).data})
-
-    @action(detail=False, methods=['get'], url_path='stats')
-    def get_stats(self, request):
-        queryset = self.get_queryset()
-        total_bookings = queryset.count()
-        booking_status = {
-            'pending': queryset.filter(booking_status='pending').count(),
-            'confirmed': queryset.filter(booking_status='confirmed').count(),
-            'in_progress': queryset.filter(booking_status='in_progress').count(),
-            'completed': queryset.filter(booking_status='completed').count(),
-            'cancelled': queryset.filter(booking_status='cancelled').count()
-        }
-        payment_status = {
-            'pending': queryset.filter(payment_status='pending').count(),
-            'completed': queryset.filter(payment_status='completed').count()
-        }
-        return Response({
-            'error': False,
-            'message': 'Statistics retrieved successfully',
-            'data': {'total_bookings': total_bookings, 'booking_status': booking_status, 'payment_status': payment_status}
-        })
 
 
 class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
