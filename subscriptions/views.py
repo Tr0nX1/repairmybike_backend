@@ -33,6 +33,31 @@ class PlanViewSet(viewsets.ModelViewSet):
             serializer.save()
         self._clear_list_cache()
 
+    @action(detail=True, methods=['post'], url_path='benefits')
+    def add_benefit(self, request, pk=None):
+        plan = self.get_object()
+        text = request.data.get('text', '').strip()
+        if not text:
+            return Response({'error': 'Benefit text required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        benefit = PlanBenefit.objects.create(plan=plan, text=text)
+        return Response(PlanBenefitSerializer(benefit).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['delete'], url_path='benefits/(?P<benefit_id>[^/.]+)')
+    def remove_benefit(self, request, pk=None, benefit_id=None):
+        plan = self.get_object()
+        try:
+            benefit = PlanBenefit.objects.get(id=benefit_id, plan=plan)
+            benefit.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except PlanBenefit.DoesNotExist:
+            return Response({'error': 'Benefit not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+    def _clear_list_cache(self):
+        # Implementation if needed
+        pass
+
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):

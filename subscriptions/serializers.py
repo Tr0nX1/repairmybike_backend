@@ -1,11 +1,17 @@
 from rest_framework import serializers
-from .models import Plan, Subscription
+from .models import Plan, Subscription, PlanBenefit
 # Removed build_absolute_media_url - using storage backend directly
 
+
+class PlanBenefitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlanBenefit
+        fields = ('id', 'text', 'is_active')
 
 
 class PlanSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    benefits_list = PlanBenefitSerializer(many=True, read_only=True)
 
     class Meta:
         model = Plan
@@ -17,6 +23,7 @@ class PlanSerializer(serializers.ModelSerializer):
             "description",
             "image",
             "benefits",
+            "benefits_list",
             "services",
             "price",
             "currency",

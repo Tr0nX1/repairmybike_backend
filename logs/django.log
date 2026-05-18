@@ -8197,3 +8197,4 @@ INFO 2026-05-17 03:25:37,322 autoreload 32928 18124 Watching for file changes wi
 INFO 2026-05-17 03:26:23,093 autoreload 32928 18124 E:\develop\repairmybike\repairmybike_backend\spare_parts\serializers.py changed, reloading.
 INFO 2026-05-17 03:26:24,936 autoreload 48048 24716 Watching for file changes with StatReloader
 INFO 2026-05-17 04:54:39,706 autoreload 48048 24716 E:\develop\repairmybike\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2026-05-17 23:32:02,045 autoreload 12708 14340 Watching for file changes with StatReloader
