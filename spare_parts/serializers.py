@@ -127,6 +127,8 @@ class SparePartDetailSerializer(serializers.ModelSerializer):
     brand_name = serializers.CharField(source='brand.name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     images = SparePartImageSerializer(many=True, read_only=True)
+    thumbnail = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
     fitments = serializers.SerializerMethodField()
 
     class Meta:
@@ -136,8 +138,41 @@ class SparePartDetailSerializer(serializers.ModelSerializer):
             'short_description', 'description', 'specs', 'mrp', 'sale_price', 'currency',
             'in_stock', 'stock_qty', 'warranty_months_total', 'warranty_free_months',
             'warranty_pro_rata_months', 'rating_average', 'rating_count', 'weight_grams',
-            'length_mm', 'width_mm', 'height_mm', 'images', 'fitments', 'created_at', 'updated_at'
+            'length_mm', 'width_mm', 'height_mm', 'thumbnail', 'thumbnail_url', 'images', 
+            'fitments', 'created_at', 'updated_at'
         ]
+
+    def get_thumbnail(self, obj):
+        """Returns standardized media object for the primary image"""
+        try:
+            request = self.context.get('request')
+            if obj.thumbnail:
+                url = request.build_absolute_uri(obj.thumbnail.url) if request else obj.thumbnail.url
+                return {
+                    "thumbnail": url,
+                    "original": url,
+                    "alt_text": obj.name
+                }
+            
+            primary = obj.images.filter(is_primary=True).first()
+            candidate = primary or obj.images.order_by('sort_order').first() or obj.images.first()
+            if not candidate or not candidate.image:
+                return None
+            url = request.build_absolute_uri(candidate.image.url) if request else candidate.image.url
+            return {
+                "thumbnail": url,
+                "original": url,
+                "alt_text": candidate.alt_text or obj.name
+            }
+        except Exception:
+            return None
+
+    def get_thumbnail_url(self, obj):
+        """Returns just the string URL for backward compatibility and simpler frontends"""
+        res = self.get_thumbnail(obj)
+        if isinstance(res, dict):
+            return res.get('original') or res.get('thumbnail')
+        return None
 
     def get_fitments(self, obj):
         items = []

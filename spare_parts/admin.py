@@ -57,10 +57,15 @@ class SparePartAdmin(ImagePreviewMixin, admin.ModelAdmin):
     inlines = [SparePartImageInline]
 
     def image_preview(self, obj):
-        # Show primary image if available
+        # 1. Check direct thumbnail field
+        if obj.thumbnail:
+            return super().image_preview(obj)
+            
+        # 2. Fallback to primary image from gallery
         primary = obj.images.filter(is_primary=True).first() or obj.images.first()
         if primary:
             return super().image_preview(primary)
+            
         return "No Image"
     image_preview.short_description = 'Preview'
 
