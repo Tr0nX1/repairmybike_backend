@@ -14,3 +14,21 @@ class StaticContent(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class PolicyContent(models.Model):
+    slug = models.SlugField(unique=True, max_length=100)
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'content_policy'
+        verbose_name = 'Policy Content'
+        verbose_name_plural = 'Policy Content'
+
+    def __str__(self):
+        return self.title

@@ -8198,3 +8198,85 @@ INFO 2026-05-17 03:26:23,093 autoreload 32928 18124 E:\develop\repairmybike\repa
 INFO 2026-05-17 03:26:24,936 autoreload 48048 24716 Watching for file changes with StatReloader
 INFO 2026-05-17 04:54:39,706 autoreload 48048 24716 E:\develop\repairmybike\repairmybike_backend\repairmybike\settings.py changed, reloading.
 INFO 2026-05-17 23:32:02,045 autoreload 12708 14340 Watching for file changes with StatReloader
+INFO 2026-05-18 01:28:47,323 autoreload 12708 14340 E:\develop\repairmybike\repairmybike_backend\spare_parts\serializers.py changed, reloading.
+INFO 2026-05-18 01:28:49,599 autoreload 5068 21836 Watching for file changes with StatReloader
+INFO 2026-05-18 01:36:27,657 autoreload 5068 21836 E:\develop\repairmybike\repairmybike_backend\spare_parts\admin.py changed, reloading.
+INFO 2026-05-18 01:36:31,807 autoreload 25216 25220 Watching for file changes with StatReloader
+INFO 2026-05-18 01:53:03,434 autoreload 25216 25220 E:\develop\repairmybike\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2026-05-18 01:53:05,605 autoreload 23112 23052 Watching for file changes with StatReloader
+INFO 2026-05-18 05:13:25,687 autoreload 23112 23052 E:\develop\repairmybike\repairmybike_backend\content\serializers.py changed, reloading.
+INFO 2026-05-18 05:13:27,801 autoreload 25420 22232 Watching for file changes with StatReloader
+INFO 2026-05-18 05:13:34,604 autoreload 25420 22232 E:\develop\repairmybike\repairmybike_backend\content\views.py changed, reloading.
+INFO 2026-05-18 05:13:36,304 autoreload 26880 26480 Watching for file changes with StatReloader
+INFO 2026-05-18 05:26:30,446 autoreload 26880 26480 E:\develop\repairmybike\repairmybike_backend\content\models.py changed, reloading.
+INFO 2026-05-18 05:26:32,112 autoreload 21848 4136 Watching for file changes with StatReloader
+INFO 2026-05-18 05:26:34,215 autoreload 21848 4136 E:\develop\repairmybike\repairmybike_backend\content\serializers.py changed, reloading.
+INFO 2026-05-18 05:26:35,666 autoreload 3716 11400 Watching for file changes with StatReloader
+INFO 2026-05-18 05:27:06,604 autoreload 3716 11400 E:\develop\repairmybike\repairmybike_backend\content\views.py changed, reloading.
+INFO 2026-05-18 05:27:08,162 autoreload 10504 27172 Watching for file changes with StatReloader
+ERROR 2026-05-18 05:28:06,792 log 9644 22608 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+ERROR 2026-05-18 05:28:06,813 log 9644 22608 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+ERROR 2026-05-18 05:28:06,833 log 9644 22608 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+ERROR 2026-05-18 05:28:06,855 log 9644 22608 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+ERROR 2026-05-18 05:28:06,878 log 9644 22608 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+ERROR 2026-05-18 05:28:06,902 log 9644 22608 Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\utils\deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+  File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
