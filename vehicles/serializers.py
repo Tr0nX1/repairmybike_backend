@@ -85,3 +85,4 @@ class UserVehicleSerializer(serializers.ModelSerializer):
         model = UserVehicle
         fields = ['id', 'vehicle_model_id', 'vehicle_model_details', 'registration_number', 'is_default', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
+        validators = []

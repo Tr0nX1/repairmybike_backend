@@ -87,10 +87,26 @@ class UserVehicleViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         if serializer.validated_data.get('is_default', False):
             UserVehicle.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
-        instance = serializer.save(user=self.request.user)
+        vehicle_model = serializer.validated_data['vehicle_model']
+        instance, created = UserVehicle.objects.get_or_create(
+            user=self.request.user,
+            vehicle_model=vehicle_model,
+            defaults={
+                'registration_number': serializer.validated_data.get('registration_number'),
+                'is_default': serializer.validated_data.get('is_default', False),
+            },
+        )
+        if not created:
+            instance.registration_number = serializer.validated_data.get(
+                'registration_number',
+                instance.registration_number,
+            )
+            instance.is_default = serializer.validated_data.get('is_default', instance.is_default)
+            instance.save(update_fields=['registration_number', 'is_default', 'updated_at'])
         if instance.is_default:
             self.request.user.default_vehicle = instance.vehicle_model
             self.request.user.save(update_fields=['default_vehicle'])
+        serializer.instance = instance
 
     @transaction.atomic
     def perform_update(self, serializer):
