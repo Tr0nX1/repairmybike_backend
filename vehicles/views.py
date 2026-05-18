@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.cache import cache
+from django.db import transaction
 from .models import VehicleType, VehicleBrand, VehicleModel, UserVehicle
 from .serializers import (
     VehicleTypeSerializer, 
@@ -82,6 +83,7 @@ class UserVehicleViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return UserVehicle.objects.filter(user=self.request.user)
 
+    @transaction.atomic
     def perform_create(self, serializer):
         if serializer.validated_data.get('is_default', False):
             UserVehicle.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
@@ -90,9 +92,13 @@ class UserVehicleViewSet(viewsets.ModelViewSet):
             self.request.user.default_vehicle = instance.vehicle_model
             self.request.user.save(update_fields=['default_vehicle'])
 
+    @transaction.atomic
     def perform_update(self, serializer):
         if serializer.validated_data.get('is_default', False):
-            UserVehicle.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+            UserVehicle.objects.filter(
+                user=self.request.user,
+                is_default=True,
+            ).exclude(pk=serializer.instance.pk).update(is_default=False)
         instance = serializer.save()
         if instance.is_default:
             self.request.user.default_vehicle = instance.vehicle_model
