@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import UserSession, PhoneOTP, EmailOTP, OTPAttempt, UserAddress, StaffDirectory, ContactSubmission
+from vehicles.models import VehicleModel
 
 User = get_user_model()
 
@@ -66,9 +67,34 @@ class UserAddressSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
 
 
+class DefaultVehicleSerializer(serializers.ModelSerializer):
+    """
+    Returns a flat vehicle shape that Flutter's profile restore can parse.
+    image is a plain URL string because Flutter calls .toString() on it.
+    """
+    brand_name = serializers.CharField(source='vehicle_brand.name', read_only=True)
+    type_name = serializers.CharField(source='vehicle_brand.vehicle_type.name', read_only=True)
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VehicleModel
+        fields = ['id', 'name', 'brand_name', 'type_name', 'image']
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        try:
+            url = obj.image.url
+            request = self.context.get('request')
+            return request.build_absolute_uri(url) if request else url
+        except Exception:
+            return None
+
+
 class UserSerializer(serializers.ModelSerializer):
     addresses = UserAddressSerializer(many=True, read_only=True)
     profile_picture_url = serializers.SerializerMethodField()
+    default_vehicle = DefaultVehicleSerializer(read_only=True)
     
     class Meta:
         model = User

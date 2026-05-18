@@ -83,7 +83,17 @@ class UserVehicleViewSet(viewsets.ModelViewSet):
         return UserVehicle.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # Handle setting is_default logic if needed
         if serializer.validated_data.get('is_default', False):
             UserVehicle.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
-        serializer.save(user=self.request.user)
+        instance = serializer.save(user=self.request.user)
+        if instance.is_default:
+            self.request.user.default_vehicle = instance.vehicle_model
+            self.request.user.save(update_fields=['default_vehicle'])
+
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('is_default', False):
+            UserVehicle.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+        instance = serializer.save()
+        if instance.is_default:
+            self.request.user.default_vehicle = instance.vehicle_model
+            self.request.user.save(update_fields=['default_vehicle'])

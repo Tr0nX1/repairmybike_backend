@@ -53,7 +53,7 @@ class BookingCreateSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_blank=True)
     
     # Vehicle Info
-    vehicle_model_id = serializers.IntegerField()
+    vehicle_model_id = serializers.IntegerField(required=False, allow_null=True)
     
     # Service Info
     service_ids = serializers.ListField(

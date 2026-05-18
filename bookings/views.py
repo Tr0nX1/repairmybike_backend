@@ -547,9 +547,19 @@ class BookingViewSet(viewsets.ModelViewSet):
 
         data = serializer.validated_data
         
+        vehicle_model_id = data.get('vehicle_model_id')
+        if not vehicle_model_id:
+            if request.user.is_authenticated and request.user.default_vehicle_id:
+                vehicle_model_id = request.user.default_vehicle_id
+            else:
+                return Response({
+                    'error': True,
+                    'message': 'vehicle_model_id is required. No default vehicle set on account.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
         # Verify vehicle model exists
         try:
-            vehicle_model = VehicleModel.objects.get(id=data['vehicle_model_id'])
+            vehicle_model = VehicleModel.objects.get(id=vehicle_model_id)
         except VehicleModel.DoesNotExist:
             return Response({
                 'error': True,
@@ -580,7 +590,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             try:
                 pricing = ServicePricing.objects.get(
                     service_id=service_id,
-                    vehicle_model_id=data['vehicle_model_id']
+                    vehicle_model_id=vehicle_model_id
                 )
                 service_prices[service_id] = pricing.price
                 total_amount += pricing.price
