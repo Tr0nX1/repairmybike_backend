@@ -55,28 +55,25 @@ def _merge_guest_data(user, guest_id):
             return
             
         logger.info(f"Merging guest data for guest_id: {guest_id} into user: {user.id}")
-        
-        # Update bookings
-        Booking.objects.filter(guest_session=guest_session).update(
-            user=user,
-            guest_session=None
-        )
-        
+
         # Update cart
         from spare_parts.models import Cart
-        Cart.objects.filter(guest_session=guest_session).update(
-            user=user,
-            guest_session=None
-        )
-        
+        Cart.objects.filter(session_id=str(guest_session.guest_id), user__isnull=True).update(user=user)
+
+        # Update saved services
+        from services.models import GuestSavedService, UserSavedService
+        guest_saved_services = GuestSavedService.objects.filter(guest_session=guest_session)
+        for item in guest_saved_services:
+            UserSavedService.objects.get_or_create(user=user, service=item.service)
+        guest_saved_services.delete()
+
         # Update saved items
-        from spare_parts.models import GuestSavedPart
-        from spare_parts.models import SavedPart
+        from spare_parts.models import GuestSavedPart, UserSavedPart
         guest_saved = GuestSavedPart.objects.filter(guest_session=guest_session)
         for item in guest_saved:
-            SavedPart.objects.get_or_create(user=user, spare_part=item.spare_part)
+            UserSavedPart.objects.get_or_create(user=user, spare_part=item.spare_part)
         guest_saved.delete()
-        
+
     except Exception as e:
         logger.error(f"Error merging guest data: {e}")
 

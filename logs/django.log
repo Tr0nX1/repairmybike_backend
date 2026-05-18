@@ -8518,3 +8518,4 @@ django.db.utils.ProgrammingError: column user_vehicles.nickname does not exist
 LINE 1: ...s"."user_id", "user_vehicles"."vehicle_model_id", "user_vehi...
                                                              ^
 
+INFO 2026-05-18 12:10:42,079 autoreload 18872 25816 Watching for file changes with StatReloader
