@@ -50,6 +50,7 @@ class UserVehicle(models.Model):
     user = models.ForeignKey('authentication.User', on_delete=models.CASCADE, related_name='vehicles')
     vehicle_model = models.ForeignKey(VehicleModel, on_delete=models.CASCADE, related_name='user_vehicles')
     registration_number = models.CharField(max_length=20, blank=True, null=True)
+    current_odometer = models.PositiveIntegerField(default=0)
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

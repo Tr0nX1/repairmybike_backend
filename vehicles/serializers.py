@@ -83,6 +83,38 @@ class UserVehicleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserVehicle
-        fields = ['id', 'vehicle_model_id', 'vehicle_model_details', 'registration_number', 'is_default', 'created_at', 'updated_at']
+        fields = [
+            'id', 'vehicle_model_id', 'vehicle_model_details',
+            'registration_number', 'current_odometer', 'is_default',
+            'created_at', 'updated_at',
+        ]
         read_only_fields = ['id', 'created_at', 'updated_at']
         validators = []
+
+    def create(self, validated_data):
+        user = validated_data['user']
+        vehicle_model = validated_data['vehicle_model']
+        instance, created = UserVehicle.objects.get_or_create(
+            user=user,
+            vehicle_model=vehicle_model,
+            defaults={
+                'registration_number': validated_data.get('registration_number'),
+                'current_odometer': validated_data.get('current_odometer', 0),
+                'is_default': validated_data.get('is_default', False),
+            },
+        )
+        if not created:
+            update_fields = []
+            if 'registration_number' in validated_data:
+                instance.registration_number = validated_data['registration_number']
+                update_fields.append('registration_number')
+            if 'current_odometer' in validated_data:
+                instance.current_odometer = validated_data['current_odometer']
+                update_fields.append('current_odometer')
+            if 'is_default' in validated_data:
+                instance.is_default = validated_data['is_default']
+                update_fields.append('is_default')
+            if update_fields:
+                update_fields.append('updated_at')
+                instance.save(update_fields=update_fields)
+        return instance
