@@ -8519,3 +8519,9 @@ LINE 1: ...s"."user_id", "user_vehicles"."vehicle_model_id", "user_vehi...
                                                              ^
 
 INFO 2026-05-18 12:10:42,079 autoreload 18872 25816 Watching for file changes with StatReloader
+INFO 2026-05-18 12:30:02,855 autoreload 18872 25816 E:\develop\repairmybike\repairmybike_backend\services\serializers.py changed, reloading.
+INFO 2026-05-18 12:30:03,850 autoreload 1848 23460 Watching for file changes with StatReloader
+INFO 2026-05-18 12:30:22,063 autoreload 1848 23460 E:\develop\repairmybike\repairmybike_backend\spare_parts\serializers.py changed, reloading.
+INFO 2026-05-18 12:30:22,940 autoreload 5088 3516 Watching for file changes with StatReloader
+INFO 2026-05-18 12:30:37,040 autoreload 5088 3516 E:\develop\repairmybike\repairmybike_backend\services\views.py changed, reloading.
+INFO 2026-05-18 12:30:37,909 autoreload 7728 23064 Watching for file changes with StatReloader

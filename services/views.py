@@ -101,31 +101,23 @@ class ServiceViewSet(viewsets.ModelViewSet):
     
     def list(self, request, *args, **kwargs):
         category_id = request.query_params.get('category_id')
+        user = request.user
+        user_identifier = f"user_{user.id}" if user.is_authenticated else (f"guest_{user.guest_id}" if getattr(user, 'is_guest', False) else "anon")
         
         if category_id:
-            cache_key = f'services_category_{category_id}'
-            cached_data = cache.get(cache_key)
-            
-            if cached_data:
-                return Response({
-                    'error': False,
-                    'message': 'Services retrieved successfully',
-                    'data': cached_data
-                })
-            
+            cache_key = f'services_category_{category_id}_{user_identifier}'
             queryset = self.get_queryset().filter(service_category_id=category_id)
         else:
-            cache_key = 'services_all'
-            cached_data = cache.get(cache_key)
-            
-            if cached_data:
-                return Response({
-                    'error': False,
-                    'message': 'Services retrieved successfully',
-                    'data': cached_data
-                })
-            
+            cache_key = f'services_all_{user_identifier}'
             queryset = self.get_queryset()
+
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response({
+                'error': False,
+                'message': 'Services retrieved successfully',
+                'data': cached_data
+            })
         
         serializer = self.get_serializer(queryset, many=True)
         

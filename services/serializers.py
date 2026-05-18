@@ -38,18 +38,35 @@ class ServiceSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='service_category.name', read_only=True)
     price = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
+    is_saved = serializers.SerializerMethodField()
     
     def get_price(self, obj):
         # Get the lowest price across all vehicle models
         pricing = obj.pricing.order_by('price').first()
         return float(pricing.price) if pricing else 0.0
+
+    def get_is_saved(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+            
+        user = request.user
+        if user.is_authenticated:
+            return UserSavedService.objects.filter(user=user, service=obj).exists()
+            
+        # Guest logic
+        guest_id = getattr(user, 'guest_id', None)
+        if guest_id:
+            return GuestSavedService.objects.filter(guest_session__guest_id=guest_id, service=obj).exists()
+            
+        return False
     
     class Meta:
         model = Service
         fields = [
             'id', 'service_category', 'category_name', 'name', 'description',
             'rating', 'reviews_count', 'specifications', 'images', 'price',
-            'is_featured', 'created_at', 'updated_at'
+            'is_featured', 'is_saved', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 

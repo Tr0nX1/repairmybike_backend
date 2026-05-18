@@ -87,6 +87,7 @@ class SparePartListSerializer(serializers.ModelSerializer):
     brand_name = serializers.CharField(source='brand.name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     thumbnail = serializers.SerializerMethodField()
+    is_saved = serializers.SerializerMethodField()
 
     class Meta:
         model = SparePart
@@ -94,11 +95,27 @@ class SparePartListSerializer(serializers.ModelSerializer):
             'id', 'name', 'slug', 'sku', 'brand', 'brand_name', 'category', 'category_name',
             'short_description', 'mrp', 'sale_price', 'currency', 'in_stock', 'stock_qty',
             'warranty_months_total', 'warranty_free_months', 'warranty_pro_rata_months',
-            'rating_average', 'rating_count', 'thumbnail', 'created_at', 'updated_at'
+            'rating_average', 'rating_count', 'thumbnail', 'is_saved', 'created_at', 'updated_at'
         ]
 
+    def get_is_saved(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+            
+        user = request.user
+        if user.is_authenticated:
+            return UserSavedPart.objects.filter(user=user, spare_part=obj).exists()
+            
+        # Guest logic
+        guest_id = getattr(user, 'guest_id', None)
+        if guest_id:
+            return GuestSavedPart.objects.filter(guest_session__guest_id=guest_id, spare_part=obj).exists()
+            
+        return False
+
     def get_thumbnail(self, obj):
-        """Returns standardized media object for the primary image"""
+        # ... existing implementation ...
         try:
             request = self.context.get('request')
             if obj.thumbnail:
@@ -130,6 +147,7 @@ class SparePartDetailSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
     thumbnail_url = serializers.SerializerMethodField()
     fitments = serializers.SerializerMethodField()
+    is_saved = serializers.SerializerMethodField()
 
     class Meta:
         model = SparePart
@@ -139,8 +157,25 @@ class SparePartDetailSerializer(serializers.ModelSerializer):
             'in_stock', 'stock_qty', 'warranty_months_total', 'warranty_free_months',
             'warranty_pro_rata_months', 'rating_average', 'rating_count', 'weight_grams',
             'length_mm', 'width_mm', 'height_mm', 'thumbnail', 'thumbnail_url', 'images', 
-            'fitments', 'created_at', 'updated_at'
+            'fitments', 'is_saved', 'created_at', 'updated_at'
         ]
+
+    def get_is_saved(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+            
+        user = request.user
+        if user.is_authenticated:
+            return UserSavedPart.objects.filter(user=user, spare_part=obj).exists()
+            
+        # Guest logic
+        guest_id = getattr(user, 'guest_id', None)
+        if guest_id:
+            return GuestSavedPart.objects.filter(guest_session__guest_id=guest_id, spare_part=obj).exists()
+            
+        return False
+
 
     def get_thumbnail(self, obj):
         """Returns standardized media object for the primary image"""
