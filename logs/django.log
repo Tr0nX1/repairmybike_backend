@@ -8280,3 +8280,7 @@ Traceback (most recent call last):
   File "E:\develop\repairmybike\repairmybike_backend\venv\Lib\site-packages\django\http\request.py", line 202, in get_host
     raise DisallowedHost(msg)
 django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+INFO 2026-05-18 06:55:29,234 autoreload 24148 9628 Watching for file changes with StatReloader
+INFO 2026-05-18 07:18:59,247 basehttp 10504 20440 "GET /api/content/pages/privacy-policy/ HTTP/1.1" 200 16942
+WARNING 2026-05-18 07:18:59,632 log 10504 20440 Not Found: /favicon.ico
+WARNING 2026-05-18 07:18:59,633 basehttp 10504 20440 "GET /favicon.ico HTTP/1.1" 404 4751
