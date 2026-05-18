@@ -8284,3 +8284,4 @@ INFO 2026-05-18 06:55:29,234 autoreload 24148 9628 Watching for file changes wit
 INFO 2026-05-18 07:18:59,247 basehttp 10504 20440 "GET /api/content/pages/privacy-policy/ HTTP/1.1" 200 16942
 WARNING 2026-05-18 07:18:59,632 log 10504 20440 Not Found: /favicon.ico
 WARNING 2026-05-18 07:18:59,633 basehttp 10504 20440 "GET /favicon.ico HTTP/1.1" 404 4751
+INFO 2026-05-18 11:46:26,989 autoreload 10744 23668 Watching for file changes with StatReloader
