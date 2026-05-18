@@ -4,19 +4,11 @@
         "builder": "DOCKERFILE",
         "dockerfilePath": "Dockerfile",
         "watchPatterns": [
+            "**/*.py",
             "requirements.txt",
-            "repairmybike/**",
-            "railway.json",
             "Dockerfile",
-            "authentication/**",
-            "services/**",
-            "vehicles/**",
-            "bookings/**",
-            "payments/**",
-            "staff/**",
-            "shop/**",
-            "spare_parts/**",
-            "subscriptions/**",
+            "railway.json",
+            "start.sh",
             "manage.py",
             ".env.example"
         ]
