@@ -12,9 +12,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from bookings.models import Booking, BookingPart
 from spare_parts.models import SparePart
-from bookings.serializers import BookingDetailSerializer
+from bookings.serializers import BookingDetailSerializer, BookingPartSerializer
 from rest_framework import permissions
-from .permissions import IsStaffAuthenticated, IsSuperUser
+from .permissions import IsStaffAuthenticated, IsSuperUser, IsSuperuserOrManager
 from .models import ActivityLog, CashMovement, CashReconciliation, CashSession
 from .serializers import (
     ActivityLogSerializer,
@@ -23,6 +23,7 @@ from .serializers import (
     CashSessionSerializer,
     StaffUserSerializer,
 )
+from authentication.serializers import AdminUserSerializer
 
 User = get_user_model()
 
@@ -42,6 +43,120 @@ class StaffUserViewSet(viewsets.ReadOnlyModelViewSet):
         return Response({
             'error': False,
             'message': 'Staff list retrieved successfully',
+            'data': serializer.data,
+        })
+
+
+class UserManagementViewSet(viewsets.GenericViewSet):
+    """
+    User management for administrators and managers.
+    """
+    permission_classes = [permissions.IsAuthenticated, IsSuperuserOrManager]
+    serializer_class = AdminUserSerializer
+    queryset = User.objects.all().order_by('-created_at')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        search = self.request.query_params.get('search', '').strip()
+        role_filter = self.request.query_params.get('role', '').lower()
+        is_staff = self.request.query_params.get('is_staff')
+        is_active = self.request.query_params.get('is_active')
+
+        if search:
+            qs = qs.filter(
+                Q(username__icontains=search) |
+                Q(email__icontains=search) |
+                Q(phone_number__icontains=search)
+            )
+
+        if role_filter == 'staff':
+            qs = qs.filter(is_staff=True, is_superuser=False)
+        elif role_filter == 'manager':
+            qs = qs.filter(is_manager=True, is_superuser=False)
+        elif role_filter == 'superuser':
+            qs = qs.filter(is_superuser=True)
+
+        if is_staff is not None:
+            if str(is_staff).lower() in ['true', '1', 'yes']:
+                qs = qs.filter(is_staff=True)
+            elif str(is_staff).lower() in ['false', '0', 'no']:
+                qs = qs.filter(is_staff=False)
+
+        if is_active is not None:
+            if str(is_active).lower() in ['true', '1', 'yes']:
+                qs = qs.filter(is_active=True)
+            elif str(is_active).lower() in ['false', '0', 'no']:
+                qs = qs.filter(is_active=False)
+
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'error': False,
+            'message': 'User list retrieved successfully',
+            'data': serializer.data,
+        })
+
+    @action(detail=True, methods=['patch'], url_path='roles')
+    def roles(self, request, pk=None):
+        user = request.user
+        target_user = self.get_object()
+        if not (user.is_superuser or getattr(user, 'is_manager', False)):
+            return Response({
+                'error': 'Manager or superuser privileges required'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        payload = request.data
+        changes = {}
+
+        if 'is_staff' in payload or 'is_superuser' in payload:
+            if not user.is_superuser:
+                return Response({
+                    'error': 'Only superusers can change staff or superuser roles',
+                    'code': 'SUPERUSER_REQUIRED'
+                }, status=status.HTTP_403_FORBIDDEN)
+
+        if user.id == target_user.id and 'is_superuser' in payload and str(payload.get('is_superuser')).lower() in ['false', '0', 'no']:
+            return Response({
+                'error': 'You cannot remove your own superuser access',
+                'code': 'SELF_DEMOTION'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        def parse_bool(value):
+            if isinstance(value, bool):
+                return value
+            return str(value).lower() in ['true', '1', 'yes']
+
+        for field in ['is_active', 'is_staff', 'is_superuser', 'is_manager']:
+            if field in payload:
+                new_value = parse_bool(payload.get(field))
+                setattr(target_user, field, new_value)
+                changes[field] = new_value
+
+        if changes:
+            target_user.save(update_fields=list(changes.keys()))
+            ActivityLog.objects.create(
+                user=user,
+                action_type='user_role_changed',
+                description=f"Updated roles for {target_user.username}",
+                content_object=target_user,
+                metadata={
+                    'target_user': str(target_user.id),
+                    'changes': changes,
+                }
+            )
+
+        serializer = self.get_serializer(target_user)
+        return Response({
+            'error': False,
+            'message': 'User roles updated successfully',
             'data': serializer.data,
         })
 
@@ -619,6 +734,14 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
     
     serializer_class = BookingDetailSerializer
 
+    VALID_TRANSITIONS = {
+        'pending': ['confirmed', 'cancelled'],
+        'confirmed': ['in_progress', 'cancelled'],
+        'in_progress': ['completed', 'cancelled'],
+        'completed': [],
+        'cancelled': [],
+    }
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         user = request.user
@@ -644,23 +767,32 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = super().get_queryset()
+        qs = Booking.objects.all().select_related(
+            'customer', 'vehicle_model'
+        ).order_by('-created_at')
         
-        # Superusers and Managers see all
+        # Superusers and managers see everything
         if user.is_superuser or getattr(user, 'is_manager', False):
-            # Additional manager-only filter by mechanic
-            mechanic_id = self.request.query_params.get('mechanic_id')
+            mechanic_id = self.request.query_params.get(
+                'mechanic_id'
+            )
             if mechanic_id:
                 qs = qs.filter(mechanic_id=mechanic_id)
             return qs
-            
-        # Regular staff/mechanics see only assigned bookings
-        return qs.filter(mechanic=user)
+        
+        # Regular staff (mechanics) see only their jobs
+        if user.is_staff:
+            return qs.filter(mechanic=user)
+        
+        # Everyone else: nothing
+        return qs.none()
 
     def list(self, request, *args, **kwargs):
         status_filter = request.query_params.get('status')
         date_filter = request.query_params.get('date')
         search = request.query_params.get('search')
+        payment_method = request.query_params.get('payment_method')
+        payment_status = request.query_params.get('payment_status')
         
         queryset = self.get_queryset()
         
@@ -668,6 +800,10 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(booking_status=status_filter)
         if date_filter:
             queryset = queryset.filter(appointment_date=date_filter)
+        if payment_method:
+            queryset = queryset.filter(payment_method=payment_method)
+        if payment_status:
+            queryset = queryset.filter(payment_status=payment_status)
         if search:
             queryset = queryset.filter(
                 Q(customer__name__icontains=search) |
@@ -693,26 +829,62 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
         })
     
     @action(detail=True, methods=['patch'], url_path='update-status')
+    @transaction.atomic
     def update_status(self, request, pk=None):
         booking = self.get_object()
         old_status = booking.booking_status
         new_status = request.data.get('status')
+        notes = (request.data.get('notes') or '').strip()
         
         if not new_status:
-            return Response({'error': True, 'message': 'status field is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'status field is required'}, status=status.HTTP_400_BAD_REQUEST)
         
+        if old_status in ['completed', 'cancelled']:
+            return Response(
+                {
+                    'error': f'Booking is already in terminal state: {old_status}',
+                    'code': 'TERMINAL_STATE',
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        allowed_statuses = self.VALID_TRANSITIONS.get(old_status, [])
+        if new_status not in allowed_statuses:
+            return Response(
+                {
+                    'error': f'Cannot transition booking from {old_status} to {new_status}',
+                    'code': 'INVALID_TRANSITION',
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         booking.booking_status = new_status
-        if new_status == 'completed' and booking.payment_method == 'cash':
-            booking.payment_status = 'completed'
+        if notes:
+            note_header = timezone.now().strftime('%Y-%m-%d %H:%M')
+            user_label = request.user.get_username() if request.user and request.user.is_authenticated else 'system'
+            appended_note = f'[{note_header}] Status {old_status} -> {new_status} by {user_label}: {notes}'
+            booking.internal_notes = (
+                f'{booking.internal_notes}\n\n{appended_note}'
+                if booking.internal_notes
+                else appended_note
+            )
         booking.save()
 
-        # AUDIT LOG
+        # ASSUMPTION: ActivityLog uses user/action_type/content_object rather than
+        # action/booking/performed_by, and action_type is limited to existing choices.
         ActivityLog.objects.create(
             user=request.user,
             action_type='status_change',
             description=f"Status changed from {old_status} to {new_status} for Booking #{booking.id}",
             content_object=booking,
-            metadata={'old_value': old_status, 'new_value': new_status, 'booking_id': booking.id}
+            metadata={
+                'from': old_status,
+                'to': new_status,
+                'notes': notes,
+                'old_value': old_status,
+                'new_value': new_status,
+                'booking_id': booking.id,
+            }
         )
         
         return Response({'error': False, 'message': f'Status updated to {new_status}', 'data': self.get_serializer(booking).data})
@@ -720,7 +892,7 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='add-part')
     @transaction.atomic
     def add_part(self, request, pk=None):
-        part_id = request.data.get('part_id')
+        part_id = request.data.get('spare_part_id') or request.data.get('part_id')
         try:
             quantity = int(request.data.get('quantity', 1))
         except (TypeError, ValueError):
@@ -736,6 +908,18 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
             return Response({'error': True, 'message': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
         except SparePart.DoesNotExist:
             return Response({'error': True, 'message': 'Part not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if booking.booking_status in ['completed', 'cancelled']:
+            return Response(
+                {'error': 'Cannot add parts to a completed or cancelled booking', 'code': 'BOOKING_TERMINAL'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not part.in_stock:
+            return Response(
+                {'error': True, 'message': f'{part.name} is out of stock'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if part.stock_qty < quantity:
             return Response({
@@ -813,6 +997,12 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
                 'message': 'Approved parts require admin permission or customer re-approval before removal'
             }, status=status.HTTP_403_FORBIDDEN)
 
+        if bp.approval_status != BookingPart.APPROVAL_PENDING:
+            return Response(
+                {'error': 'Only pending parts can be removed', 'code': 'PART_NOT_PENDING'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         part_name = bp.spare_part.name
         removed_total = bp.total_price
         booking.total_amount -= removed_total
@@ -839,6 +1029,159 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
         )
 
         return Response({'error': False, 'message': 'Part removed', 'data': BookingDetailSerializer(booking).data})
+
+    @action(detail=True, methods=['delete'], url_path='remove-part/(?P<booking_part_id>[^/.]+)')
+    @transaction.atomic
+    def delete_part(self, request, pk=None, booking_part_id=None):
+        try:
+            booking = Booking.objects.select_for_update().get(pk=pk)
+        except Booking.DoesNotExist:
+            return Response({'error': True, 'message': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            bp = BookingPart.objects.select_for_update().select_related('spare_part').get(id=booking_part_id, booking=booking)
+        except BookingPart.DoesNotExist:
+            return Response({'error': 'Booking part does not belong to this booking', 'code': 'BOOKING_PART_MISMATCH'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if booking.booking_status in ['completed', 'cancelled']:
+            return Response(
+                {'error': 'Cannot remove parts from a completed or cancelled booking', 'code': 'BOOKING_TERMINAL'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if bp.approval_status != BookingPart.APPROVAL_PENDING:
+            return Response(
+                {'error': 'Only pending parts can be removed', 'code': 'PART_NOT_PENDING'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        part_name = bp.spare_part.name
+        removed_total = bp.total_price
+        booking.total_amount -= removed_total
+        if booking.total_amount < 0:
+            booking.total_amount = Decimal('0.00')
+        bp.delete()
+        booking.save(update_fields=['total_amount', 'updated_at'])
+
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='part_removed',
+            description=f"Removed {part_name} from Booking #{booking.id}",
+            content_object=booking,
+            metadata={
+                'old_value': BookingPart.APPROVAL_PENDING,
+                'new_value': 'removed',
+                'booking_id': booking.id,
+                'booking_part_id': booking_part_id,
+                'part_name': part_name,
+                'amount': str(removed_total),
+            }
+        )
+
+        booking = self.get_queryset().get(pk=booking.pk)
+        return Response({'error': False, 'message': 'Part removed', 'data': BookingDetailSerializer(booking).data})
+
+    @action(detail=True, methods=['post'], url_path='approve-part/(?P<booking_part_id>[^/.]+)')
+    @transaction.atomic
+    def approve_part(self, request, pk=None, booking_part_id=None):
+        return self._set_booking_part_approval(
+            request=request,
+            pk=pk,
+            booking_part_id=booking_part_id,
+            target_status=BookingPart.APPROVAL_APPROVED,
+            already_code='ALREADY_APPROVED',
+            # ASSUMPTION: ActivityLog.action_type is max_length=20, so use
+            # the existing shorter choice and keep the requested name in metadata.
+            action_type='part_approved',
+            verb='approved',
+            requested_action='booking_part_approved',
+        )
+
+    @action(detail=True, methods=['post'], url_path='reject-part/(?P<booking_part_id>[^/.]+)')
+    @transaction.atomic
+    def reject_part(self, request, pk=None, booking_part_id=None):
+        return self._set_booking_part_approval(
+            request=request,
+            pk=pk,
+            booking_part_id=booking_part_id,
+            target_status=BookingPart.APPROVAL_REJECTED,
+            already_code='ALREADY_REJECTED',
+            # ASSUMPTION: ActivityLog.action_type is max_length=20, so use
+            # the existing shorter choice and keep the requested name in metadata.
+            action_type='part_rejected',
+            verb='rejected',
+            requested_action='booking_part_rejected',
+        )
+
+    def _set_booking_part_approval(self, request, pk, booking_part_id, target_status, already_code, action_type, verb, requested_action):
+        try:
+            booking = Booking.objects.select_for_update().get(pk=pk)
+        except Booking.DoesNotExist:
+            return Response({'error': True, 'message': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            booking_part = BookingPart.objects.select_for_update().select_related('spare_part').get(
+                id=booking_part_id,
+                booking=booking,
+            )
+        except BookingPart.DoesNotExist:
+            return Response(
+                {'error': 'Booking part does not belong to this booking', 'code': 'BOOKING_PART_MISMATCH'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if booking.booking_status in ['completed', 'cancelled']:
+            return Response(
+                {'error': 'Cannot change parts on a completed or cancelled booking', 'code': 'BOOKING_TERMINAL'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if booking_part.approval_status == target_status:
+            return Response(
+                {'error': f'Booking part is already {verb}', 'code': already_code},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        old_status = booking_part.approval_status
+        booking_part.approval_status = target_status
+        if target_status == BookingPart.APPROVAL_APPROVED:
+            booking_part.approved_by = request.user
+            booking_part.approved_at = timezone.now()
+            update_fields = ['approval_status', 'approved_by', 'approved_at']
+        else:
+            booking_part.approved_by = request.user
+            booking_part.approved_at = timezone.now()
+            update_fields = ['approval_status', 'approved_by', 'approved_at']
+        booking_part.save(update_fields=update_fields)
+
+        # ASSUMPTION: ActivityLog uses user/action_type/content_object rather than
+        # action/booking/performed_by, and BookingPart's locked price field is unit_price.
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type=action_type,
+            description=f"{booking_part.spare_part.name} {verb} for Booking #{booking.id}",
+            content_object=booking_part,
+            metadata={
+                'from': old_status,
+                'to': target_status,
+                'old_value': old_status,
+                'new_value': target_status,
+                'booking_id': booking.id,
+                'booking_part_id': booking_part.id,
+                'action': requested_action,
+                'part': booking_part.spare_part.name,
+                'part_id': booking_part.spare_part_id,
+                'price': str(booking_part.unit_price),
+                'quantity': booking_part.quantity,
+                'amount': str(booking_part.total_price),
+            }
+        )
+
+        return Response({
+            'error': False,
+            'message': f'Booking part {verb}',
+            'data': BookingPartSerializer(booking_part).data,
+        })
 
 
 class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):

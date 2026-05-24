@@ -1,12 +1,15 @@
 from django.core.cache import cache
+from django.db import transaction
+from django.utils import timezone
 from rest_framework import viewsets, permissions, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from staff.permissions import IsSuperuserOrManager
+from staff.models import ActivityLog
 
 from .models import Plan, Subscription, PlanBenefit
-
-from .serializers import PlanSerializer, SubscriptionSerializer
+from .serializers import PlanSerializer, SubscriptionSerializer, PlanBenefitSerializer
 
 
 class PlanViewSet(viewsets.ModelViewSet):
@@ -53,6 +56,31 @@ class PlanViewSet(viewsets.ModelViewSet):
         except PlanBenefit.DoesNotExist:
             return Response({'error': 'Benefit not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=['patch'], url_path='benefits/(?P<benefit_id>[^/.]+)')
+    def update_benefit(self, request, pk=None, benefit_id=None):
+        plan = self.get_object()
+        try:
+            benefit = PlanBenefit.objects.get(id=benefit_id, plan=plan)
+        except PlanBenefit.DoesNotExist:
+            return Response({'error': 'Benefit not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        text = request.data.get('text')
+        is_active = request.data.get('is_active')
+        if text is None and is_active is None:
+            return Response({'error': 'At least one field is required to update'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if text is not None:
+            text = str(text).strip()
+            if not text:
+                return Response({'error': 'Benefit text cannot be blank'}, status=status.HTTP_400_BAD_REQUEST)
+            benefit.text = text
+        if is_active is not None:
+            if isinstance(is_active, str):
+                is_active = is_active.lower() in ['1', 'true', 'yes', 'on']
+            benefit.is_active = bool(is_active)
+        benefit.save()
+        return Response(PlanBenefitSerializer(benefit).data, status=status.HTTP_200_OK)
+
 
     def _clear_list_cache(self):
         # Implementation if needed
@@ -76,12 +104,15 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         email = self.request.query_params.get("email")
         user_id = self.request.query_params.get("user_id")
         phone = self.request.query_params.get("phone")
+        status_param = self.request.query_params.get("status")
         if email:
             qs = qs.filter(contact_email=email)
         if user_id:
             qs = qs.filter(user_id=user_id)
         if phone:
             qs = qs.filter(contact_phone=phone)
+        if status_param:
+            qs = qs.filter(status=status_param)
         return qs
 
     def list(self, request, *args, **kwargs):
@@ -112,31 +143,191 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='adjust-visits')
     def adjust_visits(self, request, pk=None):
         subscription = self.get_object()
-        visits_to_add = request.data.get('visits_to_add')
-        reason = request.data.get('reason', '')
+        adjustment = request.data.get('adjustment')
+        reason = request.data.get('reason', '').strip()
 
-        if visits_to_add is None:
-            return Response({'error': 'visits_to_add is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if adjustment is None:
+            return Response({'error': 'adjustment is required', 'code': 'OUT_OF_BOUNDS'}, status=status.HTTP_400_BAD_REQUEST)
+        if not reason:
+            return Response({'error': 'reason is required', 'code': 'REASON_REQUIRED'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            visits_to_add = int(visits_to_add)
-        except ValueError:
-            return Response({'error': 'visits_to_add must be an integer'}, status=status.HTTP_400_BAD_REQUEST)
+            adjustment = int(adjustment)
+        except (ValueError, TypeError):
+            return Response({'error': 'adjustment must be an integer', 'code': 'INVALID_ADJUSTMENT'}, status=status.HTTP_400_BAD_REQUEST)
 
-        subscription.visits_remaining += visits_to_add
-        subscription.save()
+        included = subscription.plan.included_visits or 0
+        old_value = subscription.visits_consumed or 0
+        new_value = old_value + adjustment
+
+        if new_value < 0 or new_value > included:
+            return Response(
+                {
+                    'error': f'Visits adjustment out of bounds. Must be between 0 and {included}.',
+                    'code': 'OUT_OF_BOUNDS'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        subscription.visits_consumed = new_value
+        subscription.save(update_fields=['visits_consumed', 'updated_at'])
 
         from staff.models import ActivityLog
         ActivityLog.objects.create(
             user=request.user,
-            action_type='subscription_adjustment',
-            description=f"Adjusted visits for subscription #{subscription.id} by {visits_to_add}. Reason: {reason}",
+            action_type='subscription_visits_adjusted',
+            description=f"Adjusted visits for subscription #{subscription.id} by {adjustment}. Reason: {reason}",
             content_object=subscription,
-            metadata={'adjustment': visits_to_add, 'reason': reason}
+            metadata={
+                'subscription_id': str(subscription.id),
+                'adjustment': adjustment,
+                'old_value': old_value,
+                'new_value': new_value,
+                'reason': reason,
+            }
         )
 
         return Response({
             'error': False,
-            'message': f"Added {visits_to_add} visits. Total remaining: {subscription.visits_remaining}",
+            'message': f'Visits adjusted to {new_value}.',
             'data': self.get_serializer(subscription).data
         })
+
+    @action(detail=True, methods=['post'], url_path='approve',
+            permission_classes=[permissions.IsAuthenticated, IsSuperuserOrManager])
+    def approve(self, request, pk=None):
+        subscription = self.get_object()
+        
+        # Validate current state
+        if subscription.status != 'pending':
+            return Response(
+                {'error': 'Only pending subscriptions can be approved.',
+                 'code': 'INVALID_STATUS'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Activate
+        now = timezone.now()
+        subscription.status = 'active'
+        subscription.approved_by = request.user
+        subscription.approved_at = now
+        
+        # Reset visits on fresh activation
+        subscription.visits_consumed = 0
+        
+        # Recompute dates from today
+        subscription.start_date = now
+        subscription.end_date = None        # clear so save() recomputes
+        subscription.next_billing_date = None
+        subscription.save()                 # triggers compute_end_date
+        
+        # Notify customer
+        def notify_customer():
+            try:
+                from notifications.models import Notification
+                from repairmybike.fcm import send_push_notification
+                plan_name = subscription.plan.name
+                visits = subscription.plan.included_visits or 0
+                
+                Notification.objects.create(
+                    user=subscription.user,
+                    title="Subscription Activated",
+                    message=f"Your {plan_name} plan is now active. "
+                            f"You have {visits} visits available.",
+                    notification_type='subscription'
+                )
+                
+                if subscription.user:
+                    send_push_notification(
+                        subscription.user,
+                        "Subscription Activated",
+                        f"Your {plan_name} plan is now active!",
+                        {'type': 'subscription_approved',
+                         'subscription_id': str(subscription.id)}
+                    )
+                
+                ActivityLog.objects.create(
+                    user=request.user,
+                    action_type='subscription_approved',
+                    description=f"Approved subscription for {subscription.user.username}",
+                    content_object=subscription,
+                    metadata={
+                        'subscription_id': str(subscription.id),
+                        'approved_by': str(request.user.id),
+                        'plan': subscription.plan.name,
+                        'end_date': str(subscription.end_date),
+                    }
+                )
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(
+                    f"Failed to notify customer of approval: {e}"
+                )
+        
+        transaction.on_commit(notify_customer)
+        
+        serializer = self.get_serializer(subscription)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], url_path='reject',
+            permission_classes=[permissions.IsAuthenticated, IsSuperuserOrManager])
+    def reject(self, request, pk=None):
+        subscription = self.get_object()
+        
+        if subscription.status != 'pending':
+            return Response(
+                {'error': 'Only pending subscriptions can be rejected.',
+                 'code': 'INVALID_STATUS'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        reason = request.data.get('reason', '')
+        
+        subscription.status = 'canceled'
+        subscription.rejection_reason = reason
+        subscription.save()
+        
+        def notify_customer():
+            try:
+                from notifications.models import Notification
+                from repairmybike.fcm import send_push_notification
+                plan_name = subscription.plan.name
+                
+                Notification.objects.create(
+                    user=subscription.user,
+                    title="Subscription Request Update",
+                    message=f"Your request for {plan_name} could not "
+                            f"be approved. Please contact the shop.",
+                    notification_type='subscription'
+                )
+                
+                if subscription.user:
+                    send_push_notification(
+                        subscription.user,
+                        "Subscription Request Update",
+                        f"Your {plan_name} request was not approved. Please contact the shop.",
+                        {'type': 'subscription_rejected',
+                         'subscription_id': str(subscription.id)}
+                    )
+                
+                ActivityLog.objects.create(
+                    user=request.user,
+                    action_type='subscription_rejected',
+                    description=f"Rejected subscription for {subscription.user.username}",
+                    content_object=subscription,
+                    metadata={
+                        'subscription_id': str(subscription.id),
+                        'rejected_by': str(request.user.id),
+                        'reason': reason,
+                    }
+                )
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(
+                    f"Failed to notify customer of rejection: {e}"
+                )
+        
+        transaction.on_commit(notify_customer)
+        
+        serializer = self.get_serializer(subscription)
+        return Response(serializer.data)

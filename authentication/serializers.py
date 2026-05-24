@@ -7,30 +7,30 @@ User = get_user_model()
 
 
 class StaffDirectorySerializer(serializers.ModelSerializer):
-    class StaffDirectorySerializer(serializers.ModelSerializer):
-        email = serializers.SerializerMethodField()
-        photo_url = serializers.SerializerMethodField()
-        is_manager = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    photo_url = serializers.SerializerMethodField()
+    is_manager = serializers.SerializerMethodField()
 
-        class Meta:
-            model = StaffDirectory
-            fields = ['id', 'name', 'employee_id', 'role', 'is_active', 'email', 'photo', 'photo_url', 'is_manager', 'created_at']
-            read_only_fields = ['id', 'created_at']
+    class Meta:
+        model = StaffDirectory
+        fields = [
+            'id', 'identifier', 'name', 'employee_id', 'role',
+            'is_active', 'email', 'photo', 'photo_url', 'is_manager',
+            'created_at'
+        ]
+        read_only_fields = ['id', 'created_at']
 
-        def get_email(self, obj):
-            identifier = (obj.identifier or '').strip()
-            if '@' in identifier:
-                return identifier
-            return None
+    def get_email(self, obj):
+        identifier = (obj.identifier or '').strip()
+        if '@' in identifier:
+            return identifier
+        return None
 
-        def get_photo_url(self, obj):
-            request = self.context.get('request')
-            if obj.photo:
-                return request.build_absolute_uri(obj.photo.url) if request else obj.photo.url
-            return None
-
-        def get_is_manager(self, obj):
-            return str(obj.role).lower() in ['manager', 'admin', 'superuser']
+    def get_photo_url(self, obj):
+        request = self.context.get('request')
+        if obj.photo:
+            return request.build_absolute_uri(obj.photo.url) if request else obj.photo.url
+        return None
 
     def get_is_manager(self, obj):
         return str(obj.role).lower() in ['manager', 'admin', 'superuser']
@@ -104,6 +104,23 @@ class UserSerializer(serializers.ModelSerializer):
             'is_manager', 'default_vehicle', 'addresses', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email', 'phone_number',
+            'first_name', 'last_name', 'full_name',
+            'is_active', 'is_staff', 'is_superuser', 'is_manager',
+            'is_verified', 'created_at'
+        ]
+        read_only_fields = fields
+
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}".strip() or obj.username
 
     def get_profile_picture_url(self, obj):
         request = self.context.get('request')

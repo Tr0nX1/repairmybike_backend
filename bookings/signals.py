@@ -43,6 +43,21 @@ def booking_push_notifications(sender, instance, created, **kwargs):
                 data = {'type': 'new_booking', 'booking_id': str(instance.id)}
                 
                 send_push_to_multiple(staff_users, title, body, data)
+                
+                try:
+                    from notifications.models import Notification
+                    for staff_member in staff_users:
+                        Notification.objects.create(
+                            user=staff_member,
+                            title=title,
+                            message=body,
+                            notification_type='booking_update'
+                        )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).error(
+                        f"Failed to create staff notification rows: {e}"
+                    )
                 # Note: We'll skip logging ActivityLog here to avoid recursive signal loops or noise unless requested
             else:
                 # Trigger 2: Status Change
@@ -52,10 +67,11 @@ def booking_push_notifications(sender, instance, created, **kwargs):
                         'confirmed': f"Your booking is confirmed! We'll see you on {instance.appointment_date}.",
                         'in_progress': f"Work has started on your vehicle. 🔧",
                         'completed': "Your bike is ready for pickup! 🎉",
-                        'cancelled': f"Your booking #{instance.id} has been cancelled."
+                        'cancelled': f"Your booking #{instance.id} has been cancelled.",
+                        'assigned': None
                     }
                     
-                    if instance.booking_status in status_messages:
+                    if instance.booking_status in status_messages and status_messages[instance.booking_status]:
                         user = User.objects.filter(phone_number=instance.customer.phone).first()
                         if user:
                             title = "Booking Update"

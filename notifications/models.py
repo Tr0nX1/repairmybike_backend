@@ -7,6 +7,8 @@ class Notification(models.Model):
         ('promotion', 'Promotion'),
         ('system', 'System'),
         ('payment', 'Payment'),
+        ('subscription', 'Subscription'),
+        ('order_update', 'Order Update'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')

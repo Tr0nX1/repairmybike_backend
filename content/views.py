@@ -1,7 +1,8 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.response import Response
 from .models import PolicyContent, StaticContent
 from .serializers import PolicyContentSerializer, StaticContentSerializer
+from staff.permissions import IsSuperuserOrManager
 
 POLICY_KEY_ALIASES = {
     'terms-and-conditions': ('terms-and-conditions', 'terms'),
@@ -38,11 +39,13 @@ class StaticContentViewSet(viewsets.ModelViewSet):
     queryset = StaticContent.objects.all()
     serializer_class = StaticContentSerializer
     lookup_field = 'key'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['key', 'title']
 
     def get_permissions(self):
         if self.action in ['retrieve', 'list']:
             return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
+        return [IsSuperuserOrManager()]
 
     def _candidate_keys(self, key):
         return POLICY_KEY_ALIASES.get(key, (key,))

@@ -113,12 +113,13 @@ class ServicePricingSerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(source='service.service_category.id', read_only=True)
     category_name = serializers.CharField(source='service.service_category.name', read_only=True)
     description = serializers.CharField(source='service.description', read_only=True)
+    vehicle_model_name = serializers.CharField(source='vehicle_model.name', read_only=True)
     
     class Meta:
         model = ServicePricing
         fields = [
             'id', 'service_id', 'service_name', 'category_id', 'category_name',
-            'description', 'vehicle_model', 'price', 'created_at', 'updated_at'
+            'description', 'vehicle_model', 'vehicle_model_name', 'price', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 

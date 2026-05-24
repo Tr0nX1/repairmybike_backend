@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
+from decimal import Decimal
 from .models import (
     SparePartCategory,
     SparePartBrand,
@@ -97,6 +98,7 @@ class SparePartListSerializer(serializers.ModelSerializer):
             'warranty_months_total', 'warranty_free_months', 'warranty_pro_rata_months',
             'rating_average', 'rating_count', 'thumbnail', 'is_saved', 'created_at', 'updated_at'
         ]
+        read_only_fields = ['id', 'in_stock', 'created_at', 'updated_at']
 
     def get_is_saved(self, obj):
         request = self.context.get('request')
@@ -159,6 +161,25 @@ class SparePartDetailSerializer(serializers.ModelSerializer):
             'length_mm', 'width_mm', 'height_mm', 'thumbnail', 'thumbnail_url', 'images', 
             'fitments', 'is_saved', 'created_at', 'updated_at'
         ]
+        read_only_fields = ['id', 'slug', 'in_stock', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        if not validated_data.get('slug'):
+            import re
+            name = validated_data.get('name', '')
+            sku = validated_data.get('sku', '')
+            base = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+            slug = f"{base}-{sku}".lower() if sku else base
+            
+            # Ensure unique slug
+            original_slug = slug
+            counter = 1
+            from spare_parts.models import SparePart
+            while SparePart.objects.filter(slug=slug).exists():
+                slug = f"{original_slug}-{counter}"
+                counter += 1
+            validated_data['slug'] = slug
+        return super().create(validated_data)
 
     def get_is_saved(self, obj):
         request = self.context.get('request')
@@ -309,6 +330,16 @@ class OrderSerializer(serializers.ModelSerializer):
             'estimated_delivery', 'delivered_at', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'user', 'amount_total', 'currency', 'payment_method', 'payment_status', 'status', 'created_at', 'updated_at']
+
+
+class OrderTransitionSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
+    notes = serializers.CharField(required=False, allow_blank=True)
+
+
+class OrderCashPaymentSerializer(serializers.Serializer):
+    amount_received = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal('0.01'))
+    notes = serializers.CharField(required=False, allow_blank=True)
 
 
 class CheckoutSerializer(serializers.Serializer):

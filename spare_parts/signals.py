@@ -46,10 +46,20 @@ def low_stock_push_notification(sender, instance, created, **kwargs):
             def send_notifications():
                 try:
                     from django.contrib.auth import get_user_model
+                    from notifications.models import Notification
                     User = get_user_model()
                     
                     superusers = User.objects.filter(is_superuser=True, is_active=True)
                     data = {'type': 'low_stock', 'part_id': str(instance.id)}
+                    
+                    # Create Notification rows in DB for all superusers
+                    for admin in superusers:
+                        Notification.objects.create(
+                            user=admin,
+                            title=title,
+                            message=body,
+                            notification_type='system' # Or add 'stock_alert' if you want to extend choices
+                        )
                     
                     success = send_push_to_multiple(superusers, title, body, data)
                     if success:

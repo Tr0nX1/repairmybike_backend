@@ -97,6 +97,19 @@ class SparePart(models.Model):
     def __str__(self):
         return f"{self.name} ({self.sku})"
 
+    def save(self, *args, **kwargs):
+        # Derive in_stock from stock_qty
+        self.in_stock = self.stock_qty > 0
+        
+        # If update_fields is present, ensure in_stock is included if stock_qty is
+        if 'update_fields' in kwargs and kwargs['update_fields'] is not None:
+            update_fields = set(kwargs['update_fields'])
+            if 'stock_qty' in update_fields:
+                update_fields.add('in_stock')
+            kwargs['update_fields'] = list(update_fields)
+            
+        super().save(*args, **kwargs)
+
 
 class SparePartImage(models.Model):
     spare_part = models.ForeignKey(SparePart, on_delete=models.CASCADE, related_name='images')

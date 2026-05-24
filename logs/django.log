@@ -8525,3 +8525,125 @@ INFO 2026-05-18 12:30:22,063 autoreload 1848 23460 E:\develop\repairmybike\repai
 INFO 2026-05-18 12:30:22,940 autoreload 5088 3516 Watching for file changes with StatReloader
 INFO 2026-05-18 12:30:37,040 autoreload 5088 3516 E:\develop\repairmybike\repairmybike_backend\services\views.py changed, reloading.
 INFO 2026-05-18 12:30:37,909 autoreload 7728 23064 Watching for file changes with StatReloader
+INFO 2026-05-23 07:12:07,652 autoreload 23992 22944 Watching for file changes with StatReloader
+INFO 2026-05-23 07:13:13,443 basehttp 23992 18188 "GET /api/content/static-content/ HTTP/1.1" 200 79611
+INFO 2026-05-23 07:13:14,529 basehttp 23992 18188 "GET /api/shop/shop-info/ HTTP/1.1" 200 77
+WARNING 2026-05-23 07:22:26,596 log 23992 26560 Forbidden: /api/auth/staff-directory/
+WARNING 2026-05-23 07:22:26,596 basehttp 23992 26560 "GET /api/auth/staff-directory/?format=json HTTP/1.1" 403 58
+INFO 2026-05-23 07:24:07,563 autoreload 23992 22944 E:\develop\repairmybike\repairmybike_backend\payments\views.py changed, reloading.
+INFO 2026-05-23 07:24:08,830 autoreload 16124 14604 Watching for file changes with StatReloader
+INFO 2026-05-23 07:24:35,736 autoreload 16124 14604 E:\develop\repairmybike\repairmybike_backend\payments\views.py changed, reloading.
+INFO 2026-05-23 07:24:36,897 autoreload 20000 24412 Watching for file changes with StatReloader
+INFO 2026-05-23 07:33:58,881 autoreload 1844 18120 Watching for file changes with StatReloader
+INFO 2026-05-23 07:53:43,389 autoreload 20000 24412 E:\develop\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-05-23 07:53:43,507 autoreload 1844 18120 E:\develop\repairmybike\repairmybike_backend\subscriptions\models.py changed, reloading.
+INFO 2026-05-23 07:53:44,668 autoreload 26220 9356 Watching for file changes with StatReloader
+INFO 2026-05-23 07:53:44,775 autoreload 14720 13932 Watching for file changes with StatReloader
+INFO 2026-05-23 07:53:46,428 autoreload 26220 9356 E:\develop\repairmybike\repairmybike_backend\notifications\models.py changed, reloading.
+INFO 2026-05-23 07:53:46,615 autoreload 14720 13932 E:\develop\repairmybike\repairmybike_backend\notifications\models.py changed, reloading.
+INFO 2026-05-23 07:53:47,338 autoreload 6340 9828 Watching for file changes with StatReloader
+INFO 2026-05-23 07:53:47,773 autoreload 2428 3992 Watching for file changes with StatReloader
+INFO 2026-05-23 07:53:49,030 autoreload 6340 9828 E:\develop\repairmybike\repairmybike_backend\staff\models.py changed, reloading.
+INFO 2026-05-23 07:53:49,524 autoreload 2428 3992 E:\develop\repairmybike\repairmybike_backend\staff\models.py changed, reloading.
+INFO 2026-05-23 07:53:49,990 autoreload 1480 26456 Watching for file changes with StatReloader
+INFO 2026-05-23 07:53:50,676 autoreload 12308 7372 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:16,868 autoreload 12308 7372 E:\develop\repairmybike\repairmybike_backend\subscriptions\apps.py changed, reloading.
+INFO 2026-05-23 07:56:17,121 autoreload 1480 26456 E:\develop\repairmybike\repairmybike_backend\subscriptions\apps.py changed, reloading.
+INFO 2026-05-23 07:56:17,976 autoreload 3132 2088 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:18,046 autoreload 2588 25632 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:24,255 autoreload 2588 25632 E:\develop\repairmybike\repairmybike_backend\subscriptions\views.py changed, reloading.
+INFO 2026-05-23 07:56:24,292 autoreload 3132 2088 E:\develop\repairmybike\repairmybike_backend\subscriptions\views.py changed, reloading.
+INFO 2026-05-23 07:56:25,200 autoreload 25096 4104 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:25,449 autoreload 25012 11756 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:27,882 autoreload 25096 4104 E:\develop\repairmybike\repairmybike_backend\subscriptions\views.py changed, reloading.
+INFO 2026-05-23 07:56:28,223 autoreload 25012 11756 E:\develop\repairmybike\repairmybike_backend\subscriptions\views.py changed, reloading.
+INFO 2026-05-23 07:56:28,738 autoreload 12872 12104 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:29,316 autoreload 20672 22888 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:35,470 autoreload 20672 22888 E:\develop\repairmybike\repairmybike_backend\subscriptions\serializers.py changed, reloading.
+INFO 2026-05-23 07:56:35,839 autoreload 12872 12104 E:\develop\repairmybike\repairmybike_backend\subscriptions\serializers.py changed, reloading.
+INFO 2026-05-23 07:56:36,528 autoreload 2788 8848 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:36,772 autoreload 11740 21228 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:39,303 autoreload 2788 8848 E:\develop\repairmybike\repairmybike_backend\subscriptions\serializers.py changed, reloading.
+INFO 2026-05-23 07:56:39,451 autoreload 11740 21228 E:\develop\repairmybike\repairmybike_backend\subscriptions\serializers.py changed, reloading.
+INFO 2026-05-23 07:56:40,362 autoreload 6896 18256 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:40,380 autoreload 15472 5040 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:45,465 autoreload 6896 18256 E:\develop\repairmybike\repairmybike_backend\subscriptions\views.py changed, reloading.
+INFO 2026-05-23 07:56:45,605 autoreload 15472 5040 E:\develop\repairmybike\repairmybike_backend\subscriptions\views.py changed, reloading.
+INFO 2026-05-23 07:56:46,355 autoreload 21444 19892 Watching for file changes with StatReloader
+INFO 2026-05-23 07:56:46,771 autoreload 23908 16208 Watching for file changes with StatReloader
+INFO 2026-05-23 08:15:35,647 autoreload 21444 19892 E:\develop\repairmybike\repairmybike_backend\notifications\models.py changed, reloading.
+INFO 2026-05-23 08:15:35,943 autoreload 23908 16208 E:\develop\repairmybike\repairmybike_backend\notifications\models.py changed, reloading.
+INFO 2026-05-23 08:15:36,613 autoreload 24816 10640 Watching for file changes with StatReloader
+INFO 2026-05-23 08:15:37,125 autoreload 24420 22000 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:04,776 autoreload 24816 10640 E:\develop\repairmybike\repairmybike_backend\staff\models.py changed, reloading.
+INFO 2026-05-23 08:17:04,839 autoreload 24420 22000 E:\develop\repairmybike\repairmybike_backend\staff\models.py changed, reloading.
+INFO 2026-05-23 08:17:05,736 autoreload 21876 22220 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:05,983 autoreload 17184 21040 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:13,246 autoreload 17184 21040 E:\develop\repairmybike\repairmybike_backend\bookings\signals.py changed, reloading.
+INFO 2026-05-23 08:17:13,918 autoreload 21876 22220 E:\develop\repairmybike\repairmybike_backend\bookings\signals.py changed, reloading.
+INFO 2026-05-23 08:17:14,049 autoreload 2432 20560 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:14,701 autoreload 18992 19256 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:22,652 autoreload 2432 20560 E:\develop\repairmybike\repairmybike_backend\bookings\signals.py changed, reloading.
+INFO 2026-05-23 08:17:23,181 autoreload 18992 19256 E:\develop\repairmybike\repairmybike_backend\bookings\signals.py changed, reloading.
+INFO 2026-05-23 08:17:23,692 autoreload 5012 26560 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:24,058 autoreload 10476 24324 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:29,865 autoreload 5012 26560 E:\develop\repairmybike\repairmybike_backend\bookings\signals.py changed, reloading.
+INFO 2026-05-23 08:17:30,096 autoreload 10476 24324 E:\develop\repairmybike\repairmybike_backend\bookings\signals.py changed, reloading.
+INFO 2026-05-23 08:17:30,916 autoreload 12508 8452 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:31,021 autoreload 11532 6116 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:35,081 autoreload 11532 6116 E:\develop\repairmybike\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2026-05-23 08:17:35,118 autoreload 12508 8452 E:\develop\repairmybike\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2026-05-23 08:17:36,027 autoreload 20356 8356 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:36,251 autoreload 3688 4240 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:40,388 autoreload 3688 4240 E:\develop\repairmybike\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2026-05-23 08:17:41,035 autoreload 20356 8356 E:\develop\repairmybike\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2026-05-23 08:17:41,451 autoreload 12116 21048 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:41,960 autoreload 9876 9188 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:54,204 autoreload 9876 9188 E:\develop\repairmybike\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2026-05-23 08:17:54,998 autoreload 12116 21048 E:\develop\repairmybike\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2026-05-23 08:17:55,100 autoreload 3192 7728 Watching for file changes with StatReloader
+INFO 2026-05-23 08:17:56,062 autoreload 24908 2484 Watching for file changes with StatReloader
+INFO 2026-05-23 08:42:34,918 autoreload 26928 13932 Watching for file changes with StatReloader
+INFO 2026-05-23 20:16:46,947 autoreload 19404 21744 Watching for file changes with StatReloader
+INFO 2026-05-23 21:13:09,968 autoreload 19404 21744 E:\develop\repairmybike\repairmybike_backend\spare_parts\serializers.py changed, reloading.
+INFO 2026-05-23 21:13:15,867 autoreload 16992 27212 Watching for file changes with StatReloader
+INFO 2026-05-23 21:13:54,043 autoreload 16992 27212 E:\develop\repairmybike\repairmybike_backend\spare_parts\views.py changed, reloading.
+INFO 2026-05-23 21:13:56,781 autoreload 9756 1604 Watching for file changes with StatReloader
+INFO 2026-05-23 21:14:03,777 autoreload 9756 1604 E:\develop\repairmybike\repairmybike_backend\staff\views.py changed, reloading.
+INFO 2026-05-23 21:14:06,692 autoreload 19056 10400 Watching for file changes with StatReloader
+INFO 2026-05-23 21:14:18,342 autoreload 19056 10400 E:\develop\repairmybike\repairmybike_backend\services\serializers.py changed, reloading.
+INFO 2026-05-23 21:14:21,541 autoreload 13240 8984 Watching for file changes with StatReloader
+INFO 2026-05-23 21:26:45,000 autoreload 13240 8984 E:\develop\repairmybike\repairmybike_backend\staff\permissions.py changed, reloading.
+INFO 2026-05-23 21:26:48,120 autoreload 24600 22724 Watching for file changes with StatReloader
+INFO 2026-05-23 21:33:41,378 autoreload 24600 22724 E:\develop\repairmybike\repairmybike_backend\authentication\authentication.py changed, reloading.
+INFO 2026-05-23 21:34:22,295 autoreload 15456 16368 Watching for file changes with StatReloader
+INFO 2026-05-23 22:14:50,956 autoreload 15456 16368 E:\develop\repairmybike\repairmybike_backend\staff\views.py changed, reloading.
+INFO 2026-05-23 22:14:52,182 autoreload 20624 19884 Watching for file changes with StatReloader
+INFO 2026-05-23 22:14:58,200 autoreload 20624 19884 E:\develop\repairmybike\repairmybike_backend\bookings\signals.py changed, reloading.
+INFO 2026-05-23 22:14:59,282 autoreload 18068 25904 Watching for file changes with StatReloader
+WARNING 2026-05-23 23:18:30,513 log 18068 22412 Not Found: /
+WARNING 2026-05-23 23:18:30,519 basehttp 18068 22412 "GET / HTTP/1.1" 404 4700
+INFO 2026-05-23 23:18:51,112 basehttp 18068 22412 "GET /health/ HTTP/1.1" 200 66
+INFO 2026-05-23 23:19:47,830 basehttp 18068 22412 "GET /health/ HTTP/1.1" 200 66
+INFO 2026-05-23 23:21:56,969 autoreload 27068 4592 Watching for file changes with StatReloader
+INFO 2026-05-23 23:29:12,782 basehttp 27068 17560 "OPTIONS /api/services/services/ HTTP/1.1" 200 0
+INFO 2026-05-23 23:29:12,786 basehttp 27068 17560 "OPTIONS /api/spare-parts/parts/ HTTP/1.1" 200 0
+INFO 2026-05-23 23:29:12,788 basehttp 27068 20376 "OPTIONS /api/subscriptions/plans/ HTTP/1.1" 200 0
+INFO 2026-05-23 23:29:31,050 basehttp 27068 26524 "GET /api/services/services/ HTTP/1.1" 200 14469
+INFO 2026-05-23 23:29:35,456 basehttp 27068 20376 "GET /api/subscriptions/plans/ HTTP/1.1" 200 6521
+INFO 2026-05-23 23:29:44,016 basehttp 27068 20376 "GET /api/services/services/ HTTP/1.1" 200 14469
+INFO 2026-05-23 23:29:49,175 basehttp 27068 17560 - Broken pipe from ('127.0.0.1', 51055)
+INFO 2026-05-23 23:29:49,290 basehttp 27068 16776 "GET /api/subscriptions/plans/ HTTP/1.1" 200 6521
+INFO 2026-05-23 23:30:01,093 basehttp 27068 26524 "GET /api/spare-parts/parts/ HTTP/1.1" 200 10112
+INFO 2026-05-23 23:30:07,756 basehttp 27068 26524 "OPTIONS /api/auth/otp/request/ HTTP/1.1" 200 0
+INFO 2026-05-23 23:30:10,320 basehttp 27068 26524 "POST /api/auth/otp/request/ HTTP/1.1" 200 98
+INFO 2026-05-23 23:30:39,237 basehttp 27068 26524 "OPTIONS /api/auth/otp/verify/ HTTP/1.1" 200 0
+INFO 2026-05-23 23:30:43,544 views 27068 26524 Merging guest data for guest_id: 00000000-0000-4000-8000-019e58ac5895 into user: 26
+ERROR 2026-05-23 23:30:46,447 views 27068 26524 Unified OTP verification failed: 'UserSerializer' object has no attribute 'get_profile_picture_url'
+WARNING 2026-05-23 23:30:46,701 log 27068 26524 Bad Request: /api/auth/otp/verify/
+WARNING 2026-05-23 23:30:46,702 basehttp 27068 26524 "POST /api/auth/otp/verify/ HTTP/1.1" 400 114
+ERROR 2026-05-23 23:31:13,902 views 27068 26524 Unified OTP verification failed: {'status_code': 401, 'error_type': 'server error', 'error_message': '{"errorCode":"E061104","errorDescription":"One time code expired"}'}
+WARNING 2026-05-23 23:31:14,143 log 27068 26524 Bad Request: /api/auth/otp/verify/
+WARNING 2026-05-23 23:31:14,143 basehttp 27068 26524 "POST /api/auth/otp/verify/ HTTP/1.1" 400 193
+INFO 2026-05-23 23:36:22,370 basehttp 27068 6908 "GET /health/ HTTP/1.1" 200 66
+INFO 2026-05-24 00:59:29,208 autoreload 16496 2256 Watching for file changes with StatReloader

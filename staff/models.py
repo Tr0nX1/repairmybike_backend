@@ -173,12 +173,18 @@ class ActivityLog(models.Model):
         ('stock_deducted', 'Stock Deducted'),
         ('stock_reversed', 'Stock Reversed'),
         ('price_locked', 'Price Locked'),
+        ('subscription_visits_adjusted', 'Subscription Visits Adjusted'),
+        ('user_role_changed', 'User Role Changed'),
         ('booking_cancelled', 'Booking Cancelled'),
         ('mechanic_assigned', 'Mechanic Assigned'),
+        ('subscription_requested', 'Subscription Requested'),
+        ('subscription_approved', 'Subscription Approved'),
+        ('subscription_rejected', 'Subscription Rejected'),
+        ('order_placed', 'Order Placed'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='activity_logs')
-    action_type = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    action_type = models.CharField(max_length=32, choices=ACTION_CHOICES)
     description = models.TextField()
     
     # Generic linkage to any model

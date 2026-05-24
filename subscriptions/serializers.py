@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from services.models import Service
 from .models import Plan, Subscription, PlanBenefit
 # Removed build_absolute_media_url - using storage backend directly
 
@@ -12,6 +13,12 @@ class PlanBenefitSerializer(serializers.ModelSerializer):
 class PlanSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     benefits_list = PlanBenefitSerializer(many=True, read_only=True)
+    included_services = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Service.objects.all(),
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = Plan
@@ -25,6 +32,7 @@ class PlanSerializer(serializers.ModelSerializer):
             "benefits",
             "benefits_list",
             "services",
+            "included_services",
             "price",
             "currency",
             "billing_period",
@@ -36,6 +44,20 @@ class PlanSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("id", "created_at", "updated_at")
 
+    def create(self, validated_data):
+        included_services = validated_data.pop('included_services', None)
+        plan = super().create(validated_data)
+        if included_services is not None:
+            plan.included_services.set(included_services)
+        return plan
+
+    def update(self, instance, validated_data):
+        included_services = validated_data.pop('included_services', None)
+        plan = super().update(instance, validated_data)
+        if included_services is not None:
+            plan.included_services.set(included_services)
+        return plan
+
     def get_image(self, obj):
         """Returns absolute URL from storage backend"""
         try:
@@ -45,9 +67,15 @@ class PlanSerializer(serializers.ModelSerializer):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    plan_name = serializers.CharField(source="plan.name", read_only=True)
+    plan_name = serializers.SerializerMethodField(read_only=True)
+    plan_visit_limit = serializers.IntegerField(source="plan.included_visits", read_only=True)
+    visits_used = serializers.IntegerField(source="visits_consumed", read_only=True)
+    visits_remaining = serializers.SerializerMethodField(read_only=True)
     remaining_visits = serializers.SerializerMethodField(read_only=True)
     is_active = serializers.SerializerMethodField(read_only=True)
+    user_name = serializers.SerializerMethodField(read_only=True)
+    user_phone = serializers.SerializerMethodField(read_only=True)
+    approved_by = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Subscription
@@ -55,7 +83,10 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             "id",
             "plan",
             "plan_name",
+            "plan_visit_limit",
             "user",
+            "user_name",
+            "user_phone",
             "contact_email",
             "contact_phone",
             "status",
@@ -66,12 +97,17 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             "next_billing_date",
             "razorpay_subscription_id",
             "visits_consumed",
+            "visits_used",
+            "visits_remaining",
             "remaining_visits",
+            "approved_by",
+            "approved_at",
+            "rejection_reason",
             "metadata",
             "created_at",
             "updated_at",
         )
-        read_only_fields = ("id", "created_at", "updated_at")
+        read_only_fields = ("id", "created_at", "updated_at", "approved_by", "approved_at", "rejection_reason")
 
     def validate(self, attrs):
         plan = attrs.get("plan") or getattr(self.instance, "plan", None)
@@ -103,6 +139,9 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         except Exception:
             return 0
 
+    def get_visits_remaining(self, obj):
+        return self.get_remaining_visits(obj)
+
     def get_is_active(self, obj):
         try:
             # Active if not expired and status is not 'expired'
@@ -114,3 +153,15 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             return obj.end_date > timezone.now() and obj.status != "expired"
         except Exception:
             return False
+
+    def get_approved_by(self, obj):
+        return obj.approved_by.username if obj.approved_by else None
+
+    def get_plan_name(self, obj):
+        return obj.plan.name if obj.plan else None
+
+    def get_user_name(self, obj):
+        return obj.user.username if obj.user else None
+
+    def get_user_phone(self, obj):
+        return obj.user.phone_number if obj.user and hasattr(obj.user, 'phone_number') else None

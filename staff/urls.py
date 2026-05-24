@@ -7,10 +7,12 @@ from .views import (
     PaymentCollectionViewSet,
     StaffBookingViewSet,
     StaffUserViewSet,
+    UserManagementViewSet,
 )
 
 router = DefaultRouter()
 router.register(r'staff', StaffUserViewSet, basename='staff-user')
+router.register(r'users', UserManagementViewSet, basename='user-management')
 router.register(r'bookings', StaffBookingViewSet, basename='staff-booking')
 router.register(r'logs', ActivityLogViewSet, basename='activity-log')
 router.register(r'cash-sessions', CashSessionViewSet, basename='cash-session')

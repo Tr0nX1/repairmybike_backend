@@ -27,7 +27,11 @@ class IsStaffAuthenticated(permissions.BasePermission):
 
     def has_permission(self, request, view):
         user = getattr(request, 'user', None)
-        return bool(user and user.is_authenticated and (user.is_staff or user.is_superuser))
+        return bool(
+            user 
+            and user.is_authenticated 
+            and (user.is_staff or user.is_superuser or getattr(user, 'is_manager', False))
+        )
 
 
 class IsSuperUser(permissions.BasePermission):
@@ -37,4 +41,15 @@ class IsSuperUser(permissions.BasePermission):
     message = 'Admin (superuser) privileges required'
 
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.is_superuser)
+        return bool(request.user and request.user.is_authenticated and request.user.is_superuser)
+
+
+class IsSuperuserOrManager(permissions.BasePermission):
+    """
+    Allows access only to superuser or manager users.
+    """
+    message = 'Admin or manager privileges required'
+
+    def has_permission(self, request, view):
+        user = getattr(request, 'user', None)
+        return bool(user and user.is_authenticated and (user.is_superuser or getattr(user, 'is_manager', False)))

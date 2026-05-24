@@ -83,15 +83,18 @@ class DescopeAuthentication(BaseAuthentication):
                 return None
             
             # Validate token with Descope
-            jwt_response = descope_client.validate_session(token)
+            try:
+                jwt_response = descope_client.validate_session(token)
+            except Exception as e:
+                raise AuthenticationFailed(f"Descope token validation failed: {str(e)}")
             
             if not jwt_response:
-                return None
+                raise AuthenticationFailed("Invalid or expired Descope token")
                 
             # Extract user info from JWT
             user_id = jwt_response.get('sub')
             if not user_id:
-                return None
+                raise AuthenticationFailed("Invalid user identifier in token")
                 
             # Get or create user
             user, created = self._get_or_create_user(jwt_response)
@@ -103,6 +106,8 @@ class DescopeAuthentication(BaseAuthentication):
                 
             return (user, token)
             
+        except AuthenticationFailed:
+            raise
         except Exception as e:
             logger.error(f"Descope authentication failed: {str(e)}")
             return None
@@ -181,22 +186,27 @@ class DescopeSessionAuthentication(BaseAuthentication):
             descope_client = DescopeClient(project_id=settings.DESCOPE_PROJECT_ID)
             
             # Validate session token
-            jwt_response = descope_client.validate_session(session_token)
+            try:
+                jwt_response = descope_client.validate_session(session_token)
+            except Exception as e:
+                raise AuthenticationFailed(f"Descope session token validation failed: {str(e)}")
             
             if not jwt_response:
-                return None
+                raise AuthenticationFailed("Invalid or expired Descope session token")
                 
             user_id = jwt_response.get('sub')
             if not user_id:
-                return None
+                raise AuthenticationFailed("Invalid user identifier in session token")
                 
             # Get user
             try:
                 user = User.objects.get(descope_user_id=user_id)
                 return (user, session_token)
             except User.DoesNotExist:
-                return None
+                raise AuthenticationFailed("User matching session token not found")
                 
+        except AuthenticationFailed:
+            raise
         except Exception as e:
             logger.error(f"Session authentication failed: {str(e)}")
             return None
@@ -220,23 +230,33 @@ class PasswordSessionAuthentication(BaseAuthentication):
         if not token:
             return None
 
+        # If it looks like a JWT (Descope token), pass it to Descope authentication
+        if '.' in token:
+            return None
+
         try:
-            # Look up an active, non-expired session
+            # Look up the session
             session = UserSession.objects.filter(
                 session_token=token,
-                is_active=True,
-                expires_at__gt=timezone.now(),
             ).select_related('user').first()
 
             if not session:
-                return None
+                raise AuthenticationFailed('Invalid session token')
+
+            if not session.is_active:
+                raise AuthenticationFailed('Session has been deactivated')
+
+            if session.expires_at <= timezone.now():
+                raise AuthenticationFailed('Session token has expired')
 
             user = session.user
             if not user.is_active:
-                return None
+                raise AuthenticationFailed('User account is inactive')
 
             return (user, token)
 
+        except AuthenticationFailed:
+            raise
         except Exception as e:
             logger.error(f"PasswordSessionAuthentication failed: {e}")
             return None

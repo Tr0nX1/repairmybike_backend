@@ -29,6 +29,8 @@ from .serializers import (
     CartSerializer,
     CartAddItemSerializer,
     OrderSerializer,
+    OrderTransitionSerializer,
+    OrderCashPaymentSerializer,
     CheckoutSerializer,
     BuyNowSerializer,
     UserSavedPartSerializer,
@@ -324,7 +326,6 @@ class SparePartViewSet(viewsets.ModelViewSet):
                             'sale_price': sale_price,
                             'stock_qty': stock_qty,
                             'description': row.get('description', '').strip(),
-                            'in_stock': stock_qty > 0,
                             'slug': sku.lower(), # Fallback slug if needed, usually sku is unique
                         }
                     )
@@ -527,15 +528,77 @@ class CartViewSet(viewsets.ViewSet):
                     unit_price=item.unit_price,
                 )
                 
-                # Deduct stock and update in_stock flag
+                # Deduct stock
                 part.stock_qty -= item.quantity
-                if part.stock_qty <= 0:
-                    part.in_stock = False
+                if part.stock_qty < 0:
                     part.stock_qty = 0
-                part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+                part.save(update_fields=['stock_qty', 'updated_at'])
 
             # Clear cart after successful checkout
             cart.items.all().delete()
+
+            # Notify staff of new order
+            def notify_staff_new_order():
+                try:
+                    from django.contrib.auth import get_user_model
+                    from notifications.models import Notification
+                    from repairmybike.fcm import send_push_to_multiple
+                    from staff.models import ActivityLog
+                    from django.db.models import Q
+                    User = get_user_model()
+                    
+                    staff_users = User.objects.filter(
+                        is_active=True
+                    ).filter(
+                        Q(is_staff=True) |
+                        Q(is_manager=True) |
+                        Q(is_superuser=True)
+                    )
+                    
+                    item_count = order.items.count()
+                    title = f"New Parts Order #{order.id}"
+                    body = (
+                        f"{order.customer_name} ordered "
+                        f"{item_count} item(s). "
+                        f"Total: ₹{order.amount_total}"
+                    )
+                    data = {
+                        'type': 'new_order',
+                        'order_id': str(order.id),
+                    }
+                    
+                    # DB Notification rows
+                    for staff_member in staff_users:
+                        Notification.objects.create(
+                            user=staff_member,
+                            title=title,
+                            message=body,
+                            notification_type='order_update'
+                        )
+                    
+                    # Push notification
+                    send_push_to_multiple(staff_users, title, body, data)
+                    
+                    # ActivityLog
+                    ActivityLog.objects.create(
+                        user=order.user,
+                        action_type='order_placed',
+                        description=f"New order #{order.id} placed "
+                                    f"by {order.customer_name}",
+                        metadata={
+                            'order_id': str(order.id),
+                            'amount': str(order.amount_total),
+                            'item_count': item_count,
+                            'phone': order.phone,
+                        }
+                    )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).error(
+                        f"Failed to notify staff of new order: {e}"
+                    )
+            
+            transaction.on_commit(notify_staff_new_order)
 
             order_serializer = OrderSerializer(order, context={'request': request})
             return Response({
@@ -603,12 +666,74 @@ class CartViewSet(viewsets.ViewSet):
                 unit_price=part.sale_price,
             )
 
-            # Deduct stock and update in_stock flag
+            # Deduct stock
             part.stock_qty -= quantity
-            if part.stock_qty <= 0:
-                part.in_stock = False
+            if part.stock_qty < 0:
                 part.stock_qty = 0
-            part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+            part.save(update_fields=['stock_qty', 'updated_at'])
+
+            # Notify staff of new order
+            def notify_staff_new_order():
+                try:
+                    from django.contrib.auth import get_user_model
+                    from notifications.models import Notification
+                    from repairmybike.fcm import send_push_to_multiple
+                    from staff.models import ActivityLog
+                    from django.db.models import Q
+                    User = get_user_model()
+                    
+                    staff_users = User.objects.filter(
+                        is_active=True
+                    ).filter(
+                        Q(is_staff=True) |
+                        Q(is_manager=True) |
+                        Q(is_superuser=True)
+                    )
+                    
+                    item_count = order.items.count()
+                    title = f"New Parts Order #{order.id}"
+                    body = (
+                        f"{order.customer_name} ordered "
+                        f"{item_count} item(s). "
+                        f"Total: ₹{order.amount_total}"
+                    )
+                    data = {
+                        'type': 'new_order',
+                        'order_id': str(order.id),
+                    }
+                    
+                    # DB Notification rows
+                    for staff_member in staff_users:
+                        Notification.objects.create(
+                            user=staff_member,
+                            title=title,
+                            message=body,
+                            notification_type='order_update'
+                        )
+                    
+                    # Push notification
+                    send_push_to_multiple(staff_users, title, body, data)
+                    
+                    # ActivityLog
+                    ActivityLog.objects.create(
+                        user=order.user,
+                        action_type='order_placed',
+                        description=f"New order #{order.id} placed "
+                                    f"by {order.customer_name}",
+                        metadata={
+                            'order_id': str(order.id),
+                            'amount': str(order.amount_total),
+                            'item_count': item_count,
+                            'phone': order.phone,
+                        }
+                    )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).error(
+                        f"Failed to notify staff of new order: {e}"
+                    )
+            
+            transaction.on_commit(notify_staff_new_order)
 
             order_serializer = OrderSerializer(order, context={'request': request})
             return Response({
@@ -627,19 +752,26 @@ class OrderViewSet(viewsets.ModelViewSet):
     """
     queryset = Order.objects.prefetch_related('items__spare_part').all()
     serializer_class = OrderSerializer
+    ORDER_TRANSITIONS = {
+        'created': ['confirmed', 'cancelled'],
+        'confirmed': ['fulfilled', 'cancelled'],
+        'fulfilled': [],
+        'cancelled': [],
+    }
     
     def get_permissions(self):
         """
         Assign permissions based on action:
-        - list/retrieve/create/cancel: Requires IsGuestOrAuthenticated + object ownership check
-        - update/delete: Restricted to admin only
+        - list/retrieve: Requires IsAuthenticated
+        - update/delete/transition/cash payment collection: Requires IsAuthenticated + IsSuperuserOrManager
+        - create/cancel: Requires IsGuestOrAuthenticated + object ownership check (IsOrderOwner)
         """
-        if self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [permissions.IsAdminUser]
-        else:
-            permission_classes = [IsGuestOrAuthenticated, IsOrderOwner]
-        
-        return [permission() for permission in permission_classes]
+        if self.action in ['list', 'retrieve']:
+            return [permissions.IsAuthenticated()]
+        if self.action in ['update', 'partial_update', 'destroy', 'transition_status', 'mark_cash_paid']:
+            from staff.permissions import IsSuperuserOrManager
+            return [permissions.IsAuthenticated(), IsSuperuserOrManager()]
+        return [IsGuestOrAuthenticated(), IsOrderOwner()]
     
     def get_queryset(self):
         """
@@ -672,6 +804,23 @@ class OrderViewSet(viewsets.ModelViewSet):
         List orders - filtered by get_queryset() based on user role.
         """
         queryset = self.filter_queryset(self.get_queryset())
+        status_filter = request.query_params.get('status')
+        payment_status = request.query_params.get('payment_status')
+        phone = request.query_params.get('phone')
+        search = request.query_params.get('search')
+
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        if payment_status:
+            queryset = queryset.filter(payment_status=payment_status)
+        if phone:
+            queryset = queryset.filter(phone=phone)
+        if search:
+            queryset = queryset.filter(
+                Q(customer_name__icontains=search) |
+                Q(phone__icontains=search) |
+                Q(session_id__icontains=search)
+            )
         
         if not queryset.exists():
             return Response({
@@ -749,8 +898,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             for item in order_items:
                 part = SparePart.objects.select_for_update().get(id=item.spare_part_id)
                 part.stock_qty += item.quantity
-                part.in_stock = True
-                part.save(update_fields=['stock_qty', 'in_stock', 'updated_at'])
+                part.save(update_fields=['stock_qty', 'updated_at'])
 
             instance.status = 'cancelled'
             instance.save(update_fields=['status', 'updated_at'])
@@ -759,6 +907,191 @@ class OrderViewSet(viewsets.ModelViewSet):
                 'error': False,
                 'message': 'Order cancelled successfully. Stock has been restored.'
             }, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], url_path='transition-status')
+    @transaction.atomic
+    def transition_status(self, request, pk=None):
+        serializer = OrderTransitionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        order = Order.objects.select_for_update().prefetch_related('items__spare_part').get(pk=self.get_object().pk)
+        old_status = order.status
+        new_status = serializer.validated_data['status']
+        notes = serializer.validated_data.get('notes', '')
+
+        allowed_statuses = self.ORDER_TRANSITIONS.get(old_status, [])
+        if new_status not in allowed_statuses:
+            return Response(
+                {
+                    'error': f'Cannot transition order from {old_status} to {new_status}',
+                    'code': 'INVALID_TRANSITION',
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if new_status == 'cancelled':
+            for item in order.items.select_related('spare_part'):
+                part = SparePart.objects.select_for_update().get(id=item.spare_part_id)
+                old_stock = part.stock_qty
+                part.stock_qty += item.quantity
+                # NOTE: Use save(), not update(), so stock-related signals can observe the stock_qty change.
+                part.save(update_fields=['stock_qty', 'updated_at'])
+                ActivityLog.objects.create(
+                    user=request.user,
+                    action_type='stock_reversed',
+                    description=f"Restored {item.quantity}x {part.name} for cancelled Order #{order.id}",
+                    content_object=item,
+                    metadata={
+                        'order_id': order.id,
+                        'order_item_id': item.id,
+                        'part_id': part.id,
+                        'quantity': item.quantity,
+                        'from': old_stock,
+                        'to': part.stock_qty,
+                        'old_value': old_stock,
+                        'new_value': part.stock_qty,
+                    }
+                )
+
+        order.status = new_status
+        order.save(update_fields=['status', 'updated_at'])
+
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='order_status_changed',
+            description=f"Order #{order.id} status changed from {old_status} to {new_status}",
+            content_object=order,
+            metadata={
+                'from': old_status,
+                'to': new_status,
+                'notes': notes,
+                'order_id': order.id,
+            }
+        )
+
+        # Capture values for closure before on_commit
+        _order_id = order.id
+        _order_phone = order.phone
+        _order_user = order.user
+        _order_customer_name = order.customer_name
+        _new_status = new_status
+
+        def notify_customer_order_update():
+            try:
+                from django.contrib.auth import get_user_model
+                from notifications.models import Notification
+                from repairmybike.fcm import send_push_notification
+                User = get_user_model()
+                
+                # Find customer
+                customer = _order_user
+                if not customer and _order_phone:
+                    customer = User.objects.filter(
+                        phone_number=_order_phone
+                    ).first()
+                
+                if not customer:
+                    # Truly anonymous guest — cannot push
+                    return
+                
+                status_messages = {
+                    'confirmed': (
+                        f"Order #{_order_id} confirmed! "
+                        f"We are preparing your parts."
+                    ),
+                    'fulfilled': (
+                        f"Order #{_order_id} is ready! "
+                        f"Your parts have been dispatched. 🚀"
+                    ),
+                    'cancelled': (
+                        f"Order #{_order_id} has been cancelled. "
+                        f"Contact the shop for more information."
+                    ),
+                }
+                
+                message = status_messages.get(_new_status)
+                if not message:
+                    return  # no notification for this status
+                
+                title = "Order Update"
+                data = {
+                    'type': 'order_status',
+                    'order_id': str(_order_id),
+                    'status': _new_status,
+                }
+                
+                # DB Notification row
+                Notification.objects.create(
+                    user=customer,
+                    title=title,
+                    message=message,
+                    notification_type='order_update'
+                )
+                
+                # Push notification
+                send_push_notification(customer, title, message, data)
+                
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(
+                    f"Failed to notify customer of order update: {e}"
+                )
+        
+        transaction.on_commit(notify_customer_order_update)
+
+        order = self.get_queryset().get(pk=order.pk)
+        return Response({
+            'error': False,
+            'message': f'Order status updated to {new_status}',
+            'data': self.get_serializer(order).data,
+        })
+
+    @action(detail=True, methods=['post'], url_path='mark-cash-paid')
+    @transaction.atomic
+    def mark_cash_paid(self, request, pk=None):
+        serializer = OrderCashPaymentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        order = Order.objects.select_for_update().prefetch_related('items__spare_part').get(pk=self.get_object().pk)
+        if order.payment_status == 'cash_paid':
+            return Response(
+                {'error': 'Order is already marked cash paid', 'code': 'ALREADY_PAID'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if order.status == 'cancelled':
+            return Response(
+                {'error': 'Cancelled orders cannot be marked cash paid', 'code': 'ORDER_CANCELLED'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        amount_received = serializer.validated_data['amount_received']
+        notes = serializer.validated_data.get('notes', '')
+        old_payment_status = order.payment_status
+        order.payment_status = 'cash_paid'
+        order.save(update_fields=['payment_status', 'updated_at'])
+
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='order_cash_collected',
+            description=f"Collected cash payment of {amount_received} for Order #{order.id}",
+            content_object=order,
+            metadata={
+                'amount': str(amount_received),
+                'notes': notes,
+                'from': old_payment_status,
+                'to': order.payment_status,
+                'old_value': old_payment_status,
+                'new_value': order.payment_status,
+                'order_id': order.id,
+            }
+        )
+
+        order = self.get_queryset().get(pk=order.pk)
+        return Response({
+            'error': False,
+            'message': 'Order marked cash paid',
+            'data': self.get_serializer(order).data,
+        })
 
 
 class SavedPartViewSet(viewsets.ModelViewSet):

@@ -109,6 +109,14 @@ class Subscription(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
     next_billing_date = models.DateTimeField(blank=True, null=True)
     razorpay_subscription_id = models.CharField(max_length=128, blank=True, null=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='approved_subscriptions'
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(blank=True, default='')
     metadata = models.JSONField(default=dict, blank=True)
     # Track how many visits have been consumed in the current period
     visits_consumed = models.PositiveIntegerField(default=0)

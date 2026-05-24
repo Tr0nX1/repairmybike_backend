@@ -1,22 +1,19 @@
 from rest_framework import serializers
 from .models import PolicyContent, StaticContent
 
-class StaticContentSerializer(serializers.ModelSerializer):
-    slug = serializers.CharField(source='key', read_only=True)
-    content = serializers.CharField(source='body', read_only=True)
 
+class StaticContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaticContent
         fields = (
             'id',
             'key',
-            'slug',
             'title',
             'body',
-            'content',
             'is_active',
             'updated_at',
         )
+        read_only_fields = ('id', 'updated_at')
 
 
 class PolicyContentSerializer(serializers.ModelSerializer):

@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.conf import settings
@@ -17,7 +17,23 @@ from bookings.models import Booking
 
 
 class PaymentViewSet(viewsets.ViewSet):
-    
+    queryset = Payment.objects.select_related('booking').order_by('-created_at')
+    serializer_class = PaymentSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
+        return []
+
+    def list(self, request):
+        serializer = self.serializer_class(self.queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        payment = get_object_or_404(self.queryset, pk=pk)
+        serializer = self.serializer_class(payment)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['post'], url_path='razorpay/create-order')
     def create_razorpay_order(self, request):
         """
