@@ -166,6 +166,9 @@ class DescopeAuthentication(BaseAuthentication):
         
         return user, True
 
+    def authenticate_header(self, request):
+        return 'Bearer'
+
 
 class DescopeSessionAuthentication(BaseAuthentication):
     """
@@ -210,6 +213,9 @@ class DescopeSessionAuthentication(BaseAuthentication):
         except Exception as e:
             logger.error(f"Session authentication failed: {str(e)}")
             return None
+
+    def authenticate_header(self, request):
+        return 'Bearer'
 
 
 class PasswordSessionAuthentication(BaseAuthentication):
@@ -260,6 +266,9 @@ class PasswordSessionAuthentication(BaseAuthentication):
         except Exception as e:
             logger.error(f"PasswordSessionAuthentication failed: {e}")
             return None
+
+    def authenticate_header(self, request):
+        return 'Bearer'
 
 
 class GuestUser(AnonymousUser):
