@@ -8647,3 +8647,14 @@ WARNING 2026-05-23 23:31:14,143 log 27068 26524 Bad Request: /api/auth/otp/verif
 WARNING 2026-05-23 23:31:14,143 basehttp 27068 26524 "POST /api/auth/otp/verify/ HTTP/1.1" 400 193
 INFO 2026-05-23 23:36:22,370 basehttp 27068 6908 "GET /health/ HTTP/1.1" 200 66
 INFO 2026-05-24 00:59:29,208 autoreload 16496 2256 Watching for file changes with StatReloader
+INFO 2026-05-24 07:49:09,581 autoreload 23148 9696 Watching for file changes with StatReloader
+INFO 2026-05-24 07:58:25,389 autoreload 23148 9696 E:\develop\repairmybike\repairmybike_backend\repairmybike\settings.py changed, reloading.
+INFO 2026-05-24 07:58:26,713 autoreload 20852 14080 Watching for file changes with StatReloader
+INFO 2026-05-24 08:10:52,159 autoreload 20852 14080 E:\develop\repairmybike\repairmybike_backend\authentication\serializers.py changed, reloading.
+INFO 2026-05-24 08:10:53,557 autoreload 12280 5748 Watching for file changes with StatReloader
+INFO 2026-05-24 08:11:39,922 autoreload 12280 5748 E:\develop\repairmybike\repairmybike_backend\authentication\views.py changed, reloading.
+INFO 2026-05-24 08:11:41,499 autoreload 22532 14484 Watching for file changes with StatReloader
+INFO 2026-05-24 08:12:15,608 autoreload 22532 14484 E:\develop\repairmybike\repairmybike_backend\authentication\views.py changed, reloading.
+INFO 2026-05-24 08:12:16,987 autoreload 23196 22968 Watching for file changes with StatReloader
+INFO 2026-05-24 08:13:06,778 autoreload 23196 22968 E:\develop\repairmybike\repairmybike_backend\authentication\views.py changed, reloading.
+INFO 2026-05-24 08:13:08,273 autoreload 5832 4304 Watching for file changes with StatReloader

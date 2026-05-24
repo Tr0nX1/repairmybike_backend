@@ -524,3 +524,9 @@ def _validate_security_configuration():
 # Execute security validation
 _validate_security_configuration()
 
+
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
+]

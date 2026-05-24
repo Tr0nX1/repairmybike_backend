@@ -278,7 +278,7 @@ class UserRegistrationView(APIView):
                 )
                 return Response({
                     'message': 'User registered successfully',
-                    'user': UserSerializer(user).data
+                    'user': UserSerializer(user, context={'request': request}).data
                 }, status=status.HTTP_201_CREATED)
             except Exception as e:
                 logger.error(f"Registration failed: {str(e)}")
@@ -367,7 +367,7 @@ class PhoneOTPVerifyView(APIView):
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True}
                     )
                     return Response({
-                        'message': 'OTP verified successfully', 'user': UserSerializer(user).data,
+                        'message': 'OTP verified successfully', 'user': UserSerializer(user, context={'request': request}).data,
                         'session_token': session_jwt, 'refresh_token': refresh_jwt
                     }, status=status.HTTP_200_OK)
                 return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
@@ -399,7 +399,7 @@ class PhoneLoginView(APIView):
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True}
                     )
                     return Response({
-                        'message': 'Login successful', 'user': UserSerializer(user).data,
+                        'message': 'Login successful', 'user': UserSerializer(user, context={'request': request}).data,
                         'session_token': session_jwt, 'refresh_token': refresh_jwt
                     }, status=status.HTTP_200_OK)
                 return Response({'error': 'Invalid OTP code'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -452,7 +452,7 @@ class EmailOTPVerifyView(APIView):
                         }
                     )
                     return Response({
-                        'message': 'OTP verified successfully', 'user': UserSerializer(user).data,
+                        'message': 'OTP verified successfully', 'user': UserSerializer(user, context={'request': request}).data,
                         'session_token': session_jwt, 'refresh_token': refresh_jwt
                     }, status=status.HTTP_200_OK)
                 return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
@@ -484,7 +484,7 @@ class EmailLoginView(APIView):
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'last_activity': timezone.now()}
                     )
                     return Response({
-                        'message': 'Login successful', 'user': UserSerializer(user).data,
+                        'message': 'Login successful', 'user': UserSerializer(user, context={'request': request}).data,
                         'session_token': session_jwt, 'refresh_token': refresh_jwt
                     }, status=status.HTTP_200_OK)
                 return Response({'error': 'Invalid OTP code'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -559,7 +559,7 @@ class UnifiedOTPVerifyView(APIView):
                         defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True}
                     )
                     return Response({
-                        'message': 'OTP verified successfully', 'user': UserSerializer(user).data,
+                        'message': 'OTP verified successfully', 'user': UserSerializer(user, context={'request': request}).data,
                         'session_token': session_jwt, 'refresh_token': refresh_jwt
                     }, status=status.HTTP_200_OK)
                 return Response({'error': 'Invalid OTP code'}, status=status.HTTP_400_BAD_REQUEST)
@@ -663,7 +663,7 @@ class StaffLoginView(APIView):
             refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
             
             UserSession.objects.update_or_create(user=user, session_token=session_jwt, defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
-            return Response({'message': 'Staff login successful', 'user': UserSerializer(user).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
+            return Response({'message': 'Staff login successful', 'user': UserSerializer(user, context={'request': request}).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': 'Login failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -682,7 +682,7 @@ class StaffPasswordLoginView(APIView):
             return Response({'error': 'Invalid credentials or permissions'}, status=status.HTTP_401_UNAUTHORIZED)
         token = uuid.uuid4().hex
         UserSession.objects.update_or_create(user=user, session_token=token, defaults={'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
-        return Response({'message': 'Staff password login successful', 'user': UserSerializer(user).data, 'session_token': token}, status=status.HTTP_200_OK)
+        return Response({'message': 'Staff password login successful', 'user': UserSerializer(user, context={'request': request}).data, 'session_token': token}, status=status.HTTP_200_OK)
 
 class AdminLoginView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -703,7 +703,7 @@ class AdminLoginView(APIView):
             refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
             
             UserSession.objects.update_or_create(user=user, session_token=session_jwt, defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
-            return Response({'message': 'Admin login successful', 'user': UserSerializer(user).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
+            return Response({'message': 'Admin login successful', 'user': UserSerializer(user, context={'request': request}).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
         except Exception as e: return Response({'error': 'Login failed', 'details': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
 class AdminPasswordLoginView(APIView):
@@ -716,7 +716,7 @@ class AdminPasswordLoginView(APIView):
         if not user or not user.is_superuser: return Response({'error': 'Admin privileges required'}, status=status.HTTP_403_FORBIDDEN)
         token = uuid.uuid4().hex
         UserSession.objects.update_or_create(user=user, session_token=token, defaults={'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
-        return Response({'message': 'Admin password login successful', 'user': UserSerializer(user).data, 'session_token': token}, status=status.HTTP_200_OK)
+        return Response({'message': 'Admin password login successful', 'user': UserSerializer(user, context={'request': request}).data, 'session_token': token}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])

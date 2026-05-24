@@ -105,6 +105,18 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    def get_profile_picture_url(self, obj):
+        if not obj.profile_picture:
+            return None
+        try:
+            url = obj.profile_picture.url
+            if url.startswith(('http://', 'https://')):
+                return url
+            request = self.context.get('request')
+            return request.build_absolute_uri(url) if request else url
+        except Exception:
+            return None
+
 
 class AdminUserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
@@ -121,12 +133,6 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip() or obj.username
-
-    def get_profile_picture_url(self, obj):
-        request = self.context.get('request')
-        if obj.profile_picture:
-            return request.build_absolute_uri(obj.profile_picture.url) if request else obj.profile_picture.url
-        return None
 
 
 class UserRegistrationSerializer(serializers.Serializer):
