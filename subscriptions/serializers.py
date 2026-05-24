@@ -68,6 +68,7 @@ class PlanSerializer(serializers.ModelSerializer):
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     plan_name = serializers.SerializerMethodField(read_only=True)
+    plan_details = PlanSerializer(source="plan", read_only=True)
     plan_visit_limit = serializers.IntegerField(source="plan.included_visits", read_only=True)
     visits_used = serializers.IntegerField(source="visits_consumed", read_only=True)
     visits_remaining = serializers.SerializerMethodField(read_only=True)
@@ -82,6 +83,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "plan",
+            "plan_details",
             "plan_name",
             "plan_visit_limit",
             "user",
