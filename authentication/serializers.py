@@ -105,6 +105,18 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    def to_representation(self, instance):
+        if not instance.default_vehicle_id:
+            try:
+                from vehicles.models import UserVehicle
+                user_vehicle = UserVehicle.objects.filter(user=instance).order_by('-is_default', '-created_at').first()
+                if user_vehicle:
+                    instance.default_vehicle = user_vehicle.vehicle_model
+                    instance.save(update_fields=['default_vehicle'])
+            except Exception:
+                pass
+        return super().to_representation(instance)
+
     def get_profile_picture_url(self, obj):
         if not obj.profile_picture:
             return None
