@@ -5,7 +5,7 @@ db.sqlite3
 db.sqlite3-journal
 media
 staticfiles
-
+staticfiles/
 # Python
 __pycache__/
 *.py[cod]
