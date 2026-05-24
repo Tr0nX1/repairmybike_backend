@@ -357,7 +357,7 @@ class PhoneOTPVerifyView(APIView):
                     PhoneOTP.objects.filter(phone_number=phone_number, is_verified=False).update(is_verified=True)
                     
                     session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshSessionToken", {}).get("jwt")
                     
                     if not session_jwt:
                          return Response({'error': 'No session token returned from Descope'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -392,7 +392,7 @@ class PhoneLoginView(APIView):
                     user, created = get_or_create_user_from_auth_response(auth_response, phone_number=phone_number, guest_id=guest_id)
                     
                     session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshSessionToken", {}).get("jwt")
                     
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
@@ -442,7 +442,7 @@ class EmailOTPVerifyView(APIView):
                     EmailOTP.objects.filter(email=email, is_verified=False).update(is_verified=True)
                     
                     session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshSessionToken", {}).get("jwt")
                     
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
@@ -477,7 +477,7 @@ class EmailLoginView(APIView):
                     user, created = get_or_create_user_from_auth_response(auth_response, email=email, guest_id=guest_id)
                     
                     session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-                    refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+                    refresh_jwt = auth_response.get("refreshSessionToken", {}).get("jwt")
                     
                     UserSession.objects.update_or_create(
                         user=user, session_token=session_jwt,
@@ -539,7 +539,7 @@ class UnifiedOTPVerifyView(APIView):
                     
                     # Fix token extraction
                     session_token_data = auth_response.get("sessionToken", "")
-                    refresh_token_data = auth_response.get("refreshToken", "")
+                    refresh_token_data = auth_response.get("refreshSessionToken", "")
                     
                     if isinstance(session_token_data, dict):
                         session_jwt = session_token_data.get("jwt")
@@ -579,10 +579,10 @@ class RefreshTokenView(APIView):
             descope_client = create_descope_client()
             auth_response = descope_client.refresh_session(refresh_token)
             if not auth_response:
-                return Response({'error': 'Token refresh failed'}, status=status.HTTP_41_UNAUTHORIZED)
+                return Response({'error': 'Token refresh failed'}, status=status.HTTP_401_UNAUTHORIZED)
             
             session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-            new_refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+            new_refresh_jwt = auth_response.get("refreshSessionToken", {}).get("jwt")
             
             if new_refresh_jwt:
                 UserSession.objects.filter(refresh_token=refresh_token).update(
@@ -660,7 +660,7 @@ class StaffLoginView(APIView):
                 return Response({'error': 'Staff privileges required'}, status=status.HTTP_403_FORBIDDEN)
             
             session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-            refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+            refresh_jwt = auth_response.get("refreshSessionToken", {}).get("jwt")
             
             UserSession.objects.update_or_create(user=user, session_token=session_jwt, defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
             return Response({'message': 'Staff login successful', 'user': UserSerializer(user, context={'request': request}).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
@@ -700,7 +700,7 @@ class AdminLoginView(APIView):
             except User.DoesNotExist: return Response({'error': 'Admin privileges required'}, status=status.HTTP_403_FORBIDDEN)
             
             session_jwt = auth_response.get("sessionToken", {}).get("jwt")
-            refresh_jwt = auth_response.get("refreshToken", {}).get("jwt")
+            refresh_jwt = auth_response.get("refreshSessionToken", {}).get("jwt")
             
             UserSession.objects.update_or_create(user=user, session_token=session_jwt, defaults={'refresh_token': refresh_jwt, 'expires_at': timezone.now() + timedelta(hours=8), 'is_active': True, 'device_id': device_id, 'user_agent': request.META.get('HTTP_USER_AGENT'), 'ip_address': request.META.get('REMOTE_ADDR'), 'last_activity': timezone.now()})
             return Response({'message': 'Admin login successful', 'user': UserSerializer(user, context={'request': request}).data, 'session_token': session_jwt, 'refresh_token': refresh_jwt}, status=status.HTTP_200_OK)
