@@ -1129,6 +1129,9 @@ class SavedPartViewSet(viewsets.ModelViewSet):
         if not spare_part_id:
              return Response({'error': True, 'message': 'spare_part_id is required'}, status=400)
 
+        if not SparePart.objects.filter(id=spare_part_id, active=True).exists():
+            return Response({'error': True, 'message': 'Spare part not found'}, status=status.HTTP_400_BAD_REQUEST)
+
         if user.is_authenticated:
             saved_obj, created = UserSavedPart.objects.get_or_create(
                 user=user, spare_part_id=spare_part_id
