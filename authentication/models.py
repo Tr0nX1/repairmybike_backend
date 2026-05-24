@@ -2,7 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 import uuid
-
+from django.conf import settings
+from django.contrib.auth import get_user_model
 
 class User(AbstractUser):
     """Custom User model with Descope integration"""
@@ -209,6 +210,14 @@ class ContactSubmission(models.Model):
         ('replied', 'Replied'),
     ]
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='contact_submissions',
+        help_text="Link to authenticated user if available"
+    )
     name = models.CharField(max_length=255)
     email = models.EmailField()
     phone = models.CharField(max_length=20, blank=True)
@@ -220,6 +229,10 @@ class ContactSubmission(models.Model):
     class Meta:
         db_table = 'contact_submissions'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', 'created_at']),
+            models.Index(fields=['user', 'created_at']),
+        ]
 
     def __str__(self):
         return f"{self.name} - {self.subject}"

@@ -328,7 +328,7 @@ class ContactSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactSubmission
         fields = '__all__'
-        read_only_fields = ['id', 'status', 'created_at']
+        read_only_fields = ['id', 'user', 'status', 'created_at']
 
 
 class CustomerDetailSerializer(serializers.ModelSerializer):

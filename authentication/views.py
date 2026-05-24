@@ -151,6 +151,33 @@ class ContactSubmissionViewSet(viewsets.ModelViewSet):
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
 
+    def perform_create(self, serializer):
+        """
+        Link contact submission to authenticated user if available.
+        This prevents logout issues when authenticated users submit contact forms.
+        """
+        if self.request.user and self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+            logger.info(f"Contact submission created by user: {self.request.user.id} ({self.request.user.email})")
+        else:
+            serializer.save()
+            logger.info("Guest contact submission created")
+
+    def create(self, request, *args, **kwargs):
+        """
+        Override create to return consistent response format with authentication preserved.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        # Return success response with consistent format
+        return Response({
+            'error': False,
+            'message': 'Contact submission created successfully',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
 class StaffDirectoryViewSet(viewsets.ModelViewSet):
     """ViewSet for StaffDirectory model"""
     queryset = StaffDirectory.objects.all().order_by('-created_at')

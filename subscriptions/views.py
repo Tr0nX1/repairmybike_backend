@@ -101,6 +101,22 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        
+        # If user is authenticated, filter to show their subscriptions by default
+        # unless they explicitly filter by different user/phone/email
+        if self.request.user and self.request.user.is_authenticated:
+            # Check if user is admin/staff - admins can see all
+            if not (self.request.user.is_staff or self.request.user.is_superuser):
+                # Regular users: show their own subscriptions unless filtering by phone/email
+                has_phone_filter = self.request.query_params.get("phone")
+                has_email_filter = self.request.query_params.get("email")
+                has_user_filter = self.request.query_params.get("user_id")
+                
+                # Only restrict if no explicit filters are provided
+                if not (has_phone_filter or has_email_filter or has_user_filter):
+                    qs = qs.filter(user=self.request.user)
+        
+        # Apply additional filters
         email = self.request.query_params.get("email")
         user_id = self.request.query_params.get("user_id")
         phone = self.request.query_params.get("phone")
@@ -114,6 +130,39 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
         if status_param:
             qs = qs.filter(status=status_param)
         return qs
+
+    def perform_create(self, serializer):
+        """
+        Link subscription to authenticated user if available.
+        This prevents logout issues when authenticated users create subscriptions.
+        """
+        # If user is authenticated, link them to the subscription
+        if self.request.user and self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info(f"Subscription created and linked to user: {self.request.user.id} ({self.request.user.email})")
+        else:
+            # For guest users, just save without user
+            serializer.save()
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info("Guest subscription created without user link")
+
+    def create(self, request, *args, **kwargs):
+        """
+        Override create to return consistent response format with authentication preserved.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        # Return success response with consistent format
+        return Response({
+            'error': False,
+            'message': 'Subscription created successfully',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
