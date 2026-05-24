@@ -118,6 +118,7 @@ class Subscription(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
     rejection_reason = models.TextField(blank=True, default='')
     metadata = models.JSONField(default=dict, blank=True)
+    renewal_history = models.JSONField(default=list)
     # Track how many visits have been consumed in the current period
     visits_consumed = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
