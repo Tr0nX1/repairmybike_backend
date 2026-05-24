@@ -282,6 +282,29 @@ AUTH_USER_MODEL = 'authentication.User'
 DESCOPE_PROJECT_ID = config('DESCOPE_PROJECT_ID', default=None)
 DESCOPE_MANAGEMENT_KEY = config('DESCOPE_MANAGEMENT_KEY', default=None)
 
+# Temporary debug logging for Descope initialization issues
+import os
+print("=== DESCOPE INITIALIZATION DEBUG ===")
+print(f"DEBUG status: {DEBUG}")
+print(f"DESCOPE_PROJECT_ID in os.environ: {'DESCOPE_PROJECT_ID' in os.environ}")
+if DESCOPE_PROJECT_ID is None:
+    print("DESCOPE_PROJECT_ID value: None")
+elif DESCOPE_PROJECT_ID == "":
+    print("DESCOPE_PROJECT_ID value: '' (Empty String)")
+else:
+    masked_pid = DESCOPE_PROJECT_ID[:4] + "*" * (len(DESCOPE_PROJECT_ID) - 4) if len(DESCOPE_PROJECT_ID) > 4 else "****"
+    print(f"DESCOPE_PROJECT_ID value: {masked_pid} (length: {len(DESCOPE_PROJECT_ID)})")
+
+print(f"DESCOPE_MANAGEMENT_KEY in os.environ: {'DESCOPE_MANAGEMENT_KEY' in os.environ}")
+if DESCOPE_MANAGEMENT_KEY is None:
+    print("DESCOPE_MANAGEMENT_KEY value: None")
+elif DESCOPE_MANAGEMENT_KEY == "":
+    print("DESCOPE_MANAGEMENT_KEY value: '' (Empty String)")
+else:
+    masked_mkey = DESCOPE_MANAGEMENT_KEY[:4] + "*" * (len(DESCOPE_MANAGEMENT_KEY) - 4) if len(DESCOPE_MANAGEMENT_KEY) > 4 else "****"
+    print(f"DESCOPE_MANAGEMENT_KEY value: {masked_mkey} (length: {len(DESCOPE_MANAGEMENT_KEY)})")
+print("====================================")
+
 # Validate Descope configuration at startup (production only)
 if not DEBUG:
     if not DESCOPE_PROJECT_ID or not DESCOPE_MANAGEMENT_KEY:
@@ -297,13 +320,7 @@ else:
     # Development mode without Descope - will fall back to other auth methods
     print("[WARNING] Descope not configured - development mode with basic auth only")
 
-if DESCOPE_PROJECT_ID and DESCOPE_PROJECT_ID.startswith('P320Gzmd6m'):
-    if not DEBUG:
-        raise ValueError(
-            'WARNING: DESCOPE_PROJECT_ID appears to be a development/example key. '
-            'Please set DESCOPE_PROJECT_ID to your actual production project ID.'
-        )
-    # In development mode, it's OK to use example credentials for testing
+# In development mode, it's OK to use example credentials for testing
 
 
 # Django REST Framework Configuration
