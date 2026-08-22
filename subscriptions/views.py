@@ -16,9 +16,14 @@ class PlanViewSet(viewsets.ModelViewSet):
     queryset = Plan.objects.filter(active=True).order_by("price")
     serializer_class = PlanSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
-    permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ["name", "description"]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
+
 
     def perform_create(self, serializer):
         image = self.request.FILES.get('image')
