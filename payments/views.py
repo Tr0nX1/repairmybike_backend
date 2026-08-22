@@ -23,7 +23,8 @@ class PaymentViewSet(viewsets.ViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
-        return []
+        return [permissions.IsAuthenticated()]
+
 
     def list(self, request):
         serializer = self.serializer_class(self.queryset, many=True)
