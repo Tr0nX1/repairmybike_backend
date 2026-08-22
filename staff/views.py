@@ -1,5 +1,5 @@
 from datetime import timedelta
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
@@ -10,7 +10,8 @@ from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from bookings.models import Booking, BookingPart
+from bookings.models import Booking, BookingPart, BookingService
+from services.models import Service, ServicePricing
 from spare_parts.models import SparePart
 from bookings.serializers import BookingDetailSerializer, BookingPartSerializer
 from rest_framework import permissions
@@ -976,6 +977,92 @@ class StaffBookingViewSet(viewsets.ModelViewSet):
         )
 
         return Response({'error': False, 'message': 'Part added pending approval', 'data': BookingDetailSerializer(booking).data})
+
+    @action(detail=True, methods=['post'], url_path='add-service')
+    @transaction.atomic
+    def add_service(self, request, pk=None):
+        service_id = request.data.get('service_id') or request.data.get('service')
+        if not service_id:
+            return Response({'error': True, 'message': 'service_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            booking = Booking.objects.select_for_update().get(pk=pk)
+        except Booking.DoesNotExist:
+            return Response({'error': True, 'message': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if booking.booking_status in ['completed', 'cancelled']:
+            return Response(
+                {'error': 'Cannot add services to a completed or cancelled booking', 'code': 'BOOKING_TERMINAL'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            service = Service.objects.get(id=service_id)
+        except Service.DoesNotExist:
+            return Response({'error': True, 'message': 'Service not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if BookingService.objects.filter(booking=booking, service=service).exists():
+            return Response(
+                {'error': True, 'message': f'{service.name} is already added to this booking', 'code': 'SERVICE_ALREADY_ADDED'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        custom_price = request.data.get('custom_price')
+        if custom_price is not None:
+            user = request.user
+            if not (getattr(user, 'is_superuser', False) or getattr(user, 'is_manager', False)):
+                return Response(
+                    {'error': True, 'message': 'Only managers or admins can override service price'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            try:
+                service_price = Decimal(str(custom_price))
+                if service_price < Decimal('0.00'):
+                    return Response({'error': True, 'message': 'custom_price cannot be negative'}, status=status.HTTP_400_BAD_REQUEST)
+            except (TypeError, ValueError, InvalidOperation):
+                return Response({'error': True, 'message': 'Invalid custom_price format'}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            try:
+                pricing = ServicePricing.objects.get(
+                    service=service,
+                    vehicle_model=booking.vehicle_model
+                )
+                service_price = pricing.price
+            except ServicePricing.DoesNotExist:
+                return Response({
+                    'error': True,
+                    'message': f'Service pricing not found for {service.name} and selected vehicle model'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        booking_service = BookingService.objects.create(
+            booking=booking,
+            service=service,
+            price=service_price,
+        )
+
+        booking.total_amount += service_price
+        booking.save(update_fields=['total_amount', 'updated_at'])
+
+        ActivityLog.objects.create(
+            user=request.user,
+            action_type='service_added',
+            description=f"Added service {service.name} (₹{service_price}) to Booking #{booking.id}",
+            content_object=booking_service,
+            metadata={
+                'booking_id': booking.id,
+                'booking_service_id': booking_service.id,
+                'service_id': service.id,
+                'service_name': service.name,
+                'amount': str(service_price),
+            }
+        )
+
+        return Response({
+            'error': False,
+            'message': 'Service added successfully',
+            'data': BookingDetailSerializer(booking).data
+        })
 
     @action(detail=True, methods=['post'], url_path='remove-part')
     @transaction.atomic
