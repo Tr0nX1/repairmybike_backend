@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'cms',
     'content',
     'notifications',
+    'quick_service',
 ]
 
 MIDDLEWARE = [
