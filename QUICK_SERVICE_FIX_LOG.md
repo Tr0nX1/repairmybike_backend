@@ -79,34 +79,18 @@
   - Migration 0003: `quick_service/migrations/0003_quickservicerequest_quick_service_request_user_or_guest_required.py`
   - Applied to PostgreSQL database: `quick_service_requests` table schema & DB check constraint created.
 
-### 2. Permissions & ViewSet Updates (`quick_service/views.py`)
-- `QuickServiceConfigView`: Updated `permission_classes` to `[permissions.AllowAny]` (publicly accessible).
-- `QuickServiceRequestViewSet`:
-  - Added `GuestAuthentication` to `authentication_classes`.
-  - Updated `permission_classes` to `[IsGuestOrAuthenticated]` for list/create/retrieve.
-  - `perform_create`: If `user.is_authenticated`, sets `user=user`, `guest_id=None`. If guest (`X-Guest-ID` header present), sets `user=None`, `guest_id=guest_id`. Rejects requests missing both with HTTP 401/400.
-  - `get_queryset`: Filters by `user=request.user` if authenticated, or `guest_id=guest_id` if guest. Staff receive all records.
-  - Staff `PATCH` endpoint remains restricted to `IsStaffAuthenticated`.
+---
 
-### 3. Serializers Updates (`quick_service/serializers.py`)
-- `QuickServiceRequestCreateSerializer`: Accepts `name` (required), `phone_number` (required), `vehicle_number`, `vehicle_manufacturer`, `vehicle_model`.
-- `QuickServiceRequestSerializer`: Exposes all read fields including `name`, `vehicle_number`, `vehicle_manufacturer`, `vehicle_model`, `guest_id`.
-- `QuickServiceRequestStaffUpdateSerializer`: Allows staff to update vehicle details alongside `status`, `staff_notes`, `services_grabbed`, and `total_amount`.
+## Query Parameter Filtering Update (`?status=` & `?search=`)
 
-### 4. Comprehensive Test Suite Results (`scratch/test_quick_service_guest.py` & `scratch/test_constraint.py`)
-
-| Test # | Scenario Description | HTTP Method & Route | Auth / Header State | Expected | Result | Detailed Output |
-| :-: | :--- | :--- | :--- | :-: | :-: | :--- |
-| **a** | Public Config Endpoint | `GET /api/quick-service/config/` | Public (No auth/guest) | HTTP 200 | **PASS** | Returns title, rules HTML, price, support phone. |
-| **b** | Guest Request Creation | `POST /api/quick-service/requests/` | Guest (`X-Guest-ID`) | HTTP 201 | **PASS** | Created request #5 with `user=null`, `guest_id=10448a0d...`. |
-| **c** | Untraceable Request Block | `POST /api/quick-service/requests/` | No Auth / No Header | HTTP 401 | **PASS** | Blocked with 401 Unauthorized for traceability. |
-| **d** | Logged-in Request Creation | `POST /api/quick-service/requests/` | Authenticated Token | HTTP 201 | **PASS** | Created request #6 with `user=customer`, `guest_id=null`. |
-| **e** | Same Guest History Retrieval | `GET /api/quick-service/requests/` | Guest B (`X-Guest-ID`) | HTTP 200 | **PASS** | Guest B retrieved request #5 successfully. |
-| **f** | Guest History Isolation | `GET /api/quick-service/requests/` | Guest F (Different ID) | HTTP 200 | **PASS** | Returns 0 items — Guest F cannot see Guest B's requests. |
-| **g** | Staff PATCH Vehicle & Status | `PATCH /api/quick-service/requests/5/` | Staff Authenticated | HTTP 200 | **PASS** | Updated vehicle details (`TVS Jupiter 125`), status (`mechanic_dispatched`), amount (`450.00`). |
-| **h** | Guest PATCH Block | `PATCH /api/quick-service/requests/5/` | Guest User | HTTP 403 | **PASS** | Guest PATCH forbidden (403 properly returned). |
-| **i** | DB CheckConstraint Enforce | Direct ORM `bulk_create(user=None, guest_id=None)` | Direct DB Insert | `IntegrityError` | **PASS** | PostgreSQL `CheckConstraint` raised `IntegrityError` at DB level. |
+- **Analysis**: Initial viewset only filtered queryset by authorization (`is_staff`, `user`, `guest_id`) and lacked query parameter filtering.
+- **Implementation (`quick_service/views.py`)**:
+  - Added `status` query parameter filtering: `qs = qs.filter(status=status_param)` when `?status=` is present (and not `'all'`).
+  - Added `search` query parameter filtering: `qs = qs.filter(Q(name__icontains=search) | Q(phone_number__icontains=search) | Q(vehicle_number__icontains=search) | Q(vehicle_manufacturer__icontains=search) | Q(vehicle_model__icontains=search))` when `?search=` is present.
+- **Verification (`scratch/test_quick_service_query_params.py`)**:
+  - `GET /api/quick-service/requests/?status=mechanic_dispatched`: Returns 200 OK with filtered list matching status.
+  - `GET /api/quick-service/requests/?search=Sunil`: Returns 200 OK with filtered list matching name/phone/vehicle fields.
 
 ---
 
-**Status:** Implementation & DB CheckConstraint Verification Complete — All Test Cases Passed.
+**Status:** Backend Query Filtering Active & Fully Verified.
