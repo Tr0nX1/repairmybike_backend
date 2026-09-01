@@ -599,7 +599,7 @@ class RefreshTokenView(APIView):
     """Handle token refresh using Descope refresh token"""
     permission_classes = [permissions.AllowAny]
     def post(self, request):
-        refresh_token = request.data.get('refresh_token')
+        refresh_token = request.data.get('refresh_token') or request.data.get('refresh')
         if not refresh_token:
             return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
