@@ -35,7 +35,18 @@ if not DEBUG and 'django-insecure' in SECRET_KEY:
 # ============================================================================
 # ALLOWED_HOSTS CONFIGURATION - STRICT HOST HEADER VALIDATION
 # ============================================================================
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+raw_allowed_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = []
+for host in raw_allowed_hosts:
+    cleaned = host.strip()
+    if cleaned.startswith('https://'):
+        cleaned = cleaned[8:]
+    elif cleaned.startswith('http://'):
+        cleaned = cleaned[7:]
+    cleaned = cleaned.split('/')[0].strip()
+    if cleaned and cleaned not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(cleaned)
+
 if not DEBUG and '*' in ALLOWED_HOSTS:
     raise ImproperlyConfigured("Wildcard ALLOWED_HOSTS in production")
 
@@ -101,24 +112,39 @@ WSGI_APPLICATION = 'repairmybike.wsgi.application'
 import dj_database_url
 
 # Database configuration with Railway-specific optimizations
+import sys
 DATABASE_URL = config('DATABASE_URL', default='')
+IS_TESTING = 'test' in sys.argv or 'test_coverage' in sys.argv
 
-if DATABASE_URL:
+if IS_TESTING:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+    print("[OK] Configured in-memory SQLite database for test execution")
+elif DATABASE_URL:
     # Production database configuration (Railway PostgreSQL)
+    db_conn_max_age = config('DB_CONN_MAX_AGE', default=60, cast=int)
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=db_conn_max_age,
             conn_health_checks=True,
             ssl_require=True,
         )
     }
     # Enable atomic requests for better data consistency
     DATABASES['default']['ATOMIC_REQUESTS'] = True
-    # Add PostgreSQL-specific options
+    # Add PostgreSQL-specific options including keepalives to prevent idle disconnects on Railway proxy
     DATABASES['default']['OPTIONS'] = {
         'sslmode': 'require',
         'connect_timeout': 10,
+        'keepalives': 1,
+        'keepalives_idle': 30,
+        'keepalives_interval': 10,
+        'keepalives_count': 5,
     }
     print("[OK] Configured PostgreSQL database from DATABASE_URL")
 else:
@@ -385,10 +411,20 @@ else:
     # Production: Load from environment, synchronized with frontend URL
     csrf_origins_str = config('CSRF_TRUSTED_ORIGINS', default=None)
     if csrf_origins_str:
-        CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_str.split(',')]
+        CSRF_TRUSTED_ORIGINS = []
+        for origin in csrf_origins_str.split(','):
+            cleaned = origin.strip().rstrip('/')
+            if cleaned:
+                if not cleaned.startswith(('http://', 'https://')):
+                    cleaned = f'https://{cleaned}'
+                if cleaned not in CSRF_TRUSTED_ORIGINS:
+                    CSRF_TRUSTED_ORIGINS.append(cleaned)
     else:
-        # Fallback to CORS origins if not explicitly set
-        CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if '*' not in host]
+        # Fallback to ALLOWED_HOSTS if not explicitly set
+        CSRF_TRUSTED_ORIGINS = [
+            f'https://{host}' for host in ALLOWED_HOSTS
+            if '*' not in host and host not in ('localhost', '127.0.0.1', '0.0.0.0')
+        ]
     print(f"[OK] Production CSRF Trusted Origins: {CSRF_TRUSTED_ORIGINS}")
 
 # Proxy settings (crucial for Railway)

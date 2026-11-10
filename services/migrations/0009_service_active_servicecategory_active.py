@@ -2,6 +2,25 @@
 
 from django.db import migrations, models
 
+def add_active_to_services(apps, schema_editor):
+    if schema_editor.connection.vendor == 'postgresql':
+        schema_editor.execute('ALTER TABLE services ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;')
+    elif schema_editor.connection.vendor == 'sqlite':
+        with schema_editor.connection.cursor() as cursor:
+            cursor.execute("PRAGMA table_info(services);")
+            columns = [col[1] for col in cursor.fetchall()]
+            if 'active' not in columns:
+                schema_editor.execute('ALTER TABLE services ADD COLUMN active boolean NOT NULL DEFAULT 1;')
+
+def add_active_to_categories(apps, schema_editor):
+    if schema_editor.connection.vendor == 'postgresql':
+        schema_editor.execute('ALTER TABLE service_categories ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;')
+    elif schema_editor.connection.vendor == 'sqlite':
+        with schema_editor.connection.cursor() as cursor:
+            cursor.execute("PRAGMA table_info(service_categories);")
+            columns = [col[1] for col in cursor.fetchall()]
+            if 'active' not in columns:
+                schema_editor.execute('ALTER TABLE service_categories ADD COLUMN active boolean NOT NULL DEFAULT 1;')
 
 class Migration(migrations.Migration):
 
@@ -12,25 +31,13 @@ class Migration(migrations.Migration):
     operations = [
         migrations.SeparateDatabaseAndState(
             database_operations=[
-                migrations.RunSQL(
-                    sql=(
-                        'ALTER TABLE services '
-                        'ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;'
-                    ),
-                    reverse_sql=(
-                        'ALTER TABLE services '
-                        'DROP COLUMN IF EXISTS active;'
-                    ),
+                migrations.RunPython(
+                    add_active_to_services,
+                    reverse_code=migrations.RunPython.noop,
                 ),
-                migrations.RunSQL(
-                    sql=(
-                        'ALTER TABLE service_categories '
-                        'ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;'
-                    ),
-                    reverse_sql=(
-                        'ALTER TABLE service_categories '
-                        'DROP COLUMN IF EXISTS active;'
-                    ),
+                migrations.RunPython(
+                    add_active_to_categories,
+                    reverse_code=migrations.RunPython.noop,
                 ),
             ],
             state_operations=[

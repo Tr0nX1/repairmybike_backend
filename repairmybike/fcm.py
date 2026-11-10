@@ -8,14 +8,20 @@ logger = logging.getLogger(__name__)
 
 # Initialize Firebase Admin SDK
 firebase_app = None
-if settings.FIREBASE_CREDENTIALS_JSON:
-    try:
-        cred_dict = json.loads(settings.FIREBASE_CREDENTIALS_JSON)
-        cred = credentials.Certificate(cred_dict)
-        firebase_app = firebase_admin.initialize_app(cred)
-        logger.info("[OK] Firebase Admin SDK initialized")
-    except Exception as e:
-        logger.error(f"[ERROR] Failed to initialize Firebase Admin SDK: {e}")
+try:
+    firebase_app = firebase_admin.get_app()
+except ValueError:
+    firebase_creds_json = getattr(settings, 'FIREBASE_CREDENTIALS_JSON', None)
+    if firebase_creds_json and firebase_creds_json.strip():
+        try:
+            cred_dict = json.loads(firebase_creds_json)
+            cred = credentials.Certificate(cred_dict)
+            firebase_app = firebase_admin.initialize_app(cred)
+            logger.info("[OK] Firebase Admin SDK initialized")
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to initialize Firebase Admin SDK: {e}")
+    else:
+        logger.info("[INFO] FCM: No FIREBASE_CREDENTIALS_JSON provided. Push notifications are disabled.")
 
 def send_push_notification(user, title, body, data=None):
     """
