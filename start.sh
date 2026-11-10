@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 echo "=== [STARTUP] RepairMyBike Backend Initializing ==="
 
@@ -7,13 +6,13 @@ echo "=== [STARTUP] RepairMyBike Backend Initializing ==="
 PORT="${PORT:-${PORT_HTTP:-8080}}"
 echo "[STARTUP] Binding to port: $PORT"
 
-# 1. Wait for PostgreSQL to become available (up to 60 seconds)
-echo "[STARTUP] Waiting for database connection..."
-python manage.py wait_for_db --timeout 60
+# 1. Attempt database connection wait (up to 20 seconds), but don't prevent server boot
+echo "[STARTUP] Checking database connection..."
+python manage.py wait_for_db --timeout 20 || echo "[WARNING] Database unavailable after 20s. Starting in degraded mode."
 
-# 2. Apply database migrations
+# 2. Apply database migrations if database is available
 echo "[STARTUP] Running database migrations..."
-python manage.py migrate --no-input
+python manage.py migrate --no-input || echo "[WARNING] Migrations skipped or failed. Server will start in degraded mode."
 
 # 3. Collect static files
 echo "[STARTUP] Collecting static files..."

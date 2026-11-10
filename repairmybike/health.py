@@ -16,6 +16,8 @@ def health_check(request):
     """
     db_connected = False
     db_note = "Database query successful"
+    diag = {}
+
     try:
         # Basic database connectivity check
         with connection.cursor() as cursor:
@@ -27,12 +29,42 @@ def health_check(request):
         db_connected = False
         db_note = f"Database unavailable: {type(e).__name__}"
 
-    return JsonResponse({
+        # Safe diagnostic inspection (no secrets exposed)
+        try:
+            import socket
+            from django.conf import settings
+            db_conf = settings.DATABASES.get('default', {})
+            host = db_conf.get('HOST', '')
+            port = db_conf.get('PORT', '') or 5432
+            
+            diag['target_host'] = host or 'localhost'
+            diag['target_port'] = port
+            
+            if host and host not in ['localhost', '127.0.0.1', '']:
+                try:
+                    resolved_ip = socket.gethostbyname(host)
+                    diag['dns'] = f"resolved: {resolved_ip}"
+                    try:
+                        sock = socket.create_connection((resolved_ip, int(port)), timeout=3)
+                        sock.close()
+                        diag['tcp'] = "connected"
+                    except Exception as tcp_err:
+                        diag['tcp'] = f"failed: {type(tcp_err).__name__}"
+                except Exception as dns_err:
+                    diag['dns'] = f"failed: {type(dns_err).__name__}"
+        except Exception:
+            pass
+
+    response_data = {
         'status': 'healthy' if db_connected else 'degraded',
         'database': 'connected' if db_connected else 'disconnected',
         'version': '1.0.0',
         'note': db_note
-    }, status=200 if db_connected else 503)
+    }
+    if diag:
+        response_data['diagnostics'] = diag
+
+    return JsonResponse(response_data, status=200 if db_connected else 503)
 
 @transaction.non_atomic_requests
 def readiness_check(request):
