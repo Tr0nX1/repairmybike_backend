@@ -63,6 +63,15 @@ def health_check(request):
                 except Exception:
                     candidate_dns[candidate] = "unresolved"
             diag['candidates'] = candidate_dns
+
+            # Non-sensitive environment variable names (keys only, no secrets)
+            import os
+            relevant_keys = [k for k in sorted(os.environ.keys()) if any(w in k for w in ['RAILWAY', 'PG', 'DB', 'POSTGRES', 'DATABASE'])]
+            diag['db_env_keys'] = relevant_keys
+            if 'PGHOST' in os.environ:
+                diag['pghost_value'] = os.environ.get('PGHOST')
+            if 'DB_HOST' in os.environ:
+                diag['db_host_value'] = os.environ.get('DB_HOST')
         except Exception:
             pass
 
