@@ -26,13 +26,8 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 # Copy project files
 COPY . /app
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-HTTP_PORT="${PORT_HTTP:-8080}"\n\
-python manage.py migrate --no-input\n\
-python manage.py collectstatic --no-input\n\
-gunicorn repairmybike.wsgi:application --bind 0.0.0.0:$HTTP_PORT --workers 2 --timeout 120' > start.sh && \
-    chmod +x start.sh
+# Ensure startup script has LF line endings and is executable
+RUN sed -i 's/\r$//' /app/start.sh && chmod +x /app/start.sh
 
 # Run the application
-CMD ["/bin/bash", "./start.sh"]
+CMD ["/bin/bash", "/app/start.sh"]

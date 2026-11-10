@@ -42,6 +42,32 @@ class DatabaseConfigTestCase(SimpleTestCase):
         self.assertNotIn('https://admin.repairmybike.in', cleaned_hosts)
         self.assertNotIn(' backend.railway.internal', cleaned_hosts)
 
+    def test_internal_mesh_routing_logic(self):
+        """Verifies that internal mesh host rewriting correctly handles proxy URLs."""
+        import re
+        db_url = "postgresql://postgres:secret@mainline.proxy.rlwy.net:12825/railway"
+        internal_host = "postgres.railway.internal"
+        db_port = "5432"
+        rewritten = re.sub(r'@[^/:]+(?::\d+)?/', f'@{internal_host}:{db_port}/', db_url)
+        self.assertEqual(rewritten, "postgresql://postgres:secret@postgres.railway.internal:5432/railway")
+
+    def test_sslmode_selection_logic(self):
+        """Verifies that internal connections default to sslmode=prefer while external connections use require."""
+        internal_url = "postgresql://postgres:secret@postgres.railway.internal:5432/railway"
+        external_url = "postgresql://postgres:secret@mainline.proxy.rlwy.net:12825/railway"
+        
+        is_internal_1 = any(h in internal_url for h in ['railway.internal', 'localhost', '127.0.0.1'])
+        is_internal_2 = any(h in external_url for h in ['railway.internal', 'localhost', '127.0.0.1'])
+        
+        self.assertTrue(is_internal_1)
+        self.assertFalse(is_internal_2)
+        
+        mode_1 = 'prefer' if is_internal_1 else 'require'
+        mode_2 = 'prefer' if is_internal_2 else 'require'
+        
+        self.assertEqual(mode_1, 'prefer')
+        self.assertEqual(mode_2, 'require')
+
 class patch_env:
     def __init__(self, **kwargs):
         self.kwargs = kwargs

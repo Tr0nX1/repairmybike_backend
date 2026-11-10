@@ -113,8 +113,35 @@ import dj_database_url
 
 # Database configuration with Railway-specific optimizations
 import sys
+import re
+
 DATABASE_URL = config('DATABASE_URL', default='')
 IS_TESTING = 'test' in sys.argv or 'test_coverage' in sys.argv
+
+# 1. Resolve host overrides or build URL from individual variables if missing
+db_host_env = config('DB_HOST', default=config('PGHOST', default=''))
+db_port_env = config('DB_PORT', default=config('PGPORT', default='5432'))
+db_user_env = config('DB_USER', default=config('PGUSER', default='postgres'))
+db_pass_env = config('DB_PASSWORD', default=config('PGPASSWORD', default=''))
+db_name_env = config('DB_NAME', default=config('PGDATABASE', default='railway'))
+
+if not DATABASE_URL and db_host_env:
+    DATABASE_URL = f"postgresql://{db_user_env}:{db_pass_env}@{db_host_env}:{db_port_env}/{db_name_env}"
+
+# 2. Detect Railway runtime environment and route to private mesh if using public proxy
+is_railway = bool(
+    os.environ.get('RAILWAY_ENVIRONMENT') or 
+    os.environ.get('RAILWAY_PROJECT_ID') or 
+    os.environ.get('RAILWAY_SERVICE_ID')
+)
+
+if is_railway and DATABASE_URL and 'proxy.rlwy.net' in DATABASE_URL:
+    internal_host = db_host_env if db_host_env and 'railway.internal' in db_host_env else 'postgres.railway.internal'
+    DATABASE_URL = re.sub(r'@[^/:]+(?::\d+)?/', f'@{internal_host}:{db_port_env}/', DATABASE_URL)
+    print(f"[INFO] Railway container detected: routed DATABASE_URL to internal mesh '{internal_host}:{db_port_env}'")
+elif db_host_env and DATABASE_URL and db_host_env not in DATABASE_URL and 'railway.internal' in db_host_env:
+    DATABASE_URL = re.sub(r'@[^/:]+(?::\d+)?/', f'@{db_host_env}:{db_port_env}/', DATABASE_URL)
+    print(f"[INFO] Using configured private DB_HOST: '{db_host_env}:{db_port_env}'")
 
 if IS_TESTING:
     DATABASES = {
@@ -125,6 +152,15 @@ if IS_TESTING:
     }
     print("[OK] Configured in-memory SQLite database for test execution")
 elif DATABASE_URL:
+    # Determine if database connection is on internal network
+    is_internal = any(h in DATABASE_URL for h in ['railway.internal', 'localhost', '127.0.0.1'])
+    
+    # Railway private mesh (WireGuard) does not use TLS on internal port 5432.
+    # 'prefer' safely uses TLS if available and connects without TLS on internal networks.
+    default_sslmode = 'prefer' if is_internal else 'require'
+    sslmode = config('DB_SSLMODE', default=default_sslmode)
+    ssl_require = (sslmode == 'require')
+
     # Production database configuration (Railway PostgreSQL)
     db_conn_max_age = config('DB_CONN_MAX_AGE', default=60, cast=int)
     DATABASES = {
@@ -132,21 +168,21 @@ elif DATABASE_URL:
             default=DATABASE_URL,
             conn_max_age=db_conn_max_age,
             conn_health_checks=True,
-            ssl_require=True,
+            ssl_require=ssl_require,
         )
     }
     # Enable atomic requests for better data consistency
     DATABASES['default']['ATOMIC_REQUESTS'] = True
     # Add PostgreSQL-specific options including keepalives to prevent idle disconnects on Railway proxy
     DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'require',
+        'sslmode': sslmode,
         'connect_timeout': 10,
         'keepalives': 1,
         'keepalives_idle': 30,
         'keepalives_interval': 10,
         'keepalives_count': 5,
     }
-    print("[OK] Configured PostgreSQL database from DATABASE_URL")
+    print(f"[OK] Configured PostgreSQL database (sslmode: {sslmode}, internal: {is_internal})")
 elif not DEBUG:
     raise ImproperlyConfigured(
         "CRITICAL DATABASE CONFIGURATION ERROR: DATABASE_URL environment variable is required in production. "
