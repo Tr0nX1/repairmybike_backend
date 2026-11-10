@@ -68,6 +68,9 @@ def health_check(request):
             import os
             relevant_keys = [k for k in sorted(os.environ.keys()) if any(w in k for w in ['RAILWAY', 'PG', 'DB', 'POSTGRES', 'DATABASE'])]
             diag['db_env_keys'] = relevant_keys
+            diag['railway_project_name'] = os.environ.get('RAILWAY_PROJECT_NAME')
+            diag['railway_service_name'] = os.environ.get('RAILWAY_SERVICE_NAME')
+            diag['railway_private_domain'] = os.environ.get('RAILWAY_PRIVATE_DOMAIN')
             if 'PGHOST' in os.environ:
                 diag['pghost_value'] = os.environ.get('PGHOST')
             if 'DB_HOST' in os.environ:
