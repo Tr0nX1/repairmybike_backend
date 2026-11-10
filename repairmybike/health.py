@@ -40,6 +40,7 @@ def health_check(request):
             diag['target_host'] = host or 'localhost'
             diag['target_port'] = port
             
+            # Test target host DNS & TCP
             if host and host not in ['localhost', '127.0.0.1', '']:
                 try:
                     resolved_ip = socket.gethostbyname(host)
@@ -52,6 +53,16 @@ def health_check(request):
                         diag['tcp'] = f"failed: {type(tcp_err).__name__}"
                 except Exception as dns_err:
                     diag['dns'] = f"failed: {type(dns_err).__name__}"
+
+            # Probe common Railway internal candidate hostnames
+            candidate_dns = {}
+            for candidate in ['postgres.railway.internal', 'postgresql.railway.internal', 'repairmybikedb.railway.internal', 'database.railway.internal']:
+                try:
+                    c_ip = socket.gethostbyname(candidate)
+                    candidate_dns[candidate] = f"resolved: {c_ip}"
+                except Exception:
+                    candidate_dns[candidate] = "unresolved"
+            diag['candidates'] = candidate_dns
         except Exception:
             pass
 
