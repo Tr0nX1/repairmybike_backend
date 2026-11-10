@@ -25,3 +25,4 @@ class HealthCheckTestCase(TestCase):
         data = response.json()
         self.assertEqual(data.get('status'), 'degraded')
         self.assertEqual(data.get('database'), 'disconnected')
+

@@ -147,6 +147,11 @@ elif DATABASE_URL:
         'keepalives_count': 5,
     }
     print("[OK] Configured PostgreSQL database from DATABASE_URL")
+elif not DEBUG:
+    raise ImproperlyConfigured(
+        "CRITICAL DATABASE CONFIGURATION ERROR: DATABASE_URL environment variable is required in production. "
+        "Production must always connect to PostgreSQL and cannot silently fall back to SQLite."
+    )
 else:
     DATABASES = {
         'default': {
@@ -154,7 +159,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    print("[OK] Configured SQLite database (no DATABASE_URL provided)")
+    print("[OK] Configured local SQLite database (Development mode only)")
 
 
 
@@ -549,6 +554,10 @@ def _validate_security_configuration():
         # 5. Descope validation
         if not DESCOPE_PROJECT_ID or not DESCOPE_MANAGEMENT_KEY:
             warnings.append('WARNING: Descope credentials not configured - authentication may fail')
+
+        # 6. Database production validation (prohibit SQLite in production)
+        if not IS_TESTING and (not DATABASE_URL or 'sqlite' in DATABASES['default']['ENGINE']):
+            errors.append('CRITICAL: Production mode requires PostgreSQL DATABASE_URL. SQLite is prohibited in production.')
     
     # Report errors and warnings
     if errors:

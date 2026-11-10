@@ -17,6 +17,13 @@ class IsAuthenticatedOrGuestReadOnly(permissions.BasePermission):
             return True
         return False
 
+    def has_object_permission(self, request, view, obj):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        return obj.user == request.user
+
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer

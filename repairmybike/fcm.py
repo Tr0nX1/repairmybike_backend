@@ -8,9 +8,21 @@ logger = logging.getLogger(__name__)
 
 # Initialize Firebase Admin SDK
 firebase_app = None
-try:
-    firebase_app = firebase_admin.get_app()
-except ValueError:
+
+def get_firebase_app():
+    """
+    Get or initialize the Firebase Admin SDK singleton.
+    Fails safely without raising exceptions if credentials are missing or invalid.
+    """
+    global firebase_app
+    if firebase_app:
+        return firebase_app
+    try:
+        firebase_app = firebase_admin.get_app()
+        return firebase_app
+    except ValueError:
+        pass
+
     firebase_creds_json = getattr(settings, 'FIREBASE_CREDENTIALS_JSON', None)
     if firebase_creds_json and firebase_creds_json.strip():
         try:
@@ -20,14 +32,21 @@ except ValueError:
             logger.info("[OK] Firebase Admin SDK initialized")
         except Exception as e:
             logger.error(f"[ERROR] Failed to initialize Firebase Admin SDK: {e}")
+            firebase_app = None
     else:
         logger.info("[INFO] FCM: No FIREBASE_CREDENTIALS_JSON provided. Push notifications are disabled.")
+        firebase_app = None
+    return firebase_app
+
+# Initial attempt on module load
+firebase_app = get_firebase_app()
 
 def send_push_notification(user, title, body, data=None):
     """
     Send a single push notification to a user.
     """
-    if not firebase_app:
+    app = get_firebase_app()
+    if not app:
         logger.warning("FCM: Firebase app not initialized. Skipping.")
         return False
 
@@ -45,7 +64,7 @@ def send_push_notification(user, title, body, data=None):
     )
 
     try:
-        response = messaging.send(message)
+        response = messaging.send(message, app=app)
         logger.info(f"FCM: Successfully sent message to user {user.id}: {response}")
         return True
     except Exception as e:
@@ -56,7 +75,8 @@ def send_push_to_multiple(users, title, body, data=None):
     """
     Send push notifications to multiple users using multicast.
     """
-    if not firebase_app:
+    app = get_firebase_app()
+    if not app:
         logger.warning("FCM: Firebase app not initialized. Skipping.")
         return False
 
@@ -76,7 +96,7 @@ def send_push_to_multiple(users, title, body, data=None):
     )
 
     try:
-        response = messaging.send_multicast(message)
+        response = messaging.send_multicast(message, app=app)
         logger.info(f"FCM: Multicast success: {response.success_count}, failure: {response.failure_count}")
         return True
     except Exception as e:
