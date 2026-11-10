@@ -26,8 +26,9 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 # Copy project files
 COPY . /app
 
-# Ensure startup script has LF line endings and is executable
-RUN sed -i 's/\r$//' /app/start.sh && chmod +x /app/start.sh
+# Create bulletproof startup script directly inside container
+RUN printf '#!/bin/bash\nHTTP_PORT="${PORT_HTTP:-8080}"\npython manage.py migrate --no-input || true\npython manage.py collectstatic --no-input || true\nexec gunicorn repairmybike.wsgi:application --bind 0.0.0.0:$HTTP_PORT --workers 2 --timeout 120\n' > /app/start.sh && \
+    chmod +x /app/start.sh
 
 # Run the application
 CMD ["/bin/bash", "/app/start.sh"]
